@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "equator",
+  "version": "${version}",
+
+  "name": "Equator Lib",
+  "description": "",
+  "authors": [
+    "KrLite"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+
+  "license": "MIT",
+  "icon": "assets/equator/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.krlite.equator.EquatorLib"
+    ]
+  },
+  "mixins": [
+    "equator.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.14.6",
+    "fabric": "*",
+    "minecraft": "~1.18.2",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
