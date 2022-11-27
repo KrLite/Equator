@@ -3,31 +3,44 @@ package net.krlite.equator.base;
 import net.minecraft.util.Util;
 
 public class Timer {
-    private final long init;
+    private final long origin;
+    private Timer offset;
 
     public Timer() {
-        init = Util.getMeasuringTimeMs();
+        origin = Util.getMeasuringTimeMs();
     }
 
     @Deprecated
-    public Timer(long init) {
-        this.init = init;
+    public Timer(long origin) {
+        this.origin = origin;
     }
 
-    public long initializedTime() {
-        return init;
+    public long getOrigin() {
+        return origin;
     }
 
-    public long queue() {
-        return Util.getMeasuringTimeMs() - init;
+    public void suspend(long time) {
+
     }
 
-    public double queue(int tenfolds) {
-        return (Util.getMeasuringTimeMs() - init) / Math.pow(10, tenfolds);
+    public long getElapsed() {
+        return getDuration() - (offset == null ? 0 : offset.getElapsed());
+    }
+
+    public double getElapsed(int tenfolds) {
+        return (getElapsed()) / Math.pow(10, tenfolds);
+    }
+
+    public long getDuration() {
+        return Util.getMeasuringTimeMs() - origin;
+    }
+
+    public double getDuration(int tenfolds) {
+        return (getDuration()) / Math.pow(10, tenfolds);
     }
 
     @Deprecated
     public long calculate(long time) {
-        return time - init;
+        return time - origin;
     }
 }
