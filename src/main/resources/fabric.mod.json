@@ -4,13 +4,13 @@
   "version": "${version}",
 
   "name": "Equator Lib",
-  "description": "",
+  "description": "A Render Library for Minecraft.",
   "authors": [
     "KrLite"
   ],
   "contact": {
-    "homepage": "",
-    "sources": ""
+    "homepage": "https://github.com/KrLite",
+    "sources": "https://github.com/KrLite/Equator"
   },
 
   "license": "MIT",
