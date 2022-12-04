@@ -1,9 +1,14 @@
 package net.krlite.equator.base.sprite;
 
+import net.krlite.equator.render.Equator;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * A sprite that defines a part of an identifier.<br />
+ * Compatible with {@link Equator the Equator Renderers}.
+ */
 public class IdentifierSprite {
     private final Identifier identifier;
     private final float uBegin, vBegin, uEnd, vEnd;
@@ -17,19 +22,18 @@ public class IdentifierSprite {
     }
 
     public IdentifierSprite(Identifier identifier, int textureSize, int x, int y, int width, int height) {
-        this.identifier = identifier;
-        uBegin = (float) x / textureSize;
-        vBegin = (float) y / textureSize;
-        uEnd = (float) (x + width) / textureSize;
-        vEnd = (float) (y + height) / textureSize;
+        this(
+                identifier,
+                textureSize, textureSize, x, y, width, height
+        );
     }
 
     public IdentifierSprite(Identifier identifier, int textureWidth, int textureHeight, int x, int y, int width, int height) {
-        this.identifier = identifier;
-        uBegin = (float) x / textureWidth;
-        vBegin = (float) y / textureHeight;
-        uEnd = (float) (x + width) / textureWidth;
-        vEnd = (float) (y + height) / textureHeight;
+        this(
+                identifier,
+                (float) x / textureWidth, (float) y / textureHeight,
+                (float) (x + width) / textureWidth, (float) (y + height) / textureHeight
+        );
     }
 
     @Contract("_ -> new")
@@ -37,7 +41,7 @@ public class IdentifierSprite {
         return new IdentifierSprite(identifier, 0, 0, 1, 1);
     }
 
-    public Identifier getIdentifier() {
+    public Identifier identifier() {
         return this.identifier;
     }
 
@@ -55,5 +59,9 @@ public class IdentifierSprite {
 
     public float vEnd() {
         return this.vEnd;
+    }
+
+    public IdentifierSprite getMaskedSprite(float uBegin, float vBegin, float uEnd, float vEnd) {
+        return new IdentifierSprite(this.identifier, uBegin, vBegin, uEnd, vEnd);
     }
 }

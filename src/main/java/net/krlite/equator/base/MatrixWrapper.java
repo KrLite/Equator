@@ -1,6 +1,9 @@
 package net.krlite.equator.base;
 
+import net.minecraft.client.util.math.MatrixStack;
+
 public class MatrixWrapper {
+    private final MatrixStack matrixStack;
     private final float xLU, xLD, xRD, xRU;
     private final float yLU, yLD, yRD, yRU;
 
@@ -13,11 +16,13 @@ public class MatrixWrapper {
     }
 
     public MatrixWrapper(
+            MatrixStack matrixStack,
             float xLU, float yLU,
             float xLD, float yLD,
             float xRD, float yRD,
             float xRU, float yRU
     ) {
+        this.matrixStack = matrixStack;
         this.xLU = xLU;
         this.yLU = yLU;
         this.xLD = xLD;
@@ -29,17 +34,21 @@ public class MatrixWrapper {
     }
 
     public MatrixWrapper(
+            MatrixStack matrixStack,
             float xBegin,   float yBegin,
             float xEnd,     float yEnd
     ) {
-        xLU = xBegin;
-        yLU = yBegin;
-        xLD = xBegin;
-        yLD = yEnd;
-        xRD = xEnd;
-        yRD = yEnd;
-        xRU = xEnd;
-        yRU = yBegin;
+        this(
+                matrixStack,
+                xBegin, yBegin,
+                xBegin, yEnd,
+                xEnd,   yEnd,
+                xEnd,   yBegin
+        );
+    }
+
+    public MatrixStack matrixStack() {
+        return this.matrixStack;
     }
 
     public float xLU() {
@@ -96,6 +105,7 @@ public class MatrixWrapper {
 
     public MatrixWrapper minimal(MatrixWrapper wrapper) {
         return new MatrixWrapper(
+                matrixStack,
                 Math.min(this.xLU, wrapper.xLU),
                 Math.min(this.yLU, wrapper.yLU),
                 Math.min(this.xLD, wrapper.xLD),
@@ -109,6 +119,7 @@ public class MatrixWrapper {
 
     public MatrixWrapper maximal(MatrixWrapper wrapper) {
         return new MatrixWrapper(
+                matrixStack,
                 Math.max(this.xLU, wrapper.xLU),
                 Math.max(this.yLU, wrapper.yLU),
                 Math.max(this.xLD, wrapper.xLD),
@@ -120,12 +131,23 @@ public class MatrixWrapper {
         );
     }
 
+    public MatrixWrapper swap(MatrixStack matrixStack) {
+        return new MatrixWrapper(
+                matrixStack,
+                this.xLU, this.yLU,
+                this.xLD, this.yLD,
+                this.xRD, this.yRD,
+                this.xRU, this.yRU
+        );
+    }
+
     public MatrixWrapper blend(MatrixWrapper wrapper) {
         return blend(wrapper, 0.5F);
     }
 
     public MatrixWrapper blend(MatrixWrapper wrapper, float delta) {
         return new MatrixWrapper(
+                matrixStack,
                 lerp(this.xLU, wrapper.xLU, delta),
                 lerp(this.yLU, wrapper.yLU, delta),
                 lerp(this.xLD, wrapper.xLD, delta),
@@ -156,7 +178,7 @@ public class MatrixWrapper {
     public MatrixWrapper stretchLU(float x, float y, float delta) {
         return blend(
                 new MatrixWrapper(
-                        x, y,
+                        matrixStack, x, y,
                         half(this.xLD, x), half(this.yLD, y),
                         this.xRD, this.yRD,
                         half(this.xRU, x), half(this.yRU, y)
@@ -167,6 +189,7 @@ public class MatrixWrapper {
     public MatrixWrapper stretchLD(float x, float y, float delta) {
         return blend(
                 new MatrixWrapper(
+                        matrixStack,
                         half(this.xLU, x), half(this.yLU, y),
                         x, y,
                         half(this.xRD, x), half(this.yRD, y),
@@ -178,6 +201,7 @@ public class MatrixWrapper {
     public MatrixWrapper stretchRD(float x, float y, float delta) {
         return blend(
                 new MatrixWrapper(
+                        matrixStack,
                         this.xLU, this.yLU,
                         half(this.xLD, x), half(this.yLD, y),
                         x, y,
@@ -189,6 +213,7 @@ public class MatrixWrapper {
     public MatrixWrapper stretchRU(float x, float y, float delta) {
         return blend(
                 new MatrixWrapper(
+                        matrixStack,
                         half(this.xLU, x), half(this.yLU, y),
                         this.xLD, this.yLD,
                         half(this.xRD, x), half(this.yRD, y),
@@ -216,6 +241,7 @@ public class MatrixWrapper {
     public MatrixWrapper stretchTop(float y, float delta) {
         return blend(
                 new MatrixWrapper(
+                        matrixStack,
                         xLU, y,
                         xLD, yLD,
                         xRD, yRD,
@@ -227,6 +253,7 @@ public class MatrixWrapper {
     public MatrixWrapper stretchBottom(float y, float delta) {
         return blend(
                 new MatrixWrapper(
+                        matrixStack,
                         xLU, yLU,
                         xLD, y,
                         xRD, y,
@@ -238,6 +265,7 @@ public class MatrixWrapper {
     public MatrixWrapper stretchLeft(float x, float delta) {
         return blend(
                 new MatrixWrapper(
+                        matrixStack,
                         x,   yLU,
                         x,   yLD,
                         xRD, yRD,
@@ -249,6 +277,7 @@ public class MatrixWrapper {
     public MatrixWrapper stretchRight(float x, float delta) {
         return blend(
                 new MatrixWrapper(
+                        matrixStack,
                         xLU, yLU,
                         xLD, yLD,
                         x,   yRD,
@@ -259,6 +288,7 @@ public class MatrixWrapper {
 
     public MatrixWrapper squeezeTop(float delta) {
         return new MatrixWrapper(
+                matrixStack,
                 xLU, lerp(yLU, yLD, delta),
                 xLD, yLD,
                 xRD, yRD,
@@ -268,7 +298,7 @@ public class MatrixWrapper {
 
     public MatrixWrapper squeezeBottom(float delta) {
         return new MatrixWrapper(
-                xLU, yLU,
+                matrixStack, xLU, yLU,
                 xLD, lerp(yLD, yLU, delta),
                 xRD, lerp(yRD, yRU, delta),
                 xRU, yRU
@@ -277,6 +307,7 @@ public class MatrixWrapper {
 
     public MatrixWrapper squeezeLeft(float delta) {
         return new MatrixWrapper(
+                matrixStack,
                 lerp(xLU, xRU, delta), yLU,
                 lerp(xLD, xRD, delta), yLD,
                 xRD, yRD,
@@ -286,7 +317,7 @@ public class MatrixWrapper {
 
     public MatrixWrapper squeezeRight(float delta) {
         return new MatrixWrapper(
-                xLU, yLU,
+                matrixStack, xLU, yLU,
                 xLD, yLD,
                 lerp(xRD, xLD, delta), yRD,
                 lerp(xRU, xLU, delta), yRU
@@ -312,6 +343,7 @@ public class MatrixWrapper {
     public MatrixWrapper flipHorizontal(float delta) {
         return blend(
                 new MatrixWrapper(
+                        matrixStack,
                         xRU, yRU,
                         xRD, yRD,
                         xLD, yLD,
@@ -323,6 +355,7 @@ public class MatrixWrapper {
     public MatrixWrapper flipVertical(float delta) {
         return blend(
                 new MatrixWrapper(
+                        matrixStack,
                         xLD, yLD,
                         xLU, yLU,
                         xRU, yRU,
@@ -334,6 +367,7 @@ public class MatrixWrapper {
     public MatrixWrapper flipDiagonalLDRU(float delta) {
         return blend(
                 new MatrixWrapper(
+                        matrixStack,
                         xRD, yRD,
                         xLD, yLD,
                         xLU, yLU,
@@ -345,6 +379,7 @@ public class MatrixWrapper {
     public MatrixWrapper flipDiagonalLURD(float delta) {
         return blend(
                 new MatrixWrapper(
+                        matrixStack,
                         xLU, yLU,
                         xRU, yRU,
                         xRD, yRD,

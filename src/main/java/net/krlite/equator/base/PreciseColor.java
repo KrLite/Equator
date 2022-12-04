@@ -14,12 +14,11 @@ public class PreciseColor {
     private double alpha;
 
     /**
-     * Creates a color which every value is precisely stored as double.
-     *
-     * @param red       red (double 0 to 1),
-     * @param green     green (double 0 to 1),
-     * @param blue      blue (double 0 to 1),
-     * @param alpha     alpha (double 0 to 1).
+     * Creates a color which every value is precisely stored as a double.
+     * @param red       The independent {@link Double} <b>red</b> value from 0.0 to 1.0.
+     * @param green     The independent {@link Double} <b>green</b> value from 0.0 to 1.0.
+     * @param blue      The independent {@link Double} <b>blue</b> value from 0.0 to 1.0.
+     * @param alpha     The independent {@link Double} <b>alpha</b> value from 0.0 to 1.0.
      */
     public PreciseColor(double red, double green, double blue, double alpha) {
         this.red = Double.isNaN(red) ? Double.NaN : MathHelper.clamp(red, 0, 1);
@@ -30,21 +29,19 @@ public class PreciseColor {
 
     /**
      * Checks if the value is between zero and one.
-     *
-     * @param value     the dedicated value.
-     * @return          <tt>true</tt> if the value is in the range of 0 to 1, otherwise <tt>false</tt>.
+     * @param value     The dedicated value.
+     * @return          <code>true</code> if the value is in the range of 0 to 1, otherwise <code>false</code>.
      */
     private boolean is(double value) {
         return !Double.isNaN(value) && (value >= 0 && value <= 1);
     }
 
     /**
-     * Interpolate the value by delta.
-     *
-     * @param value     the original value,
-     * @param target    the target value,
-     * @param delta     delta index.
-     * @return          returns the value interpolated from target by delta.
+     * Interpolate the value by an index.
+     * @param value     The original value,
+     * @param target    The target value,
+     * @param delta     The index.
+     * @return          The value interpolated from target by delta.
      */
     private double lerp(double value, double target, double delta) {
         return is(value)
@@ -93,6 +90,10 @@ public class PreciseColor {
         alpha = color.getAlpha() / 255.0;
     }
 
+    /**
+     * Copies the current value to a new {@link PreciseColor} without modifying self.
+     * @return  A new {@link PreciseColor} which has the same value.
+     */
     public PreciseColor independent() {
         return new PreciseColor(this.red, this.green, this.blue, this.alpha);
     }
@@ -114,9 +115,9 @@ public class PreciseColor {
     }
 
     /**
-     * Gets the {@link PreciseColor} as a {@link Color Color.}
+     * Gets the {@link PreciseColor} as a {@link Color}.
      *
-     * @return      returns a {@link Color} same as the self.
+     * @return  The {@link Color} value.
      */
     public Color get() {
         return new Color(
@@ -128,7 +129,7 @@ public class PreciseColor {
     }
 
     /**
-     * Gets the color's RGBA integer value.
+     * Gets the color as an RGBA integer value.
      */
     public int getRGBA() {
         return get().getRGB();
@@ -206,33 +207,31 @@ public class PreciseColor {
     }
 
     /**
-     * Gets the color in string.
+     * Gets the color as a string.
      */
     public String toString() {
         return getClass().getName() + "[r=" + getRed() + ",g=" + getGreen() + ",b=" + getBlue() + ",a=" + getAlpha() + "]";
     }
 
     /**
-     * Gets the color in hex string.
+     * Gets the color as a hex string.
      */
     public String toHexString() {
         return toHexString(false);
     }
 
     /**
-     * Gets the color in hex string.
-     *
-     * @param upperCase     whether uppercase the string or not.
+     * Gets the color as a hex string.
+     * @param upperCase Whether to uppercase the string or not.
      */
     public String toHexString(boolean upperCase) {
         return upperCase ? Integer.toHexString(getRGBA()).toUpperCase() : Integer.toHexString(getRGBA());
     }
 
     /**
-     * Decodes a hex string and gets its dedicated {@link PreciseColor PreciseColor.}
-     *
-     * @param hexString     the hex string.
-     * @return              returns a {@link PreciseColor} in which the value equals the hex string.
+     * Decodes a hex string and gets its dedicated {@link PreciseColor}.
+     * @param hexString The hex string.
+     * @return          A {@link PreciseColor} in which the value equals to the hex string.
      */
     public static PreciseColor decode(String hexString) {
         return new PreciseColor(Color.decode(hexString));

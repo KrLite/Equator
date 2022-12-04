@@ -6,27 +6,53 @@ import net.minecraft.entity.player.PlayerEntity;
 import java.util.Optional;
 
 public class CoordinateSolver {
-    public static Optional<Double> angleBehindCamera(DimensionalVec3d dst, PlayerEntity player) {
-        return angleBehindCamera(dst, player, false);
+    /**
+     * Solves the <b>reverted</b> angle between the {@link PlayerEntity}'s vision and the destination {@link DimensionalVec3d}, without ignoring dimensions.
+     * @param player        The {@link PlayerEntity} to solve the angle for.
+     * @param destination   The {@link DimensionalVec3d} to solve the angle to.
+     * @return              The <b>reverted</b> angle between the {@link PlayerEntity}'s vision and the destination {@link DimensionalVec3d}.
+     */
+    public static Optional<Double> angleBehindCamera(PlayerEntity player, DimensionalVec3d destination) {
+        return angleBehindCamera(player, destination, false);
     }
 
-    public static Optional<Double> angleBehindCamera(DimensionalVec3d dst, PlayerEntity player, boolean ignoreDimension) {
-        Optional<Double> optional = angleInFrontOfCamera(dst, player, ignoreDimension);
+    /**
+     * Solves the <b>reverted</b> angle between the {@link PlayerEntity}'s vision and the destination {@link DimensionalVec3d}.
+     * @param player            The {@link PlayerEntity} to solve the angle for.
+     * @param destination       The {@link DimensionalVec3d} to solve the angle to.
+     * @param ignoreDimension   Whether to ignore the dimension of the destination {@link DimensionalVec3d} or not.
+     * @return                  The <b>reverted</b> angle between the {@link PlayerEntity}'s vision and the destination {@link DimensionalVec3d}.
+     */
+    public static Optional<Double> angleBehindCamera(PlayerEntity player, DimensionalVec3d destination, boolean ignoreDimension) {
+        Optional<Double> optional = angleInFrontOfCamera(player, destination, ignoreDimension);
 
         return optional.map(AngleSolver::revert);
     }
 
-    public static Optional<Double> angleInFrontOfCamera(DimensionalVec3d dst, PlayerEntity player) {
-        return angleInFrontOfCamera(dst, player, false);
+    /**
+     * Solves the angle between the {@link PlayerEntity}'s vision and the destination {@link DimensionalVec3d}, without ignoring dimensions.
+     * @param player        The {@link PlayerEntity} to solve the angle for.
+     * @param destination   The {@link DimensionalVec3d} to solve the angle to.
+     * @return              The angle between the {@link PlayerEntity}'s vision and the destination {@link DimensionalVec3d}.
+     */
+    public static Optional<Double> angleInFrontOfCamera(PlayerEntity player, DimensionalVec3d destination) {
+        return angleInFrontOfCamera(player, destination, false);
     }
 
-    public static Optional<Double> angleInFrontOfCamera(DimensionalVec3d dst, PlayerEntity player, boolean ignoreDimension) {
-        if ( ignoreDimension || dst.getDimension().equals(player.getWorld().getRegistryKey()) ) {
+    /**
+     * Solves the angle between the {@link PlayerEntity}'s vision and the destination {@link DimensionalVec3d}.
+     * @param player            The {@link PlayerEntity} to solve the angle for.
+     * @param destination       The {@link DimensionalVec3d} to solve the angle to.
+     * @param ignoreDimension   Whether to ignore the dimension of the destination {@link DimensionalVec3d} or not.
+     * @return                  The angle between the {@link PlayerEntity}'s vision and the destination {@link DimensionalVec3d}.
+     */
+    public static Optional<Double> angleInFrontOfCamera(PlayerEntity player, DimensionalVec3d destination, boolean ignoreDimension) {
+        if ( ignoreDimension || destination.getDimension().equals(player.getWorld().getRegistryKey()) ) {
             double
                     dstAngle = AngleSolver.clockwiseToPositive(
                             Math.atan2(
-                                    (dst.getVec3d().getZ() + 0.5) - player.getZ(),
-                                    (dst.getVec3d().getX() + 0.5) - player.getX()
+                                    (destination.getVec3d().getZ() + 0.5) - player.getZ(),
+                                    (destination.getVec3d().getX() + 0.5) - player.getX()
                             ) * 180 / Math.PI + 180
                     ),
                     cameraAngle = AngleSolver.clockwiseToPositive((player.getYaw() % 360 + 360 + 270) % 360);
@@ -37,9 +63,15 @@ public class CoordinateSolver {
         return Optional.empty();
     }
 
-    public static Optional<Double> distance(DimensionalVec3d src, DimensionalVec3d dst) {
-        return src.getDimension() != dst.getDimension()
+    /**
+     * Solves the distance between two {@link DimensionalVec3d}s.
+     * @param source        The source {@link DimensionalVec3d}.
+     * @param destination   The destination {@link DimensionalVec3d}.
+     * @return              The distance between the two {@link DimensionalVec3d}s.
+     */
+    public static Optional<Double> distance(DimensionalVec3d source, DimensionalVec3d destination) {
+        return source.getDimension() != destination.getDimension()
                 ? Optional.empty()
-                : Optional.of(src.getVec3d().distanceTo(dst.getVec3d()));
+                : Optional.of(source.getVec3d().distanceTo(destination.getVec3d()));
     }
 }
