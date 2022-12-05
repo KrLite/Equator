@@ -1,3 +1,5 @@
+### <p align=right>[Modrinth →](https://modrinth.com/mod/equator)</p>
+
 # Equator Lib 🪐
 
 ### A Simple Rendering Library for Minecraft.
