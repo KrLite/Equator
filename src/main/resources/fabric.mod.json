@@ -4,7 +4,7 @@
   "version": "${version}",
 
   "name": "Equator Lib",
-  "description": "A Render Library for Minecraft.",
+  "description": "A Simple Rendering Library for Minecraft.",
   "authors": [
     "KrLite"
   ],
