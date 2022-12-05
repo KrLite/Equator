@@ -1,4 +1,4 @@
-package net.krlite.equator.base;
+package net.krlite.equator.core;
 
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Contract;

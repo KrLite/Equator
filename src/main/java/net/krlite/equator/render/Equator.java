@@ -1,8 +1,8 @@
 package net.krlite.equator.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.krlite.equator.base.sprite.IdentifierSprite;
-import net.krlite.equator.base.MatrixWrapper;
+import net.krlite.equator.core.sprite.IdentifierSprite;
+import net.krlite.equator.core.MatrixWrapper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawableHelper;
 import net.minecraft.client.render.*;
@@ -247,7 +247,7 @@ public class Equator extends DrawableHelper {
         float scaled = (float) MinecraftClient.getInstance().getWindow().getScaledHeight() / (float) MinecraftClient.getInstance().getWindow().getScaledWidth();
 
         new Equator(
-                sprite.getMaskedSprite(
+                sprite.mask(
                         (1 - Math.min(scaling / scaled, 1)) / 2, (1 - Math.min(scaled / scaling, 1)) / 2,
                         (1 + Math.min(scaling / scaled, 1)) / 2, (1 + Math.min(scaled / scaling, 1)) / 2
                 )
@@ -270,7 +270,7 @@ public class Equator extends DrawableHelper {
 
         // Left Up Quarter
         new Equator(
-                sprite.getMaskedSprite(0.0F, 0.0F, 0.5F, 0.5F)
+                sprite.mask(0.0F, 0.0F, 0.5F, 0.5F)
         ).render(
                 matrixStack, color,
                 0.0F, 0.0F,
@@ -279,7 +279,7 @@ public class Equator extends DrawableHelper {
 
         // Left Fixer
         new Equator(
-                sprite.getMaskedSprite(0.0F, 0.5F, 0.5F, 0.5F)
+                sprite.mask(0.0F, 0.5F, 0.5F, 0.5F)
         ).render(
                 matrixStack, color,
                 0.0F, quarterSize,
@@ -289,7 +289,7 @@ public class Equator extends DrawableHelper {
 
         // Left Down Quarter
         new Equator(
-                sprite.getMaskedSprite(0.0F, 0.5F, 0.5F, 1.0F)
+                sprite.mask(0.0F, 0.5F, 0.5F, 1.0F)
         ).render(
                 matrixStack, color,
                 0.0F, height - quarterSize,
@@ -298,7 +298,7 @@ public class Equator extends DrawableHelper {
 
         // Middle Fixer
         new Equator(
-                sprite.getMaskedSprite(0.5F, 0.0F, 0.5F, 1.0F)
+                sprite.mask(0.5F, 0.0F, 0.5F, 1.0F)
         ).render(
                 matrixStack, color,
                 quarterSize, 0.0F,
@@ -307,7 +307,7 @@ public class Equator extends DrawableHelper {
 
         // Right Down Quarter
         new Equator(
-                sprite.getMaskedSprite(0.5F, 0.5F, 1.0F, 1.0F)
+                sprite.mask(0.5F, 0.5F, 1.0F, 1.0F)
         ).render(
                 matrixStack, color,
                 width - quarterSize, height - quarterSize,
@@ -316,7 +316,7 @@ public class Equator extends DrawableHelper {
 
         // Right Fixer
         new Equator(
-                sprite.getMaskedSprite(0.5F, 0.5F, 1.0F, 0.5F)
+                sprite.mask(0.5F, 0.5F, 1.0F, 0.5F)
         ).render(
                 matrixStack, color,
                 width - quarterSize, quarterSize,
@@ -325,7 +325,7 @@ public class Equator extends DrawableHelper {
 
         // Right Up Quarter
         new Equator(
-                sprite.getMaskedSprite(0.5F, 0.0F, 1.0F, 0.5F)
+                sprite.mask(0.5F, 0.0F, 1.0F, 0.5F)
         ).render(
                 matrixStack, color,
                 width - quarterSize, 0.0F,

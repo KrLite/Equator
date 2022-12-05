@@ -1,7 +1,10 @@
-package net.krlite.equator.base;
+package net.krlite.equator.core;
 
 import net.minecraft.client.util.math.MatrixStack;
 
+/**
+ * A wrapper to combine a {@link MatrixStack} and four vertices' coordinate together.
+ */
 public class MatrixWrapper {
     private final MatrixStack matrixStack;
     private final float xLU, xLD, xRD, xRU;
@@ -15,6 +18,18 @@ public class MatrixWrapper {
         return (value + target) / 2.0F;
     }
 
+    /**
+     * Creates a new {@link MatrixWrapper}.
+     * @param matrixStack   The {@link MatrixStack} to be wrapped.
+     * @param xLU           The x coordinate of the left upper vertex.
+     * @param yLU           The y coordinate of the left upper vertex.
+     * @param xLD           The x coordinate of the left down vertex.
+     * @param yLD           The y coordinate of the left down vertex.
+     * @param xRD           The x coordinate of the right down vertex.
+     * @param yRD           The y coordinate of the right down vertex.
+     * @param xRU           The x coordinate of the right upper vertex.
+     * @param yRU           The y coordinate of the right upper vertex.
+     */
     public MatrixWrapper(
             MatrixStack matrixStack,
             float xLU, float yLU,
@@ -33,6 +48,14 @@ public class MatrixWrapper {
         this.yRU = yRU;
     }
 
+    /**
+     * Creates a new {@link MatrixWrapper} by a square.
+     * @param matrixStack   The {@link MatrixStack} to be wrapped.
+     * @param xBegin        The x coordinate of the beginning vertex.
+     * @param yBegin        The y coordinate of the beginning vertex.
+     * @param xEnd          The x coordinate of the ending vertex.
+     * @param yEnd          The y coordinate of the ending vertex.
+     */
     public MatrixWrapper(
             MatrixStack matrixStack,
             float xBegin,   float yBegin,
@@ -47,6 +70,9 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Gets the wrapped {@link MatrixStack}.
+     */
     public MatrixStack matrixStack() {
         return this.matrixStack;
     }
@@ -103,6 +129,11 @@ public class MatrixWrapper {
         }
     }
 
+    /**
+     * Process two {@link MatrixWrapper}s to the minimal.
+     * @param wrapper   The {@link MatrixWrapper} to be processed.
+     * @return          The minimal {@link MatrixWrapper}.
+     */
     public MatrixWrapper minimal(MatrixWrapper wrapper) {
         return new MatrixWrapper(
                 matrixStack,
@@ -117,6 +148,11 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Process two {@link MatrixWrapper}s to the maximal.
+     * @param wrapper   The {@link MatrixWrapper} to be processed.
+     * @return          The maximal {@link MatrixWrapper}.
+     */
     public MatrixWrapper maximal(MatrixWrapper wrapper) {
         return new MatrixWrapper(
                 matrixStack,
@@ -131,6 +167,11 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Swap the wrapped {@link MatrixStack}.
+     * @param matrixStack   The dedicated {@link MatrixStack}.
+     * @return              The new {@link MatrixWrapper}.
+     */
     public MatrixWrapper swap(MatrixStack matrixStack) {
         return new MatrixWrapper(
                 matrixStack,
@@ -141,10 +182,21 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Blends two {@link MatrixWrapper}s to the average.
+     * @param wrapper   The {@link MatrixWrapper} to be blended.
+     * @return          The average {@link MatrixWrapper}.
+     */
     public MatrixWrapper blend(MatrixWrapper wrapper) {
         return blend(wrapper, 0.5F);
     }
 
+    /**
+     * Blends two {@link MatrixWrapper}s.
+     * @param wrapper   The {@link MatrixWrapper} to be blended.
+     * @param delta     The blending index.
+     * @return          The blended {@link MatrixWrapper}.
+     */
     public MatrixWrapper blend(MatrixWrapper wrapper, float delta) {
         return new MatrixWrapper(
                 matrixStack,
@@ -159,22 +211,49 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Stretch the {@link MatrixWrapper} from the left upper point.
+     * @param x The x coordinate of the target left upper point.
+     * @param y The y coordinate of the target left upper point.
+     */
     public MatrixWrapper stretchLU(float x, float y) {
         return stretchLU(x, y, 1);
     }
 
+    /**
+     * Stretch the {@link MatrixWrapper} from the left lower point.
+     * @param x The x coordinate of the target left lower point.
+     * @param y The y coordinate of the target left lower point.
+     */
     public MatrixWrapper stretchLD(float x, float y) {
         return stretchLD(x, y, 1);
     }
 
+    /**
+     * Stretch the {@link MatrixWrapper} from the right lower point.
+     * @param x The x coordinate of the target right lower point.
+     * @param y The y coordinate of the target right lower point.
+     */
     public MatrixWrapper stretchRD(float x, float y) {
         return stretchRD(x, y, 1);
     }
 
+    /**
+     * Stretch the {@link MatrixWrapper} from the right upper point.
+     * @param x The x coordinate of the target right upper point.
+     * @param y The y coordinate of the target right upper point.
+     */
     public MatrixWrapper stretchRU(float x, float y) {
         return stretchRU(x, y, 1);
     }
 
+    /**
+     * Stretches the {@link MatrixWrapper} from the left upper point.
+     * @param x     The x coordinate of the target left upper point.
+     * @param y     The y coordinate of the target left upper point.
+     * @param delta The stretching index.
+     * @return      The stretched {@link MatrixWrapper}.
+     */
     public MatrixWrapper stretchLU(float x, float y, float delta) {
         return blend(
                 new MatrixWrapper(
@@ -186,6 +265,13 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Stretches the {@link MatrixWrapper} from the left down point.
+     * @param x     The x coordinate of the target left down point.
+     * @param y     The y coordinate of the target left down point.
+     * @param delta The stretching index.
+     * @return      The stretched {@link MatrixWrapper}.
+     */
     public MatrixWrapper stretchLD(float x, float y, float delta) {
         return blend(
                 new MatrixWrapper(
@@ -198,6 +284,13 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Stretches the {@link MatrixWrapper} from the right down point.
+     * @param x     The x coordinate of the target right down point.
+     * @param y     The y coordinate of the target right down point.
+     * @param delta The stretching index.
+     * @return      The stretched {@link MatrixWrapper}.
+     */
     public MatrixWrapper stretchRD(float x, float y, float delta) {
         return blend(
                 new MatrixWrapper(
@@ -210,6 +303,13 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Stretches the {@link MatrixWrapper} from the right upper point.
+     * @param x     The x coordinate of the target right upper point.
+     * @param y     The y coordinate of the target right upper point.
+     * @param delta The stretching index.
+     * @return      The stretched {@link MatrixWrapper}.
+     */
     public MatrixWrapper stretchRU(float x, float y, float delta) {
         return blend(
                 new MatrixWrapper(
@@ -222,22 +322,44 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Stretches the {@link MatrixWrapper} from the upper side.
+     * @param y The target y coordinate.
+     */
     public MatrixWrapper stretchTop(float y) {
         return stretchTop(y, 1);
     }
 
+    /**
+     * Stretches the {@link MatrixWrapper} from the lower side.
+     * @param y The target y coordinate.
+     */
     public MatrixWrapper stretchBottom(float y) {
         return stretchBottom(y, 1);
     }
 
+    /**
+     * Stretches the {@link MatrixWrapper} from the left side.
+     * @param x The target x coordinate.
+     */
     public MatrixWrapper stretchLeft(float x) {
         return stretchLeft(x, 1);
     }
 
+    /**
+     * Stretches the {@link MatrixWrapper} from the right side.
+     * @param x The target x coordinate.
+     */
     public MatrixWrapper stretchRight(float x) {
         return stretchRight(x, 1);
     }
 
+    /**
+     * Stretches the {@link MatrixWrapper} from the upper side.
+     * @param y     The target y coordinate.
+     * @param delta The stretching index.
+     * @return      The stretched {@link MatrixWrapper}.
+     */
     public MatrixWrapper stretchTop(float y, float delta) {
         return blend(
                 new MatrixWrapper(
@@ -250,6 +372,12 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Stretches the {@link MatrixWrapper} from the lower side.
+     * @param y     The target y coordinate.
+     * @param delta The stretching index.
+     * @return      The stretched {@link MatrixWrapper}.
+     */
     public MatrixWrapper stretchBottom(float y, float delta) {
         return blend(
                 new MatrixWrapper(
@@ -262,6 +390,12 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Stretches the {@link MatrixWrapper} from the left side.
+     * @param x     The target x coordinate.
+     * @param delta The stretching index.
+     * @return      The stretched {@link MatrixWrapper}.
+     */
     public MatrixWrapper stretchLeft(float x, float delta) {
         return blend(
                 new MatrixWrapper(
@@ -274,6 +408,12 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Stretches the {@link MatrixWrapper} from the right side.
+     * @param x     The target x coordinate.
+     * @param delta The stretching index.
+     * @return      The stretched {@link MatrixWrapper}.
+     */
     public MatrixWrapper stretchRight(float x, float delta) {
         return blend(
                 new MatrixWrapper(
@@ -286,6 +426,11 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Squeezes the upper side of the {@link MatrixWrapper}.
+     * @param delta The squeezing index.
+     * @return      The squeezed {@link MatrixWrapper}.
+     */
     public MatrixWrapper squeezeTop(float delta) {
         return new MatrixWrapper(
                 matrixStack,
@@ -296,6 +441,11 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Squeezes the lower side of the {@link MatrixWrapper}.
+     * @param delta The squeezing index.
+     * @return      The squeezed {@link MatrixWrapper}.
+     */
     public MatrixWrapper squeezeBottom(float delta) {
         return new MatrixWrapper(
                 matrixStack, xLU, yLU,
@@ -305,6 +455,11 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Squeezes the left side of the {@link MatrixWrapper}.
+     * @param delta The squeezing index.
+     * @return      The squeezed {@link MatrixWrapper}.
+     */
     public MatrixWrapper squeezeLeft(float delta) {
         return new MatrixWrapper(
                 matrixStack,
@@ -315,6 +470,11 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Squeezes the right side of the {@link MatrixWrapper}.
+     * @param delta The squeezing index.
+     * @return      The squeezed {@link MatrixWrapper}.
+     */
     public MatrixWrapper squeezeRight(float delta) {
         return new MatrixWrapper(
                 matrixStack, xLU, yLU,
@@ -324,22 +484,39 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Flips the {@link MatrixWrapper} horizontally.
+     */
     public MatrixWrapper flipHorizontal() {
         return flipHorizontal(1);
     }
 
+    /**
+     * Flips the {@link MatrixWrapper} vertically.
+     */
     public MatrixWrapper flipVertical() {
         return flipVertical(1);
     }
 
-    public MatrixWrapper flipDiagonalLDRU() {
-        return flipDiagonalLDRU(1);
-    }
-
+    /**
+     * Flips the {@link MatrixWrapper} diagonally from left upper to right lower.
+     */
     public MatrixWrapper flipDiagonalLURD() {
         return flipDiagonalLURD(1);
     }
 
+    /**
+     * Flips the {@link MatrixWrapper} diagonally from right upper to left lower.
+     */
+    public MatrixWrapper flipDiagonalRULD() {
+        return flipDiagonalRULD(1);
+    }
+
+    /**
+     * Flips the {@link MatrixWrapper} horizontally.
+     * @param delta The flipping index.
+     * @return      The flipped {@link MatrixWrapper}.
+     */
     public MatrixWrapper flipHorizontal(float delta) {
         return blend(
                 new MatrixWrapper(
@@ -352,6 +529,11 @@ public class MatrixWrapper {
         );
     }
 
+    /**
+     * Flips the {@link MatrixWrapper} vertically.
+     * @param delta The flipping index.
+     * @return      The flipped {@link MatrixWrapper}.
+     */
     public MatrixWrapper flipVertical(float delta) {
         return blend(
                 new MatrixWrapper(
@@ -364,7 +546,12 @@ public class MatrixWrapper {
         );
     }
 
-    public MatrixWrapper flipDiagonalLDRU(float delta) {
+    /**
+     * Flips the {@link MatrixWrapper} diagonally from left upper to right lower.
+     * @param delta The flipping index.
+     * @return      The flipped {@link MatrixWrapper}.
+     */
+    public MatrixWrapper flipDiagonalLURD(float delta) {
         return blend(
                 new MatrixWrapper(
                         matrixStack,
@@ -376,7 +563,12 @@ public class MatrixWrapper {
         );
     }
 
-    public MatrixWrapper flipDiagonalLURD(float delta) {
+    /**
+     * Flips the {@link MatrixWrapper} diagonally from right upper to left lower.
+     * @param delta The flipping index.
+     * @return      The flipped {@link MatrixWrapper}.
+     */
+    public MatrixWrapper flipDiagonalRULD(float delta) {
         return blend(
                 new MatrixWrapper(
                         matrixStack,

@@ -2,6 +2,7 @@ package net.krlite.equator;
 
 import net.fabricmc.api.ModInitializer;
 import net.krlite.equator.render.Equator;
+import net.krlite.equator.util.IdentifierBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

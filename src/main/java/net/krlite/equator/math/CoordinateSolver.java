@@ -1,6 +1,6 @@
 package net.krlite.equator.math;
 
-import net.krlite.equator.base.DimensionalVec3d;
+import net.krlite.equator.core.DimensionalVec3d;
 import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.Optional;
