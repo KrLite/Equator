@@ -1,6 +1,6 @@
 package net.krlite.equator.util;
 
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
@@ -64,13 +64,13 @@ public class IdentifierBuilder {
 	}
 
 	/**
-	 * Gets a {@link TranslatableText} with the specified category and keys.
-	 * @param category	The category of the {@link TranslatableText}.
-	 * @param keys		The keys of the {@link TranslatableText}.
-	 * @return			The {@link TranslatableText}.
+	 * Gets a {@link Text TranslatableText} with the specified category and keys.
+	 * @param category	The category of the {@link Text TranslatableText}.
+	 * @param keys		The keys of the {@link Text TranslatableText}.
+	 * @return			The {@link Text TranslatableText}.
 	 */
-	public TranslatableText translatableText(String category, String... keys) {
-		return new TranslatableText(translationKey(category, keys));
+	public Text translatableText(String category, String... keys) {
+		return Text.translatable(translationKey(category, keys));
 	}
 
 	/**

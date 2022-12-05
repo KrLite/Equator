@@ -416,7 +416,6 @@ public class Equator extends DrawableHelper {
         renderVertex(bufferBuilder, matrix4f, xRU, yRU, uEnd, vBegin, color);
         renderVertex(bufferBuilder, matrix4f, xLU, yLU, uBegin, vBegin, color);
 
-        bufferBuilder.end();
         tessellator.draw();
 
         RenderSystem.depthMask(true);
