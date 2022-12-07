@@ -68,20 +68,20 @@ public class IdentifierBuilder {
 	}
 
 	/**
-	 * Gets a {@link Text TranslatableText} with the specified category and keys.
-	 * @param category	The category of the {@link Text TranslatableText}.
-	 * @param keys		The keys of the {@link Text TranslatableText}.
-	 * @return			The {@link Text TranslatableText}.
+	 * Gets a {@link TranslatableText} with the specified category and keys.
+ 	 * @param category	The category of the {@link TranslatableText}.
+ 	 * @param keys		The keys of the {@link TranslatableText}.
+ 	 * @return			The {@link TranslatableText}.
 	 */
 	public TranslatableText translatableText(String category, String... keys) {
  		return new TranslatableText(translationKey(category, keys));
 	}
 
 	/**
-	 * Gets a {@link TranslatableText} with the specified category and keys.
- 	 * @param category	The category of the {@link TranslatableText}.
- 	 * @param keys		The keys of the {@link TranslatableText}.
- 	 * @return			The {@link TranslatableText}.
+	 * Gets a translation key with the specified category and keys.
+ 	 * @param category	The category of the translation key.
+ 	 * @param keys		The keys of the translation key.
+ 	 * @return			The translation key.
 	 */
 	public String translationKey(String category, String... keys) {
 		return category + "." + namespace
