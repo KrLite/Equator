@@ -71,40 +71,64 @@ public class MatrixWrapper {
     }
 
     /**
-     * Gets the wrapped {@link MatrixStack}.
+     * @return  The wrapped {@link MatrixStack}.
      */
     public MatrixStack matrixStack() {
         return this.matrixStack;
     }
 
+    /**
+     * @return  The x coordinate of the left upper vertex.
+     */
     public float xLU() {
         return this.xLU;
     }
 
+    /**
+     * @return  The x coordinate of the left down vertex.
+     */
     public float xLD() {
         return this.xLD;
     }
 
+    /**
+     * @return  The x coordinate of the right down vertex.
+     */
     public float xRD() {
         return this.xRD;
     }
 
+    /**
+     * @return  The x coordinate of the right upper vertex.
+     */
     public float xRU() {
         return this.xRU;
     }
 
+    /**
+     * @return  The y coordinate of the left upper vertex.
+     */
     public float yLU() {
         return this.yLU;
     }
 
+    /**
+     * @return  The y coordinate of the left down vertex.
+     */
     public float yLD() {
         return this.yLD;
     }
 
+    /**
+     * @return  The y coordinate of the right down vertex.
+     */
     public float yRD() {
         return this.yRD;
     }
 
+    /**
+     * @return  The y coordinate of the right upper vertex.
+     */
     public float yRU() {
         return this.yRU;
     }
@@ -113,6 +137,9 @@ public class MatrixWrapper {
         return toString(false);
     }
 
+    /**
+     * @param matrix    Whether to use the matrix form.
+     */
     public String toString(boolean matrix) {
         if ( matrix ){
             return getClass().getName() + " ->\n"

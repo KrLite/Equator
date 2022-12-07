@@ -56,14 +56,14 @@ public class DimensionalVec3d {
     }
 
     /**
-     * Gets the dimension of the 3D vector.
+     * @return  The dimension of the 3D vector.
      */
     public RegistryKey<World> getDimension() {
         return dimension;
     }
 
     /**
-     * Gets the 3D vector.
+     * @return  The 3D vector.
      */
     public Vec3d getVec3d() {
         return vec3d;

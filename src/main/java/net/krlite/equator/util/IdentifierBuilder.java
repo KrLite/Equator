@@ -13,9 +13,13 @@ import java.util.stream.Collectors;
  */
 public class IdentifierBuilder {
 	/**
-	 * The external namespace of the {@link IdentifierBuilder}.
+	 * The internal namespace of the {@link IdentifierBuilder}.
 	 */
 	private final String namespace;
+
+	/**
+	 * The additional path.
+	 */
 	private final List<String> path;
 
 	/**

@@ -42,7 +42,7 @@ repositories {
 
 ```groovy
 dependencies {
-    modApi include("maven.modrinth:equator:xxx")
+    modAImplementation "maven.modrinth:equator:xxx"
 }
 ```
 

@@ -14,7 +14,7 @@ public class PreciseColor {
     private double alpha;
 
     /**
-     * Creates a color which every value is precisely stored as a double.
+     * Creates an RGBA color which every value is precisely stored as {@link Double}.
      * @param red       The independent {@link Double} <b>red</b> value from 0.0 to 1.0.
      * @param green     The independent {@link Double} <b>green</b> value from 0.0 to 1.0.
      * @param blue      The independent {@link Double} <b>blue</b> value from 0.0 to 1.0.
@@ -25,6 +25,44 @@ public class PreciseColor {
         this.green = Double.isNaN(green) ? Double.NaN : MathHelper.clamp(green, 0, 1);
         this.blue = Double.isNaN(blue) ? Double.NaN : MathHelper.clamp(blue, 0, 1);
         this.alpha = Double.isNaN(alpha) ? Double.NaN : MathHelper.clamp(alpha, 0, 1);
+    }
+
+    /**
+     * Creates an RGB color which every value is precisely stored as {@link Double}.
+     * @param red   The independent {@link Double} <b>red</b> value from 0.0 to 1.0.
+     * @param green The independent {@link Double} <b>green</b> value from 0.0 to 1.0.
+     * @param blue  The independent {@link Double} <b>blue</b> value from 0.0 to 1.0.
+     */
+    public PreciseColor(double red, double green, double blue) {
+        this.red = Double.isNaN(red) ? Double.NaN : MathHelper.clamp(red, 0, 1);
+        this.green = Double.isNaN(green) ? Double.NaN : MathHelper.clamp(green, 0, 1);
+        this.blue = Double.isNaN(blue) ? Double.NaN : MathHelper.clamp(blue, 0, 1);
+        alpha = 1;
+    }
+
+    /**
+     * Creates an RGB translucent/opaque color which every value is precisely stored as {@link Double}.
+     * @param red       The independent {@link Double} <b>red</b> value from 0.0 to 1.0.
+     * @param green     The independent {@link Double} <b>green</b> value from 0.0 to 1.0.
+     * @param blue      The independent {@link Double} <b>blue</b> value from 0.0 to 1.0.
+     * @param opaque    Whether the color is opaque or not.
+     */
+    public PreciseColor(double red, double green, double blue, boolean opaque) {
+        this.red = Double.isNaN(red) ? Double.NaN : MathHelper.clamp(red, 0, 1);
+        this.green = Double.isNaN(green) ? Double.NaN : MathHelper.clamp(green, 0, 1);
+        this.blue = Double.isNaN(blue) ? Double.NaN : MathHelper.clamp(blue, 0, 1);
+        alpha = opaque ? 1 : 0;
+    }
+
+    /**
+     * Creates an RGBA color from an existing {@link Color} which every value is precisely stored as {@link Double}.
+     * @param color The dedicated {@link Color}.
+     */
+    public PreciseColor(@NotNull Color color) {
+        red = color.getRed() / 255.0;
+        green = color.getGreen() / 255.0;
+        blue = color.getBlue() / 255.0;
+        alpha = color.getAlpha() / 255.0;
     }
 
     /**
@@ -69,27 +107,6 @@ public class PreciseColor {
         return new PreciseColor(Double.NaN, Double.NaN, Double.NaN, 1);
     }
 
-    public PreciseColor(double red, double green, double blue) {
-        this.red = Double.isNaN(red) ? Double.NaN : MathHelper.clamp(red, 0, 1);
-        this.green = Double.isNaN(green) ? Double.NaN : MathHelper.clamp(green, 0, 1);
-        this.blue = Double.isNaN(blue) ? Double.NaN : MathHelper.clamp(blue, 0, 1);
-        alpha = 1;
-    }
-
-    public PreciseColor(double red, double green, double blue, boolean opaque) {
-        this.red = Double.isNaN(red) ? Double.NaN : MathHelper.clamp(red, 0, 1);
-        this.green = Double.isNaN(green) ? Double.NaN : MathHelper.clamp(green, 0, 1);
-        this.blue = Double.isNaN(blue) ? Double.NaN : MathHelper.clamp(blue, 0, 1);
-        alpha = opaque ? 1 : 0;
-    }
-
-    public PreciseColor(@NotNull Color color) {
-        red = color.getRed() / 255.0;
-        green = color.getGreen() / 255.0;
-        blue = color.getBlue() / 255.0;
-        alpha = color.getAlpha() / 255.0;
-    }
-
     /**
      * Copies the current value to a new {@link PreciseColor} without modifying self.
      * @return  A new {@link PreciseColor} which has the same value.
@@ -98,19 +115,31 @@ public class PreciseColor {
         return new PreciseColor(this.red, this.green, this.blue, this.alpha);
     }
 
-    public double getRed() {
+    /**
+     * @return  The red value.
+     */
+    public double red() {
         return red;
     }
 
-    public double getGreen() {
+    /**
+     * @return  The green value.
+     */
+    public double green() {
         return green;
     }
 
-    public double getBlue() {
+    /**
+     * @return  The blue value.
+     */
+    public double blue() {
         return blue;
     }
 
-    public double getAlpha() {
+    /**
+     * @return  The alpha value.
+     */
+    public double alpha() {
         return alpha;
     }
 
@@ -195,10 +224,19 @@ public class PreciseColor {
         return this.castAlpha(alpha * multiplier);
     }
 
+    /**
+     * Blends the color with another {@link PreciseColor}.
+     * @param color The dedicated {@link PreciseColor}.
+     */
     public void blend(PreciseColor color) {
         blend(color, 0.5);
     }
 
+    /**
+     * Blends the color with another {@link PreciseColor}.
+     * @param color The dedicated {@link PreciseColor}.
+     * @param delta The index.
+     */
     public void blend(@NotNull PreciseColor color, double delta) {
         castRed(lerp(this.red, color.red, delta));
         castGreen(lerp(this.green, color.green, delta));
@@ -206,23 +244,20 @@ public class PreciseColor {
         castAlpha(lerp(this.alpha, color.alpha, delta));
     }
 
-    /**
-     * Gets the color as a string.
-     */
     public String toString() {
-        return getClass().getName() + "[r=" + getRed() + ",g=" + getGreen() + ",b=" + getBlue() + ",a=" + getAlpha() + "]";
+        return getClass().getName() + "[r=" + red() + ",g=" + green() + ",b=" + blue() + ",a=" + alpha() + "]";
     }
 
     /**
-     * Gets the color as a hex string.
+     * @return The hexadecimal {@link String} value of the color.
      */
     public String toHexString() {
         return toHexString(false);
     }
 
     /**
-     * Gets the color as a hex string.
      * @param upperCase Whether to uppercase the string or not.
+     * @return The hexadecimal {@link String} value of the color.
      */
     public String toHexString(boolean upperCase) {
         return upperCase ? Integer.toHexString(getRGBA()).toUpperCase() : Integer.toHexString(getRGBA());
@@ -230,7 +265,7 @@ public class PreciseColor {
 
     /**
      * Decodes a hex string and gets its dedicated {@link PreciseColor}.
-     * @param hexString The hex string.
+     * @param hexString The hexadecimal string.
      * @return          A {@link PreciseColor} in which the value equals to the hex string.
      */
     public static PreciseColor decode(String hexString) {
