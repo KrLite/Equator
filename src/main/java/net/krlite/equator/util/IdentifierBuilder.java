@@ -1,6 +1,6 @@
 package net.krlite.equator.util;
 
-import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
