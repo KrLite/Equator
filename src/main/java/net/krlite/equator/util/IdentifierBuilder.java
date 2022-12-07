@@ -78,10 +78,10 @@ public class IdentifierBuilder {
 	}
 
 	/**
-	 * Gets a translation key with the specified category and keys.
-	 * @param category	The category of the translation key.
-	 * @param keys		The keys of the translation key.
-	 * @return			The translation key.
+	 * Gets a {@link TranslatableText} with the specified category and keys.
+ 	 * @param category	The category of the {@link TranslatableText}.
+ 	 * @param keys		The keys of the {@link TranslatableText}.
+ 	 * @return			The {@link TranslatableText}.
 	 */
 	public String translationKey(String category, String... keys) {
 		return category + "." + namespace
