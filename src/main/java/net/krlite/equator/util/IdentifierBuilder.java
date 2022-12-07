@@ -73,8 +73,8 @@ public class IdentifierBuilder {
 	 * @param keys		The keys of the {@link Text TranslatableText}.
 	 * @return			The {@link Text TranslatableText}.
 	 */
-	public Text translatableText(String category, String... keys) {
-		return Text.translatable(translationKey(category, keys));
+	public TranslatableText translatableText(String category, String... keys) {
+ 		return new TranslatableText(translationKey(category, keys));
 	}
 
 	/**
