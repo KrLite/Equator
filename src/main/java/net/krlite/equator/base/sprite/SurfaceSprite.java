@@ -1,15 +1,14 @@
-package net.krlite.equator.core.sprite;
+package net.krlite.equator.base.sprite;
 
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.Objects;
+
 /**
  * A sprite that defines a 2D array set of {@link IdentifierSprite}s.
  */
-public class SurfaceSprite {
-    private final Identifier identifier;
-    private final int stepX, stepY;
-
+public record SurfaceSprite(Identifier identifier, int stepX, int stepY) {
     /**
      * Creates a {@link SurfaceSprite} by splitting an {@link Identifier} into pieces.
      * @param identifier    The dedicated {@link Identifier}.
@@ -28,16 +27,7 @@ public class SurfaceSprite {
      * @param step          The number of pieces both horizontally and vertically.
      */
     public SurfaceSprite(Identifier identifier, int step) {
-        this.identifier = identifier;
-        stepX = step;
-        stepY = step;
-    }
-
-    /**
-     * Gets the dedicated {@link Identifier}.
-     */
-    public Identifier identifier() {
-        return this.identifier;
+        this(identifier, step, step);
     }
 
     /**
@@ -66,5 +56,19 @@ public class SurfaceSprite {
                 identifier,
                 uBegin, vBegin, uEnd, vEnd
         );
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "{" +
+                "identifier=" + identifier +
+                ", stepX=" + stepX +
+                ", stepY=" + stepY +
+                "}";
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier, stepX, stepY);
     }
 }

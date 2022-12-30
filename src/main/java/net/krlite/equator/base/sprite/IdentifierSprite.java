@@ -1,18 +1,17 @@
-package net.krlite.equator.core.sprite;
+package net.krlite.equator.base.sprite;
 
-import net.krlite.equator.render.Equator;
+import net.krlite.equator.render.EquatorOld;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * A sprite that defines a part of an identifier.<br />
- * Compatible with {@link Equator the Equator Renderers}.
+ * Compatible with {@link EquatorOld the Equator Renderers}.
  */
-public class IdentifierSprite {
-    private final Identifier identifier;
-    private final float uBegin, vBegin, uEnd, vEnd;
-
+public record IdentifierSprite(Identifier identifier, float uBegin, float vBegin, float uEnd, float vEnd) {
     /**
      * Creates an {@link IdentifierSprite}.
      * @param identifier    The dedicated {@link Identifier}.
@@ -73,29 +72,6 @@ public class IdentifierSprite {
     }
 
     /**
-     * Gets the dedicated {@link Identifier}.
-     */
-    public Identifier identifier() {
-        return this.identifier;
-    }
-
-    public float uBegin() {
-        return this.uBegin;
-    }
-
-    public float vBegin() {
-        return this.vBegin;
-    }
-
-    public float uEnd() {
-        return this.uEnd;
-    }
-
-    public float vEnd() {
-        return this.vEnd;
-    }
-
-    /**
      * Masks the {@link IdentifierSprite} with another {@link IdentifierSprite}.
      * @param sprite    The {@link IdentifierSprite} to mask with.
      * @return          The masked {@link IdentifierSprite}.
@@ -114,5 +90,21 @@ public class IdentifierSprite {
      */
     public IdentifierSprite mask(float uBegin, float vBegin, float uEnd, float vEnd) {
         return new IdentifierSprite(this.identifier, uBegin, vBegin, uEnd, vEnd);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "{" +
+                "identifier=" + identifier +
+                ", uBegin=" + uBegin +
+                ", vBegin=" + vBegin +
+                ", uEnd=" + uEnd +
+                ", vEnd=" + vEnd +
+                "}";
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier, uBegin, vBegin, uEnd, vEnd);
     }
 }

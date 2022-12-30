@@ -1,15 +1,14 @@
-package net.krlite.equator.core.sprite;
+package net.krlite.equator.base.sprite;
 
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.Objects;
+
 /**
  * A sprite that defines a vertical set of {@link IdentifierSprite}s.
  */
-public class VerticalSprite {
-    private final Identifier identifier;
-    private final int step;
-
+public record VerticalSprite(Identifier identifier, int step) {
     /**
      * Creates a {@link VerticalSprite} by splitting an {@link Identifier} vertically into slices.
      * @param identifier    The dedicated {@link Identifier}.
@@ -27,15 +26,7 @@ public class VerticalSprite {
      * @param textureHeight The height of the texture.
      */
     public VerticalSprite(Identifier identifier, int textureWidth, int textureHeight) {
-        this.identifier = identifier;
-        step = textureHeight / textureWidth;
-    }
-
-    /**
-     * Gets the dedicated {@link Identifier}.
-     */
-    public Identifier identifier() {
-        return this.identifier;
+        this(identifier, textureHeight / textureWidth);
     }
 
     /**
@@ -52,5 +43,18 @@ public class VerticalSprite {
                 this.identifier,
                 0, vBegin, 1, vEnd
         );
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "{" +
+                "identifier=" + identifier +
+                ", step=" + step +
+                "}";
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier, step);
     }
 }

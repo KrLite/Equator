@@ -1,6 +1,6 @@
 package net.krlite.equator.math;
 
-import net.krlite.equator.core.DimensionalVec3d;
+import net.krlite.equator.base.DimensionalVec3d;
 import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.Optional;
@@ -47,12 +47,12 @@ public class CoordinateSolver {
      * @return                  The angle between the {@link PlayerEntity}'s vision and the destination {@link DimensionalVec3d}.
      */
     public static Optional<Double> angleInFrontOfCamera(PlayerEntity player, DimensionalVec3d destination, boolean ignoreDimension) {
-        if ( ignoreDimension || destination.getDimension().equals(player.getWorld().getRegistryKey()) ) {
+        if ( ignoreDimension || destination.dimension().equals(player.getWorld().getRegistryKey()) ) {
             double
                     dstAngle = AngleSolver.clockwiseToPositive(
                             Math.atan2(
-                                    (destination.getVec3d().getZ() + 0.5) - player.getZ(),
-                                    (destination.getVec3d().getX() + 0.5) - player.getX()
+                                    (destination.vec3d().getZ() + 0.5) - player.getZ(),
+                                    (destination.vec3d().getX() + 0.5) - player.getX()
                             ) * 180 / Math.PI + 180
                     ),
                     cameraAngle = AngleSolver.clockwiseToPositive((player.getYaw() % 360 + 360 + 270) % 360);
@@ -70,8 +70,8 @@ public class CoordinateSolver {
      * @return              The distance between the two {@link DimensionalVec3d}s.
      */
     public static Optional<Double> distance(DimensionalVec3d source, DimensionalVec3d destination) {
-        return source.getDimension() != destination.getDimension()
+        return source.dimension() != destination.dimension()
                 ? Optional.empty()
-                : Optional.of(source.getVec3d().distanceTo(destination.getVec3d()));
+                : Optional.of(source.vec3d().distanceTo(destination.vec3d()));
     }
 }

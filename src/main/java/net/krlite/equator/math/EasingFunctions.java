@@ -1,6 +1,6 @@
 package net.krlite.equator.math;
 
-import net.krlite.equator.core.Timer;
+import net.krlite.equator.base.Timer;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +21,7 @@ public class EasingFunctions {
      * @param value The dedicated value.
      */
     private static double pow(double value) {
-        return Math.pow(value, 2);
+        return pow(value, 2);
     }
 
     /**
@@ -89,7 +89,7 @@ public class EasingFunctions {
          * @return      The eased quadratic value.
          */
         public static double ease(@NotNull Timer timer, double shift) {
-            return ease(timer.queue(), 0, shift, timer.queuePeriod());
+            return ease(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -101,7 +101,7 @@ public class EasingFunctions {
          * @return      The eased quadratic value.
          */
         public static double easeIn(@NotNull Timer timer, double shift) {
-            return easeIn(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeIn(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -112,7 +112,7 @@ public class EasingFunctions {
          * @return      The eased quadratic value.
          */
         public static double easeOut(@NotNull Timer timer, double shift) {
-            return easeOut(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeOut(timer.queue(), 0, shift, timer.lasting());
         }
         
         /**
@@ -171,7 +171,7 @@ public class EasingFunctions {
          * @return      The eased cubic value.
          */
         public static double ease(@NotNull Timer timer, double shift) {
-            return ease(timer.queue(), 0, shift, timer.queuePeriod());
+            return ease(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -183,7 +183,7 @@ public class EasingFunctions {
          * @return      The eased cubic value.
          */
         public static double easeIn(@NotNull Timer timer, double shift) {
-            return easeIn(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeIn(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -195,7 +195,7 @@ public class EasingFunctions {
          * @return      The eased cubic value.
          */
         public static double easeOut(@NotNull Timer timer, double shift) {
-            return easeOut(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeOut(timer.queue(), 0, shift, timer.lasting());
         }
         
         /**
@@ -254,7 +254,7 @@ public class EasingFunctions {
          * @return      The eased quartic value.
          */
         public static double ease(@NotNull Timer timer, double shift) {
-            return ease(timer.queue(), 0, shift, timer.queuePeriod());
+            return ease(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -266,7 +266,7 @@ public class EasingFunctions {
          * @return      The eased quartic value.
          */
         public static double easeIn(@NotNull Timer timer, double shift) {
-            return easeIn(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeIn(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -278,7 +278,7 @@ public class EasingFunctions {
          * @return      The eased quartic value.
          */
         public static double easeOut(@NotNull Timer timer, double shift) {
-            return easeOut(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeOut(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -337,7 +337,7 @@ public class EasingFunctions {
          * @return      The eased quintic value.
          */
         public static double ease(@NotNull Timer timer, double shift) {
-            return ease(timer.queue(), 0, shift, timer.queuePeriod());
+            return ease(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -349,7 +349,7 @@ public class EasingFunctions {
          * @return      The eased quintic value.
          */
         public static double easeIn(@NotNull Timer timer, double shift) {
-            return easeIn(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeIn(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -361,7 +361,7 @@ public class EasingFunctions {
          * @return      The eased quintic value.
          */
         public static double easeOut(@NotNull Timer timer, double shift) {
-            return easeOut(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeOut(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -422,7 +422,7 @@ public class EasingFunctions {
          * @return      The eased sinusoidal value.
          */
         public static double ease(@NotNull Timer timer, double shift) {
-            return ease(timer.queue(), 0, shift, timer.queuePeriod());
+            return ease(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -434,7 +434,7 @@ public class EasingFunctions {
          * @return      The eased sinusoidal value.
          */
         public static double easeIn(@NotNull Timer timer, double shift) {
-            return easeIn(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeIn(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -446,7 +446,7 @@ public class EasingFunctions {
          * @return      The eased sinusoidal value.
          */
         public static double easeOut(@NotNull Timer timer, double shift) {
-            return easeOut(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeOut(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -503,7 +503,7 @@ public class EasingFunctions {
          * @return      The eased exponential value.
          */
         public static double ease(@NotNull Timer timer, double shift) {
-            return ease(timer.queue(), 0, shift, timer.queuePeriod());
+            return ease(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -515,7 +515,7 @@ public class EasingFunctions {
          * @return      The eased exponential value.
          */
         public static double easeIn(@NotNull Timer timer, double shift) {
-            return easeIn(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeIn(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -527,7 +527,7 @@ public class EasingFunctions {
          * @return      The eased exponential value.
          */
         public static double easeOut(@NotNull Timer timer, double shift) {
-            return easeOut(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeOut(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -589,7 +589,7 @@ public class EasingFunctions {
          * @return      The eased circular value.
          */
         public static double ease(@NotNull Timer timer, double shift) {
-            return ease(timer.queue(), 0, shift, timer.queuePeriod());
+            return ease(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -600,7 +600,7 @@ public class EasingFunctions {
          * @return      The eased circular value.
          */
         public static double easeIn(@NotNull Timer timer, double shift) {
-            return easeIn(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeIn(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -611,7 +611,7 @@ public class EasingFunctions {
          * @return      The eased circular value.
          */
         public static double easeOut(@NotNull Timer timer, double shift) {
-            return easeOut(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeOut(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -668,7 +668,7 @@ public class EasingFunctions {
          * @return      The eased elastic value.
          */
         public static double ease(@NotNull Timer timer, double shift) {
-            return ease(timer.queue(), 0, shift, timer.queuePeriod());
+            return ease(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -679,7 +679,7 @@ public class EasingFunctions {
          * @return      The eased elastic value.
          */
         public static double easeIn(@NotNull Timer timer, double shift) {
-            return easeIn(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeIn(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -690,7 +690,7 @@ public class EasingFunctions {
          * @return      The eased elastic value.
          */
         public static double easeOut(@NotNull Timer timer, double shift) {
-            return easeOut(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeOut(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -771,7 +771,7 @@ public class EasingFunctions {
          * @return      The eased back value.
          */
         public static double ease(@NotNull Timer timer, double shift) {
-            return ease(timer.queue(), 0, shift, timer.queuePeriod());
+            return ease(timer.queue(), 0, shift, timer.lasting());
         }
         
         /**
@@ -782,7 +782,7 @@ public class EasingFunctions {
          * @return      The eased back value.
          */
         public static double easeIn(@NotNull Timer timer, double shift) {
-            return easeIn(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeIn(timer.queue(), 0, shift, timer.lasting());
         }
         
         /**
@@ -793,7 +793,7 @@ public class EasingFunctions {
          * @return      The eased back value.
          */
         public static double easeOut(@NotNull Timer timer, double shift) {
-            return easeOut(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeOut(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**
@@ -848,7 +848,7 @@ public class EasingFunctions {
          * @return      The eased bounce value.
          */
         public static double ease(@NotNull Timer timer, double shift) {
-            return ease(timer.queue(), 0, shift, timer.queuePeriod());
+            return ease(timer.queue(), 0, shift, timer.lasting());
         }
         
         /**
@@ -859,7 +859,7 @@ public class EasingFunctions {
          * @return      The eased bounce value.
          */
         public static double easeIn(@NotNull Timer timer, double shift) {
-            return easeIn(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeIn(timer.queue(), 0, shift, timer.lasting());
         }
         
         /**
@@ -870,7 +870,7 @@ public class EasingFunctions {
          * @return      The eased bounce value.
          */
         public static double easeOut(@NotNull Timer timer, double shift) {
-            return easeOut(timer.queue(), 0, shift, timer.queuePeriod());
+            return easeOut(timer.queue(), 0, shift, timer.lasting());
         }
 
         /**

@@ -1,15 +1,14 @@
-package net.krlite.equator.core.sprite;
+package net.krlite.equator.base.sprite;
 
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.Objects;
+
 /**
  * A sprite that defines a horizontal set of {@link IdentifierSprite}s.
  */
-public class HorizontalSprite {
-    private final Identifier identifier;
-    private final int step;
-
+public record HorizontalSprite(Identifier identifier, int step) {
     /**
      * Creates a {@link HorizontalSprite} by splitting an {@link Identifier} horizontally into slices.
      * @param identifier    The dedicated {@link Identifier}.
@@ -27,15 +26,7 @@ public class HorizontalSprite {
      * @param textureHeight The height of the texture.
      */
     public HorizontalSprite(Identifier identifier, int textureWidth, int textureHeight) {
-        this.identifier = identifier;
-        step = textureWidth / textureHeight;
-    }
-
-    /**
-     * Gets the dedicated {@link Identifier}.
-     */
-    public Identifier identifier() {
-        return this.identifier;
+        this(identifier, textureWidth / textureHeight);
     }
 
     /**
@@ -52,5 +43,18 @@ public class HorizontalSprite {
                 this.identifier,
                 uBegin, 0, uEnd, 1
         );
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "{" +
+                "identifier=" + identifier +
+                ", step=" + step +
+                "}";
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(identifier, step);
     }
 }
