@@ -21,6 +21,10 @@ public record Timer(long origin, long lasting) {
 		return queueElapsed() >= 0 && queueElapsed() <= lasting;
 	}
 
+	public boolean isDone() {
+		return queueElapsed() > lasting;
+	}
+
 	public Timer reset() {
 		return new Timer(System.currentTimeMillis(), lasting);
 	}

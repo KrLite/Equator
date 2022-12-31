@@ -1,6 +1,6 @@
 package net.krlite.equator.base.geometry;
 
-import net.krlite.equator.base.PreciseColor;
+import net.krlite.equator.base.color.PreciseColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -145,6 +145,14 @@ public class TintedNode extends Node {
 
 	public TintedNode halfOpaque() {
 		return new TintedNode(this, nodeColor.halfOpaque());
+	}
+
+	public TintedNode lighter() {
+		return new TintedNode(this, nodeColor.lighter());
+	}
+
+	public TintedNode darker() {
+		return new TintedNode(this, nodeColor.darker());
 	}
 
 	public boolean equals(@NotNull TintedNode other) {

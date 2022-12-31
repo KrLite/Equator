@@ -1,9 +1,9 @@
 package net.krlite.equator.base.geometry;
 
-import net.krlite.equator.base.PreciseColor;
-import net.krlite.equator.math.AngleSolver;
+import net.krlite.equator.base.color.PreciseColor;
 import net.krlite.equator.render.Equator;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -101,6 +101,10 @@ public class TintedRect {
 		return new Rect(lu, ld, rd, ru);
 	}
 
+	public boolean visible() {
+		return anyNodeHasColor() && !allNodesAreTransparent();
+	}
+
 	public boolean allNodesHaveColor() {
 		return lu.nodeColor.hasColor() && ld.nodeColor.hasColor() && rd.nodeColor.hasColor() && ru.nodeColor.hasColor();
 	}
@@ -133,22 +137,30 @@ public class TintedRect {
 		return lu.nodeColor.isOpaque() || ld.nodeColor.isOpaque() || rd.nodeColor.isOpaque() || ru.nodeColor.isOpaque();
 	}
 
-	public TintedRect withAlpha(int alpha) {
+	public TintedRect withAlpha(int aLu, int aLd, int aRd, int aRu) {
 		return new TintedRect(
-				lu.withAlpha(alpha),
-				ld.withAlpha(alpha),
-				rd.withAlpha(alpha),
-				ru.withAlpha(alpha)
+				lu.withAlpha(aLu),
+				ld.withAlpha(aLd),
+				rd.withAlpha(aRd),
+				ru.withAlpha(aRu)
 		);
 	}
 
-	public TintedRect withOpacity(double opacity) {
+	public TintedRect withOpacity(double oLu, double oLd, double oRd, double oRu) {
 		return new TintedRect(
-				lu.withOpacity(opacity),
-				ld.withOpacity(opacity),
-				rd.withOpacity(opacity),
-				ru.withOpacity(opacity)
+				lu.withOpacity(oLu),
+				ld.withOpacity(oLd),
+				rd.withOpacity(oRd),
+				ru.withOpacity(oRu)
 		);
+	}
+
+	public TintedRect withAlpha(int alpha) {
+		return withAlpha(alpha, alpha, alpha, alpha);
+	}
+
+	public TintedRect withOpacity(double opacity) {
+		return withOpacity(opacity, opacity, opacity, opacity);
 	}
 
 	public TintedRect brighter() {
@@ -214,11 +226,29 @@ public class TintedRect {
 		);
 	}
 
+	public TintedRect lighter() {
+		return new TintedRect(
+				lu.lighter(),
+				ld.lighter(),
+				rd.lighter(),
+				ru.lighter()
+		);
+	}
+
+	public TintedRect darker() {
+		return new TintedRect(
+				lu.darker(),
+				ld.darker(),
+				rd.darker(),
+				ru.darker()
+		);
+	}
+
 	public PreciseColor getAverageColor() {
 		return PreciseColor.average(lu.nodeColor, ld.nodeColor, rd.nodeColor, ru.nodeColor);
 	}
 
-	public TintedRect cutTransparentColors() {
+	public TintedRect cut() {
 		return replace(
 				lu.nodeColor.orElse(PreciseColor.average(ld.nodeColor, ru.nodeColor).transparent()),
 				ld.nodeColor.orElse(PreciseColor.average(lu.nodeColor, rd.nodeColor).transparent()),
@@ -227,19 +257,11 @@ public class TintedRect {
 		);
 	}
 
-	public TintedRect cutTransparentColors(TintedRect fallback) {
+	public TintedRect cut(TintedRect fallback) {
 		return replace(
 				lu.nodeColor.orElse(fallback.lu.nodeColor), ld.nodeColor.orElse(fallback.ld.nodeColor),
 				rd.nodeColor.orElse(fallback.rd.nodeColor), ru.nodeColor.orElse(fallback.ru.nodeColor)
 		);
-	}
-
-	public TintedRect cut() {
-		return cutTransparentColors();
-	}
-
-	public TintedRect cut(TintedRect fallback) {
-		return cutTransparentColors(fallback);
 	}
 
 	public TintedRect replace(@NotNull Rect rect) {
@@ -448,25 +470,24 @@ public class TintedRect {
 		return flipDiagonalRuLd(1);
 	}
 
-	// ----- Drawers -----
-
+	// === Drawers ===
 	private final double
-			DEFAULT_SHADOW_RADIUS = 30, DEFAULT_ATTENUATION = 0.21,
-			DEFAULT_OPACITY = 0.41, DEFAULT_FADED_OPACITY = 0.12,
-			DEFAULT_X = 0, DEFAULT_Y = 0, FIXED_X = 0, FIXED_Y = 15;
+			DEFAULT_RADIUS = 120, DEFAULT_ATTENUATION = 0.2,
+			DEFAULT_OPACITY = 0.37, DEFAULT_FADED_OPACITY = 0.17,
+			FIXED_X = 0, FIXED_Y = 16;
 
 	public TintedRect draw(MatrixStack matrixStack) {
 		new Equator.Drawer(matrixStack).tintedRect(this);
 		return this;
 	}
 
-	public TintedRect drawShadowWithScissor(MatrixStack matrixStack, double shadowRadius, double attenuation, double x, double y) {
-		new Equator.Drawer(matrixStack).rectShadowWithScissor(scale(shadowRadius / 10.0).shift(x, y).transparent(), this, attenuation);
+	public TintedRect drawShadowWithScissor(MatrixStack matrixStack, double radius, double attenuation, double x, double y) {
+		new Equator.Drawer(matrixStack).rectShadowWithScissor(expand(radius).shift(x, y).transparent(), this, attenuation);
 		return this;
 	}
 
 	public TintedRect drawShadowWithScissor(MatrixStack matrixStack, double attenuation, double x, double y) {
-		return drawShadowWithScissor(matrixStack, DEFAULT_SHADOW_RADIUS, attenuation, x, y);
+		return drawShadowWithScissor(matrixStack, DEFAULT_RADIUS, attenuation, x, y);
 	}
 
 	public TintedRect drawShadowWithScissor(MatrixStack matrixStack, double x, double y) {
@@ -474,61 +495,103 @@ public class TintedRect {
 	}
 
 	public TintedRect drawShadowWithScissor(MatrixStack matrixStack, double attenuation) {
-		return drawShadowWithScissor(matrixStack, attenuation, DEFAULT_X, DEFAULT_Y);
+		return drawShadowWithScissor(matrixStack, attenuation, 0, 0);
 	}
 
 	public TintedRect drawShadowWithScissor(MatrixStack matrixStack) {
 		return drawShadowWithScissor(matrixStack, DEFAULT_ATTENUATION);
 	}
 
-	public TintedRect drawShadow(MatrixStack matrixStack, double shadowRadius, double attenuation, double x, double y) {
-		new Equator.Drawer(matrixStack).rectShadow(scale(shadowRadius / 10.0).shift(x, y).transparent(), this, attenuation);
+	public TintedRect drawShadow(MatrixStack matrixStack, double radius, double attenuation, Node shift) {
+		new Equator.Drawer(matrixStack).rectShadow(expand(radius).shiftBy(shift).transparent(), this, attenuation);
 		return this;
 	}
 
-	public TintedRect drawShadow(MatrixStack matrixStack, double attenuation, double x, double y) {
-		return drawShadow(matrixStack, DEFAULT_SHADOW_RADIUS, attenuation, x, y);
+	public TintedRect drawShadow(MatrixStack matrixStack, double radius, double attenuation) {
+		return drawShadow(matrixStack, radius, attenuation, new Node());
 	}
 
-	public TintedRect drawShadow(MatrixStack matrixStack, double x, double y) {
-		return drawShadow(matrixStack, DEFAULT_ATTENUATION, x, y);
+	public TintedRect drawShadow(MatrixStack matrixStack, double radius, Node shift) {
+		return drawShadow(matrixStack, radius, DEFAULT_ATTENUATION, shift);
 	}
 
-	public TintedRect drawShadow(MatrixStack matrixStack, double attenuation) {
-		return drawShadow(matrixStack, attenuation, DEFAULT_X, DEFAULT_Y);
+	public TintedRect drawShadow(MatrixStack matrixStack, double radius) {
+		return drawShadow(matrixStack, radius, new Node());
+	}
+
+	public TintedRect drawShadow(MatrixStack matrixStack, Node shift) {
+		return drawShadow(matrixStack, DEFAULT_RADIUS, shift);
 	}
 
 	public TintedRect drawShadow(MatrixStack matrixStack) {
-		return drawShadow(matrixStack, DEFAULT_ATTENUATION);
+		return drawShadow(matrixStack, DEFAULT_RADIUS);
 	}
 
-	public TintedRect drawFixedShadow(MatrixStack matrixStack, PreciseColor shadowColor, double clockwiseDegree) {
+	public TintedRect drawFixedShadow(MatrixStack matrixStack, PreciseColor lu, PreciseColor ld, PreciseColor rd, PreciseColor ru, double ratio, double clockwiseDegree) {
+		ratio = MathHelper.clamp(ratio, 0, 1);
 		new Equator.Drawer(matrixStack)
 				.rectShadowWithScissor(
-						replace(shadowColor)
-								.scale(DEFAULT_SHADOW_RADIUS / 10.0)
+						replace(lu, ld, rd, ru)
+								.expand(DEFAULT_RADIUS * ratio)
 								.shiftToCenter(center().shift(FIXED_X, FIXED_Y).rotate(center(), clockwiseDegree))
 								.transparent(),
 						replace(
-								shadowColor.withOpacity(DEFAULT_FADED_OPACITY),
-								shadowColor.withOpacity(DEFAULT_OPACITY),
-								shadowColor.withOpacity(DEFAULT_OPACITY),
-								shadowColor.withOpacity(DEFAULT_FADED_OPACITY)
+								lu.withOpacity(DEFAULT_FADED_OPACITY * ratio),
+								ld.withOpacity(DEFAULT_OPACITY * ratio),
+								rd.withOpacity(DEFAULT_OPACITY * ratio),
+								ru.withOpacity(DEFAULT_FADED_OPACITY * ratio)
 						), DEFAULT_ATTENUATION
 				).tintedRect(this);
 		return this;
 	}
 
-	public TintedRect drawFixedShadow(MatrixStack matrixStack, double clockwiseDegree) {
-		return drawFixedShadow(matrixStack, PreciseColor.BLACK, clockwiseDegree);
+	public TintedRect drawFixedShadow(MatrixStack matrixStack, TintedRect shadowRect, double ratio, double clockwiseDegree) {
+		return drawFixedShadow(matrixStack, shadowRect.lu.nodeColor, shadowRect.ld.nodeColor, shadowRect.rd.nodeColor, shadowRect.ru.nodeColor, ratio, clockwiseDegree);
+	}
+
+	public TintedRect drawFixedShadow(MatrixStack matrixStack, double ratio, double clockwiseDegree) {
+		return drawFixedShadow(matrixStack, this.darker(), ratio, clockwiseDegree);
+	}
+
+	public TintedRect drawFixedShadow(MatrixStack matrixStack, double ratio) {
+		return drawFixedShadow(matrixStack, this.darker(), ratio, 0);
 	}
 
 	public TintedRect drawFixedShadow(MatrixStack matrixStack) {
-		return drawFixedShadow(matrixStack, 0);
+		return drawFixedShadow(matrixStack, 1);
 	}
 
-	public TintedRect drawFocusedShadow(MatrixStack matrixStack, PreciseColor shadowColor) {
-		return drawFixedShadow(matrixStack, shadowColor, center().getClockwiseDegree());
+	public TintedRect drawFocusedShadow(MatrixStack matrixStack, PreciseColor lu, PreciseColor ld, PreciseColor rd, PreciseColor ru, double ratio, double clockwiseDegree) {
+		return drawFixedShadow(matrixStack, lu, ld, rd, ru, ratio, center().getClockwiseDegree());
+	}
+
+	public TintedRect drawFocusedShadow(MatrixStack matrixStack, TintedRect shadowRect, double ratio, double clockwiseDegree) {
+		return drawFocusedShadow(matrixStack, shadowRect.lu.nodeColor, shadowRect.ld.nodeColor, shadowRect.rd.nodeColor, shadowRect.ru.nodeColor, ratio, clockwiseDegree);
+	}
+
+	public TintedRect drawFocusedShadow(MatrixStack matrixStack, double ratio, double clockwiseDegree) {
+		return drawFocusedShadow(matrixStack, this.darker(), ratio, clockwiseDegree);
+	}
+
+	public TintedRect drawFocusedShadow(MatrixStack matrixStack, double ratio) {
+		return drawFocusedShadow(matrixStack, this.darker(), ratio, 0);
+	}
+
+	public TintedRect drawFocusedShadow(MatrixStack matrixStack) {
+		return drawFocusedShadow(matrixStack, 1);
+	}
+
+	public TintedRect drawFullShadow(MatrixStack matrixStack, double radius, double attenuation) {
+		return withOpacity(DEFAULT_FADED_OPACITY, DEFAULT_OPACITY, DEFAULT_OPACITY, DEFAULT_FADED_OPACITY)
+					   .drawShadow(matrixStack, radius, attenuation);
+	}
+
+	public TintedRect drawFullShadow(MatrixStack matrixStack, double radius) {
+		return drawFullShadow(matrixStack, radius, DEFAULT_ATTENUATION);
+	}
+
+	public TintedRect drawFullShadow(MatrixStack matrixStack) {
+		return drawFullShadow(matrixStack, DEFAULT_RADIUS);
 	}
 
 	@Override

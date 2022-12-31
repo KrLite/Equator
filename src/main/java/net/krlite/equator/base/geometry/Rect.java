@@ -1,5 +1,6 @@
 package net.krlite.equator.base.geometry;
 
+import net.krlite.equator.base.color.PreciseColor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,14 @@ public class Rect {
 
 	public Rect() {
 		this(new Node(), new Node(MinecraftClient.getInstance().getWindow().getScaledWidth(), MinecraftClient.getInstance().getWindow().getScaledHeight()));
+	}
+
+	public TintedRect bound(PreciseColor preciseColor) {
+		return new TintedRect(this, preciseColor);
+	}
+
+	public TintedRect bound(PreciseColor lu, PreciseColor ld, PreciseColor rd, PreciseColor ru) {
+		return new TintedRect(this, lu, ld, rd, ru);
 	}
 
 	public Rect min(@NotNull Rect other) {

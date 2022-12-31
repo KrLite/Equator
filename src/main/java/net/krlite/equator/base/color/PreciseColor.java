@@ -1,5 +1,9 @@
-package net.krlite.equator.base;
+package net.krlite.equator.base.color;
 
+import net.krlite.equator.base.geometry.Node;
+import net.krlite.equator.base.geometry.Rect;
+import net.krlite.equator.base.geometry.TintedNode;
+import net.krlite.equator.base.geometry.TintedRect;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,15 +13,18 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class PreciseColor {
-	public static final PreciseColor WHITE = new PreciseColor(1, 1, 1, 1);
-	public static final PreciseColor BLACK = new PreciseColor(0, 0, 0, 1);
-	public static final PreciseColor RED = new PreciseColor(1, 0, 0, 1);
-	public static final PreciseColor GREEN = new PreciseColor(0, 1, 0, 1);
-	public static final PreciseColor BLUE = new PreciseColor(0, 0, 1, 1);
-	public static final PreciseColor YELLOW = new PreciseColor(1, 1, 0, 1);
-	public static final PreciseColor MAGENTA = new PreciseColor(1, 0, 1, 1);
-	public static final PreciseColor CYAN = new PreciseColor(0, 1, 1, 1);
-	public static final PreciseColor TRANSPARENT = new PreciseColor(0, 0, 0, 0, true);
+	// === Basic ===
+	public static final PreciseColor WHITE = new PreciseColor(1, 1, 1);
+	public static final PreciseColor BLACK = new PreciseColor(0, 0, 0);
+	public static final PreciseColor RED = new PreciseColor(1, 0, 0);
+	public static final PreciseColor GREEN = new PreciseColor(0, 1, 0);
+	public static final PreciseColor BLUE = new PreciseColor(0, 0, 1);
+	public static final PreciseColor YELLOW = new PreciseColor(1, 1, 0);
+	public static final PreciseColor MAGENTA = new PreciseColor(1, 0, 1);
+	public static final PreciseColor CYAN = new PreciseColor(0, 1, 1);
+
+	// === Transparent ===
+	public static final PreciseColor TRANSPARENT = new PreciseColor(0 , 0, 0, 0, true); // Transparent and will only participate in alpha blending
 
 	private static double clampValue(double value) {
 		return MathHelper.clamp(value, 0, 1);
@@ -45,6 +52,23 @@ public class PreciseColor {
 		return new PreciseColor(color.getRed() / 255.0, color.getGreen() / 255.0, color.getBlue() / 255.0, color.getAlpha() / 255.0);
 	}
 
+	public static PreciseColor of(@Nullable String hexColor) {
+		if (hexColor == null) return TRANSPARENT;
+		return PreciseColor.of(Color.decode(hexColor));
+	}
+
+	public static PreciseColor of(int integerColor) {
+		return PreciseColor.of(new Color(integerColor, integerColor > 0xFFFFFF));
+	}
+
+	public static PreciseColor of(int red, int green, int blue, int alpha) {
+		return new PreciseColor(red / 255.0, green / 255.0, blue / 255.0, alpha / 255.0);
+	}
+
+	public static PreciseColor of(int red, int green, int blue) {
+		return new PreciseColor(red / 255.0, green / 255.0, blue / 255.0);
+	}
+
 	private final double r, g, b, a;
 	private final boolean transparent;
 
@@ -61,7 +85,19 @@ public class PreciseColor {
 	}
 
 	public PreciseColor(double r, double g, double b) {
-		this(r, g, b, 1.0);
+		this(r, g, b, 1);
+	}
+
+	public PreciseColor(double grayscale) {
+		this(grayscale, grayscale, grayscale);
+	}
+
+	public TintedNode bound(Node node) {
+		return new TintedNode(node, this);
+	}
+
+	public TintedRect bound(Rect rect) {
+		return new TintedRect(rect, this);
 	}
 
 	public double red() {
@@ -201,6 +237,20 @@ public class PreciseColor {
 		return withOpacity(a * 2);
 	}
 
+	public PreciseColor lighter() {
+		return new PreciseColor(
+				Math.max(Math.sqrt(r), 0.73), Math.max(Math.sqrt(g), 0.73),
+				Math.max(Math.sqrt(b), 0.73), a
+		);
+	}
+
+	public PreciseColor darker() {
+		return new PreciseColor(
+				Math.min(Math.pow(r, 2), 0.27), Math.min(Math.pow(g, 2), 0.27),
+				Math.min(Math.pow(b, 2), 0.27), a
+		);
+	}
+
 	public boolean equals(@NotNull PreciseColor other) {
 		return hashCode() == other.hashCode();
 	}
@@ -226,5 +276,14 @@ public class PreciseColor {
 	public String toShortString() {
 		if (transparent) return "PreciseColor{transparent}";
 		return "PreciseColor{" + r + ", " + g + ", " + b + ", " + a + "}";
+	}
+
+	public String toPerfectString(int spacing) {
+		if (transparent) return "";
+		return "§c" + redInt() + " ".repeat(spacing) + "§a" + greenInt() + " ".repeat(spacing) + "§9" + blueInt() + " ".repeat(spacing) + "§7" + alphaInt();
+	}
+
+	public String toPerfectString() {
+		return toPerfectString(2);
 	}
 }

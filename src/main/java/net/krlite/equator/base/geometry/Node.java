@@ -1,5 +1,6 @@
 package net.krlite.equator.base.geometry;
 
+import net.krlite.equator.base.color.PreciseColor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -14,6 +15,10 @@ public class Node {
 
 	public Node() {
 		this(0, 0);
+	}
+
+	public TintedNode bound(PreciseColor nodeColor) {
+		return new TintedNode(this, nodeColor);
 	}
 
 	public Node min(@NotNull Node other) {

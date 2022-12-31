@@ -40,12 +40,7 @@ public class IdentifierBuilder {
 
 		@Override
 		public String toString() {
-			return "IdentifierBuilder{namespace='" + namespace + "'}";
+			return "IdentifierBuilder" + "{namespace='" + namespace + "'}";
 		}
-	}
-
-	private static String check(String namespace) {
-		if (namespace.isEmpty()) return "minecraft";
-		else return namespace;
 	}
 }

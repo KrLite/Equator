@@ -1,23 +1,99 @@
 package net.krlite.equator.render;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.krlite.equator.base.PreciseColor;
+import net.krlite.equator.base.color.PreciseColor;
 import net.krlite.equator.base.geometry.Rect;
 import net.krlite.equator.base.geometry.TintedNode;
 import net.krlite.equator.base.geometry.TintedRect;
+import net.krlite.equator.base.sprite.IdentifierSprite;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
 
 public class Equator {
+	public record Renderer(MatrixStack matrixStack, IdentifierSprite identifierSprite) {
+		public Renderer rect(Rect rect, PreciseColor textureColor) {
+			Tessellator tessellator = prepare(textureColor);
+			BufferBuilder builder = tessellator.getBuffer();
+			builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+
+			renderTexturedRect(builder, rect, textureColor);
+
+			cleanup(tessellator);
+			return this;
+		}
+
+		public Renderer rect(Rect rect) {
+			return rect(rect, PreciseColor.WHITE);
+		}
+
+		public Renderer rect(double x, double y, double width, double height, PreciseColor textureColor) {
+			return rect(new Rect(x, y, width, height), textureColor);
+		}
+
+		public Renderer rect(double x, double y, double width, double height) {
+			return rect(x, y, width, height, PreciseColor.WHITE);
+		}
+
+		public Renderer centeredRect(double xCentered, double yCentered, double width, double height, PreciseColor textureColor) {
+			return rect(xCentered - width / 2, yCentered - height / 2, width, height, textureColor);
+		}
+
+		public Renderer centeredRect(double xCentered, double yCentered, double width, double height) {
+			return centeredRect(xCentered, yCentered, width, height, PreciseColor.WHITE);
+		}
+
+		// === Utilities ===
+		private Tessellator prepare() {
+			return prepare(PreciseColor.WHITE);
+		}
+
+		private Tessellator prepare(PreciseColor shaderColor) {
+			RenderSystem.disableDepthTest();
+			RenderSystem.depthMask(false);
+
+			RenderSystem.enableTexture();
+			RenderSystem.enableBlend();
+
+			RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+			RenderSystem.setShaderColor(shaderColor.redFloat(), shaderColor.greenFloat(), shaderColor.blueFloat(), shaderColor.alphaFloat());
+			RenderSystem.setShaderTexture(0, identifierSprite.identifier());
+
+			return Tessellator.getInstance();
+		}
+
+		private void cleanup(Tessellator tessellator) {
+			tessellator.draw();
+        	RenderSystem.depthMask(true);
+			RenderSystem.enableDepthTest();
+
+			RenderSystem.setShaderColor(1, 1, 1, 1);
+		}
+
+		private void renderVertex(BufferBuilder builder, TintedNode vertex, float u, float v) {
+			builder.vertex(matrixStack.peek().getPositionMatrix(), (float) vertex.x, (float) vertex.y, 0)
+					.texture(u, v)
+					.color(
+							vertex.nodeColor.redFloat(), vertex.nodeColor.greenFloat(),
+							vertex.nodeColor.blueFloat(), vertex.nodeColor.alphaFloat()
+					).next();
+		}
+
+		private void renderTexturedRect(BufferBuilder builder, Rect rect, PreciseColor textureColor) {
+			renderVertex(builder, rect.ru.bound(textureColor), identifierSprite.uBegin(), identifierSprite.vEnd());
+			renderVertex(builder, rect.lu.bound(textureColor), identifierSprite.uBegin(), identifierSprite.vBegin());
+			renderVertex(builder, rect.ld.bound(textureColor), identifierSprite.uEnd(), identifierSprite.vBegin());
+			renderVertex(builder, rect.rd.bound(textureColor), identifierSprite.uEnd(), identifierSprite.vEnd());
+		}
+	}
+
 	public record Drawer(MatrixStack matrixStack) {
 		public Drawer tintedRect(TintedRect tintedRect) {
 			Tessellator tessellator = prepare();
 			BufferBuilder builder = tessellator.getBuffer();
 			builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-			drawTintedRect(builder, tintedRect.cutTransparentColors());
+			drawTintedRect(builder, tintedRect.cut());
 
 			cleanup(tessellator);
 			return this;
@@ -27,8 +103,8 @@ public class Equator {
 			return tintedRect(new TintedRect(rect, lu, ld, rd, ru));
 		}
 
-		public Drawer tintedRect(Rect rect, PreciseColor preciseColor) {
-			return tintedRect(rect, preciseColor, preciseColor, preciseColor, preciseColor);
+		public Drawer tintedRect(Rect rect, PreciseColor fillColor) {
+			return tintedRect(rect, fillColor, fillColor, fillColor, fillColor);
 		}
 
 		public Drawer tintedRect(PreciseColor preciseColor) {
@@ -147,27 +223,30 @@ public class Equator {
 			return rectShadow(new TintedRect(), inner, attenuation);
 		}
 
-		// ----- Private methods -----
-
+		// === Utilities ===
 		private Tessellator prepare() {
 			RenderSystem.disableTexture();
 			RenderSystem.enableBlend();
 
-			RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
 			RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 
 			return Tessellator.getInstance();
+		}
+
+		private void cleanup(Tessellator tessellator) {
+			tessellator.draw();
+			RenderSystem.enableTexture();
 		}
 
 		private double nonLinearProjection(double value) {
 			return 0.5 + Math.sin(MathHelper.clamp(value, 0, 1) * Math.PI - Math.PI / 2) * 0.3;
 		}
 
-		private void drawVertex(BufferBuilder builder, TintedNode tintedNode) {
-			builder.vertex(matrixStack.peek().getPositionMatrix(), (float) tintedNode.x, (float) tintedNode.y, 0)
+		private void drawVertex(BufferBuilder builder, TintedNode vertex) {
+			builder.vertex(matrixStack.peek().getPositionMatrix(), (float) vertex.x, (float) vertex.y, 0)
 					.color(
-							tintedNode.nodeColor.redFloat(), tintedNode.nodeColor.greenFloat(),
-							tintedNode.nodeColor.blueFloat(), tintedNode.nodeColor.alphaFloat()
+							vertex.nodeColor.redFloat(), vertex.nodeColor.greenFloat(),
+							vertex.nodeColor.blueFloat(), vertex.nodeColor.alphaFloat()
 					).next();
 		}
 
@@ -179,17 +258,12 @@ public class Equator {
 			drawVertex(builder, tintedRect.rd);
 		}
 
-		private void drawTintedRect(BufferBuilder builder, Rect rect, PreciseColor preciseColor) {
-			drawTintedRect(builder, rect, preciseColor, preciseColor, preciseColor, preciseColor);
+		private void drawTintedRect(BufferBuilder builder, Rect rect, PreciseColor fillColor) {
+			drawTintedRect(builder, rect, fillColor, fillColor, fillColor, fillColor);
 		}
 
 		private void drawTintedRect(BufferBuilder builder, Rect rect, PreciseColor lu, PreciseColor ld, PreciseColor rd, PreciseColor ru) {
 			drawTintedRect(builder, new TintedRect(rect, lu, ld, rd, ru));
-		}
-
-		private void cleanup(Tessellator tessellator) {
-			tessellator.draw();
-			RenderSystem.enableTexture();
 		}
 	}
 }
