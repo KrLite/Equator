@@ -8,6 +8,7 @@ import net.krlite.equator.base.geometry.TintedNode;
 import net.krlite.equator.base.geometry.TintedRect;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.MathHelper;
 
 public class Equator {
 	public record Drawer(MatrixStack matrixStack) {
@@ -16,7 +17,7 @@ public class Equator {
 			BufferBuilder builder = tessellator.getBuffer();
 			builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-			drawTintedRect(builder, tintedRect.processTransparentColors());
+			drawTintedRect(builder, tintedRect.cutTransparentColors());
 
 			cleanup(tessellator);
 			return this;
@@ -50,9 +51,9 @@ public class Equator {
 			return horizontalGradiant(new Rect(), left, right);
 		}
 
-		public Drawer verticalGradiant(TintedRect tintedRect, double upperToLowerRatio) {
-			upperToLowerRatio = nonLinearProjection(upperToLowerRatio);
-			tintedRect = tintedRect.processTransparentColors();
+		public Drawer verticalGradiant(TintedRect tintedRect, double upperToLowerAttenuation) {
+			upperToLowerAttenuation = nonLinearProjection(upperToLowerAttenuation);
+			tintedRect = tintedRect.cut();
 
 			if (tintedRect.lu.distance(tintedRect.ld) <= 15 && tintedRect.ru.distance(tintedRect.rd) <= 15) {
 				tintedRect(tintedRect);
@@ -60,19 +61,19 @@ public class Equator {
 			}
 
 			verticalGradiant(tintedRect.squeezeFromBottom(0.5).replace(
-					tintedRect.lu.nodeColor, tintedRect.ld.nodeColor.blend(tintedRect.lu.nodeColor, upperToLowerRatio),
-					tintedRect.rd.nodeColor.blend(tintedRect.ru.nodeColor, upperToLowerRatio), tintedRect.ru.nodeColor
-			), upperToLowerRatio);
+					tintedRect.lu.nodeColor, tintedRect.ld.nodeColor.blend(tintedRect.lu.nodeColor, upperToLowerAttenuation),
+					tintedRect.rd.nodeColor.blend(tintedRect.ru.nodeColor, upperToLowerAttenuation), tintedRect.ru.nodeColor
+			), upperToLowerAttenuation);
 			verticalGradiant(tintedRect.squeezeFromTop(0.5).replace(
-					tintedRect.lu.nodeColor.blend(tintedRect.ld.nodeColor, 1 - upperToLowerRatio), tintedRect.ld.nodeColor,
-					tintedRect.rd.nodeColor, tintedRect.ru.nodeColor.blend(tintedRect.rd.nodeColor, 1 - upperToLowerRatio)
-			), upperToLowerRatio);
+					tintedRect.lu.nodeColor.blend(tintedRect.ld.nodeColor, 1 - upperToLowerAttenuation), tintedRect.ld.nodeColor,
+					tintedRect.rd.nodeColor, tintedRect.ru.nodeColor.blend(tintedRect.rd.nodeColor, 1 - upperToLowerAttenuation)
+			), upperToLowerAttenuation);
 			return this;
 		}
 
-		public Drawer horizontalGradiant(TintedRect tintedRect, double leftToRightRatio) {
-			leftToRightRatio = nonLinearProjection(leftToRightRatio);
-			tintedRect = tintedRect.processTransparentColors();
+		public Drawer horizontalGradiant(TintedRect tintedRect, double leftToRightAttenuation) {
+			leftToRightAttenuation = nonLinearProjection(leftToRightAttenuation);
+			tintedRect = tintedRect.cut();
 
 			if (tintedRect.lu.distance(tintedRect.ru) <= 15 && tintedRect.ld.distance(tintedRect.rd) <= 15) {
 				tintedRect(tintedRect);
@@ -81,20 +82,20 @@ public class Equator {
 
 			horizontalGradiant(tintedRect.squeezeFromRight(0.5).replace(
 					tintedRect.lu.nodeColor, tintedRect.ld.nodeColor,
-					tintedRect.rd.nodeColor.blend(tintedRect.ld.nodeColor, leftToRightRatio),
-					tintedRect.ru.nodeColor.blend(tintedRect.lu.nodeColor, leftToRightRatio)
-			), leftToRightRatio);
+					tintedRect.rd.nodeColor.blend(tintedRect.ld.nodeColor, leftToRightAttenuation),
+					tintedRect.ru.nodeColor.blend(tintedRect.lu.nodeColor, leftToRightAttenuation)
+			), leftToRightAttenuation);
 			horizontalGradiant(tintedRect.squeezeFromLeft(0.5).replace(
-					tintedRect.lu.nodeColor.blend(tintedRect.ru.nodeColor, 1 - leftToRightRatio),
-					tintedRect.ld.nodeColor.blend(tintedRect.rd.nodeColor, 1 - leftToRightRatio),
+					tintedRect.lu.nodeColor.blend(tintedRect.ru.nodeColor, 1 - leftToRightAttenuation),
+					tintedRect.ld.nodeColor.blend(tintedRect.rd.nodeColor, 1 - leftToRightAttenuation),
 					tintedRect.rd.nodeColor, tintedRect.ru.nodeColor
-			), leftToRightRatio);
+			), leftToRightAttenuation);
 			return this;
 		}
 
-		public Drawer rectGradiantFromMiddleWithScissor(TintedRect tintedRect, TintedRect scissor) {
-			tintedRect = tintedRect.pr();
-			scissor = scissor.pr();
+		public Drawer rectShadowWithScissor(TintedRect tintedRect, TintedRect scissor) {
+			tintedRect = tintedRect.cut();
+			scissor = scissor.cut();
 			// Upper
 			tintedRect(new TintedRect(tintedRect.lu, scissor.lu, scissor.ru, tintedRect.ru));
 			// Lower
@@ -106,27 +107,47 @@ public class Equator {
 			return this;
 		}
 
-		public Drawer rectGradiantFromMiddleWithScissor(TintedRect scissor) {
-			return rectGradiantFromMiddleWithScissor(new TintedRect(), scissor);
+		public Drawer rectShadowWithScissor(TintedRect scissor) {
+			return rectShadowWithScissor(new TintedRect(), scissor);
 		}
 
-		public Drawer rectGradiantFromMiddleWithScissor(TintedRect tintedRect, TintedRect scissor, double expandRatio) {
-			tintedRect = tintedRect.pr();
-			scissor = scissor.pr();
+		public Drawer rectShadowWithScissor(TintedRect tintedRect, TintedRect scissor, double attenuation) {
+			tintedRect = tintedRect.cut();
+			scissor = scissor.cut();
 			// Upper
-			verticalGradiant(new TintedRect(tintedRect.lu, scissor.lu, scissor.ru, tintedRect.ru), 1 - expandRatio);
+			verticalGradiant(new TintedRect(tintedRect.lu, scissor.lu, scissor.ru, tintedRect.ru), 1 - attenuation);
 			// Lower
-			verticalGradiant(new TintedRect(scissor.ld, tintedRect.ld, tintedRect.rd, scissor.rd), expandRatio);
+			verticalGradiant(new TintedRect(scissor.ld, tintedRect.ld, tintedRect.rd, scissor.rd), attenuation);
 			// Left
-			horizontalGradiant(new TintedRect(tintedRect.lu, tintedRect.ld, scissor.ld, scissor.lu), 1 - expandRatio);
+			horizontalGradiant(new TintedRect(tintedRect.lu, tintedRect.ld, scissor.ld, scissor.lu), 1 - attenuation);
 			// Right
-			horizontalGradiant(new TintedRect(scissor.ru, scissor.rd, tintedRect.rd, tintedRect.ru), expandRatio);
+			horizontalGradiant(new TintedRect(scissor.ru, scissor.rd, tintedRect.rd, tintedRect.ru), attenuation);
 			return this;
 		}
 
-		public Drawer rectGradiantFromMiddleWithScissor(TintedRect scissor, double expandRatio) {
-			return rectGradiantFromMiddleWithScissor(new TintedRect(), scissor, expandRatio);
+		public Drawer rectShadowWithScissor(TintedRect scissor, double attenuation) {
+			return rectShadowWithScissor(new TintedRect(), scissor, attenuation);
 		}
+
+		public Drawer rectShadow(TintedRect outer, TintedRect inner) {
+			rectShadowWithScissor(outer, inner);
+			return tintedRect(inner);
+		}
+
+		public Drawer rectShadow(TintedRect outer, TintedRect inner, double attenuation) {
+			rectShadowWithScissor(outer, inner, attenuation);
+			return tintedRect(inner);
+		}
+
+		public Drawer rectShadow(TintedRect inner) {
+			return rectShadow(new TintedRect(), inner);
+		}
+
+		public Drawer rectShadow(TintedRect inner, double attenuation) {
+			return rectShadow(new TintedRect(), inner, attenuation);
+		}
+
+		// ----- Private methods -----
 
 		private Tessellator prepare() {
 			RenderSystem.disableTexture();
@@ -138,8 +159,8 @@ public class Equator {
 			return Tessellator.getInstance();
 		}
 
-		private double nonLinearProjection(double ratio) {
-			return 0.5 + Math.sin(ratio * Math.PI - Math.PI / 2) * 0.3;
+		private double nonLinearProjection(double value) {
+			return 0.5 + Math.sin(MathHelper.clamp(value, 0, 1) * Math.PI - Math.PI / 2) * 0.3;
 		}
 
 		private void drawVertex(BufferBuilder builder, TintedNode tintedNode) {

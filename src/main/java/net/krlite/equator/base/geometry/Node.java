@@ -71,6 +71,14 @@ public class Node {
 		);
 	}
 
+	public double getClockwiseDegree(@NotNull Node other) {
+		return Math.toDegrees(Math.atan2(other.y - y, other.x - x) + 90);
+	}
+
+	public double getClockwiseDegree() {
+		return getClockwiseDegree(new Rect().center());
+	}
+
 	public boolean equals(@NotNull Node other) {
 		return hashCode() == other.hashCode();
 	}

@@ -9,6 +9,6 @@
     "defaultRequire": 0
   },
   "client": [
-    "client.TitleScreenMixin"
+    "client.MinecraftClientMixin"
   ]
 }

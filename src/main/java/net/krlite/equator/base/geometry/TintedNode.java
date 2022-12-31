@@ -51,12 +51,40 @@ public class TintedNode extends Node {
 		return new TintedNode(this, nodeColor.blendAll(others));
 	}
 
+	public TintedNode shift(double x, double y) {
+		return new TintedNode(this.x + x, this.y + y, nodeColor);
+	}
+
+	public TintedNode shiftBy(@NotNull Node other) {
+		return shift(other.x, other.y);
+	}
+
+	public TintedNode shiftTo(@NotNull Node other) {
+		return new TintedNode(other, nodeColor);
+	}
+
+	public TintedNode scale(@NotNull Node other, double x, double y) {
+		return replace(super.scale(other, x, y));
+	}
+
+	public TintedNode scale(@NotNull Node other, double scale) {
+		return replace(super.scale(other, scale));
+	}
+
+	public TintedNode scale(@NotNull Node other) {
+		return replace(super.scale(other));
+	}
+
 	public TintedNode interpolate(@NotNull TintedNode other, double ratio) {
-		return new TintedNode(scale(other, ratio), nodeColor.blend(other.nodeColor, ratio));
+		return new TintedNode(super.scale(other, ratio), nodeColor.blend(other.nodeColor, ratio));
 	}
 
 	public TintedNode interpolate(@NotNull TintedNode other) {
 		return interpolate(other, 0.5);
+	}
+
+	public TintedNode rotate(@NotNull Node origin, double clockwiseDegree) {
+		return replace(super.rotate(origin, clockwiseDegree));
 	}
 
 	public boolean hasColor() {
