@@ -1,11 +1,11 @@
 package net.krlite.equator.debug;
 
-import net.krlite.equator.base.Pusher;
-import net.krlite.equator.base.Timer;
 import net.krlite.equator.base.color.PreciseColor;
 import net.krlite.equator.base.color.PreciseColors;
 import net.krlite.equator.base.geometry.Rect;
 import net.krlite.equator.base.geometry.TintedRect;
+import net.krlite.equator.util.Pusher;
+import net.krlite.equator.util.Timer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;

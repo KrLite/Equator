@@ -1,6 +1,6 @@
 package net.krlite.equator.math;
 
-import net.krlite.equator.base.Timer;
+import net.krlite.equator.util.Timer;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 
