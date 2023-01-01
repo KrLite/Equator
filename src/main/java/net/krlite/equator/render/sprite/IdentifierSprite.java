@@ -1,4 +1,4 @@
-package net.krlite.equator.sprite;
+package net.krlite.equator.render.sprite;
 
 import net.krlite.equator.geometry.Rect;
 import net.krlite.equator.color.PreciseColor;

@@ -7,7 +7,7 @@ import net.krlite.equator.color.PreciseColors;
 import net.krlite.equator.geometry.Rect;
 import net.krlite.equator.geometry.TintedNode;
 import net.krlite.equator.geometry.TintedRect;
-import net.krlite.equator.sprite.IdentifierSprite;
+import net.krlite.equator.render.sprite.IdentifierSprite;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
