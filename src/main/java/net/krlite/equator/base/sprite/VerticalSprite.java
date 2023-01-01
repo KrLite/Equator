@@ -14,10 +14,7 @@ public record VerticalSprite(Identifier identifier, int step) {
      * @param identifier    The dedicated {@link Identifier}.
      * @param step          The number of slices.
      */
-    public VerticalSprite(Identifier identifier, int step) {
-        this.identifier = identifier;
-        this.step = step;
-    }
+    public VerticalSprite {}
 
     /**
      * Creates a {@link VerticalSprite} by splitting an {@link Identifier} vertically into square slices.
@@ -47,7 +44,7 @@ public record VerticalSprite(Identifier identifier, int step) {
 
     @Override
     public String toString() {
-        return getClass().getName() + "{" +
+        return "VerticalSprite" + "{" +
                 "identifier=" + identifier +
                 ", step=" + step +
                 "}";

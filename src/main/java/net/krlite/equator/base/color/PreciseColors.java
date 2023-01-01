@@ -102,6 +102,9 @@ public class PreciseColors {
 	public static final PreciseColor MINECRAFT_BACKGROUND_LIGHT_PURPLE = PreciseColor.of(0x3F153F);
 	public static final PreciseColor MINECRAFT_BACKGROUND_YELLOW = PreciseColor.of(0x3F3F15);
 	public static final PreciseColor MINECRAFT_BACKGROUND_WHITE = PreciseColor.of(0x3F3F3F);
+	// Miscellaneous
+	public static final PreciseColor MINECRAFT_MISSING_TEXTURE_PURPLE = PreciseColor.of(0xF800F8);
+	public static final PreciseColor MINECRAFT_MISSING_TEXTURE_BLACK = PreciseColor.of(0x000000);
 
 	// === Fashionable ===
 	public static final PreciseColor TURQUOISE = new PreciseColor(0.25, 0.88, 0.82);

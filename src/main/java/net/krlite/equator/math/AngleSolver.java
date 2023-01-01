@@ -61,6 +61,14 @@ public class AngleSolver {
         return 360 - castByClockwise(angle);
     }
 
+    public static double opposite(double angle) {
+        return cast(angle + 180);
+    }
+
+    public static double oppositeByClockwise(double angle) {
+        return castByClockwise(angle + 180);
+    }
+
     /**
      * Takes <b>modulus</b> by <b>180</b> to the {@link Double} angle.
      * @param angle The angle to cast.

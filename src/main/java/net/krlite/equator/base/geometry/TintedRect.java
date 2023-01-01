@@ -57,26 +57,26 @@ public class TintedRect {
 			@NotNull PreciseColor lu, @NotNull PreciseColor ld,
 			@NotNull PreciseColor rd, @NotNull PreciseColor ru
 	) {
-		this(new Rect(), lu, ld, rd, ru);
+		this(Rect.full(), lu, ld, rd, ru);
 	}
 
 	public TintedRect(
 			@Nullable Color lu, @Nullable Color ld,
 			@Nullable Color rd, @Nullable Color ru
 	) {
-		this(new Rect(), lu, ld, rd, ru);
+		this(Rect.full(), lu, ld, rd, ru);
 	}
 
 	public TintedRect(@NotNull PreciseColor preciseColor) {
-		this(new Rect(), preciseColor);
+		this(Rect.full(), preciseColor);
 	}
 
 	public TintedRect(@Nullable Color color) {
-		this(new Rect(), color);
+		this(Rect.full(), color);
 	}
 
 	public TintedRect() {
-		this(new Rect());
+		this(Rect.full());
 	}
 
 	public TintedRect min(@NotNull TintedRect other) {
@@ -249,7 +249,7 @@ public class TintedRect {
 	}
 
 	public TintedRect cut() {
-		return replace(
+		return swap(
 				lu.nodeColor.orElse(PreciseColor.average(ld.nodeColor, ru.nodeColor).transparent()),
 				ld.nodeColor.orElse(PreciseColor.average(lu.nodeColor, rd.nodeColor).transparent()),
 				rd.nodeColor.orElse(PreciseColor.average(ld.nodeColor, ru.nodeColor).transparent()),
@@ -258,31 +258,31 @@ public class TintedRect {
 	}
 
 	public TintedRect cut(TintedRect fallback) {
-		return replace(
+		return swap(
 				lu.nodeColor.orElse(fallback.lu.nodeColor), ld.nodeColor.orElse(fallback.ld.nodeColor),
 				rd.nodeColor.orElse(fallback.rd.nodeColor), ru.nodeColor.orElse(fallback.ru.nodeColor)
 		);
 	}
 
-	public TintedRect replace(@NotNull Rect rect) {
+	public TintedRect swap(@NotNull Rect rect) {
 		return new TintedRect(rect, lu.nodeColor, ld.nodeColor, rd.nodeColor, ru.nodeColor);
 	}
 
-	public TintedRect replace(@NotNull TintedNode lu, @NotNull TintedNode ld, @NotNull TintedNode rd, @NotNull TintedNode ru) {
+	public TintedRect swap(@NotNull TintedNode lu, @NotNull TintedNode ld, @NotNull TintedNode rd, @NotNull TintedNode ru) {
 		return new TintedRect(lu, ld, rd, ru);
 	}
 
-	public TintedRect replace(@NotNull PreciseColor lu, @NotNull PreciseColor ld, @NotNull PreciseColor rd, @NotNull PreciseColor ru) {
+	public TintedRect swap(@NotNull PreciseColor lu, @NotNull PreciseColor ld, @NotNull PreciseColor rd, @NotNull PreciseColor ru) {
 		return new TintedRect(
-				this.lu.replace(lu),
-				this.ld.replace(ld),
-				this.rd.replace(rd),
-				this.ru.replace(ru)
+				this.lu.swap(lu),
+				this.ld.swap(ld),
+				this.rd.swap(rd),
+				this.ru.swap(ru)
 		);
 	}
 
-	public TintedRect replace(@NotNull PreciseColor other) {
-		return replace(other, other, other, other);
+	public TintedRect swap(@NotNull PreciseColor other) {
+		return swap(other, other, other, other);
 	}
 
 	public boolean contains(@NotNull Node node) {
@@ -294,15 +294,19 @@ public class TintedRect {
 	}
 
 	public TintedRect shift(double x, double y) {
-		return replace(toRect().shift(x, y));
+		return swap(toRect().shift(x, y));
 	}
 
 	public TintedRect shiftBy(@NotNull Node node) {
-		return replace(toRect().shiftBy(node));
+		return swap(toRect().shiftBy(node));
 	}
 
 	public TintedRect shiftToCenter(@NotNull Node node) {
-		return replace(toRect().shiftToCenter(node));
+		return swap(toRect().shiftToCenter(node));
+	}
+
+	public TintedRect shiftToCenter(double x, double y) {
+		return swap(toRect().shiftToCenter(x, y));
 	}
 
 	public TintedRect scale(double scale) {
@@ -314,15 +318,15 @@ public class TintedRect {
 	}
 
 	public TintedRect scale(@NotNull Node origin, double scale) {
-		return replace(toRect().scale(origin, scale));
+		return swap(toRect().scale(origin, scale));
 	}
 
 	public TintedRect scale(@NotNull Node origin, double x, double y) {
-		return replace(toRect().scale(origin, x, y));
+		return swap(toRect().scale(origin, x, y));
 	}
 
 	public TintedRect expand(double x, double y) {
-		return replace(toRect().expand(x, y));
+		return swap(toRect().expand(x, y));
 	}
 
 	public TintedRect expand(double expand) {
@@ -334,11 +338,11 @@ public class TintedRect {
 	}
 
 	public TintedRect blendColor(@NotNull TintedRect other, double ratio) {
-		return interpolate(other.replace(toRect()), ratio);
+		return interpolate(other.swap(toRect()), ratio);
 	}
 
 	public TintedRect interpolate(@NotNull TintedRect other, double ratio) {
-		return replace(
+		return swap(
 				lu.interpolate(other.lu, ratio),
 				ld.interpolate(other.ld, ratio),
 				rd.interpolate(other.rd, ratio),
@@ -351,11 +355,11 @@ public class TintedRect {
 	}
 
 	public TintedRect rotate(@NotNull Node origin, double clockwiseDegree) {
-		return replace(toRect().rotate(origin, clockwiseDegree));
+		return swap(toRect().rotate(origin, clockwiseDegree));
 	}
 
 	public TintedRect rotate(double clockwiseDegree) {
-		return replace(toRect().rotate(clockwiseDegree));
+		return swap(toRect().rotate(clockwiseDegree));
 	}
 
 	public TintedRect stretchLu(@NotNull TintedNode lu, double ratio) {
@@ -423,19 +427,19 @@ public class TintedRect {
 	}
 
 	public TintedRect squeezeFromTop(double ratio) {
-		return replace(toRect().squeezeFromTop(ratio));
+		return swap(toRect().squeezeFromTop(ratio));
 	}
 
 	public TintedRect squeezeFromBottom(double ratio) {
-		return replace(toRect().squeezeFromBottom(ratio));
+		return swap(toRect().squeezeFromBottom(ratio));
 	}
 
 	public TintedRect squeezeFromLeft(double ratio) {
-		return replace(toRect().squeezeFromLeft(ratio));
+		return swap(toRect().squeezeFromLeft(ratio));
 	}
 
 	public TintedRect squeezeFromRight(double ratio) {
-		return replace(toRect().squeezeFromRight(ratio));
+		return swap(toRect().squeezeFromRight(ratio));
 	}
 
 	public TintedRect flipHorizontal(double ratio) {
@@ -508,7 +512,7 @@ public class TintedRect {
 	}
 
 	public TintedRect drawShadow(MatrixStack matrixStack, double radius, double attenuation) {
-		return drawShadow(matrixStack, radius, attenuation, new Node());
+		return drawShadow(matrixStack, radius, attenuation, Node.ORIGIN);
 	}
 
 	public TintedRect drawShadow(MatrixStack matrixStack, double radius, Node shift) {
@@ -516,7 +520,7 @@ public class TintedRect {
 	}
 
 	public TintedRect drawShadow(MatrixStack matrixStack, double radius) {
-		return drawShadow(matrixStack, radius, new Node());
+		return drawShadow(matrixStack, radius, Node.ORIGIN);
 	}
 
 	public TintedRect drawShadow(MatrixStack matrixStack, Node shift) {
@@ -531,11 +535,11 @@ public class TintedRect {
 		ratio = MathHelper.clamp(ratio, 0, 1);
 		new Equator.Drawer(matrixStack)
 				.rectShadowWithScissor(
-						replace(lu, ld, rd, ru)
+						swap(lu, ld, rd, ru)
 								.expand(DEFAULT_RADIUS * ratio)
-								.shiftToCenter(center().shift(FIXED_X, FIXED_Y).rotate(center(), clockwiseDegree))
+								.shiftToCenter(center().shift(FIXED_X, FIXED_Y).rotateBy(center(), clockwiseDegree))
 								.transparent(),
-						replace(
+						swap(
 								lu.withOpacity(DEFAULT_FADED_OPACITY * ratio),
 								ld.withOpacity(DEFAULT_OPACITY * ratio),
 								rd.withOpacity(DEFAULT_OPACITY * ratio),
@@ -561,20 +565,16 @@ public class TintedRect {
 		return drawFixedShadow(matrixStack, 1);
 	}
 
-	public TintedRect drawFocusedShadow(MatrixStack matrixStack, PreciseColor lu, PreciseColor ld, PreciseColor rd, PreciseColor ru, double ratio, double clockwiseDegree) {
-		return drawFixedShadow(matrixStack, lu, ld, rd, ru, ratio, center().getClockwiseDegree());
+	public TintedRect drawFocusedShadow(MatrixStack matrixStack, PreciseColor lu, PreciseColor ld, PreciseColor rd, PreciseColor ru, double ratio) {
+		return drawFixedShadow(matrixStack, lu, ld, rd, ru, ratio, center().getClockwiseDegreeIncludeNegativeY());
 	}
 
-	public TintedRect drawFocusedShadow(MatrixStack matrixStack, TintedRect shadowRect, double ratio, double clockwiseDegree) {
-		return drawFocusedShadow(matrixStack, shadowRect.lu.nodeColor, shadowRect.ld.nodeColor, shadowRect.rd.nodeColor, shadowRect.ru.nodeColor, ratio, clockwiseDegree);
-	}
-
-	public TintedRect drawFocusedShadow(MatrixStack matrixStack, double ratio, double clockwiseDegree) {
-		return drawFocusedShadow(matrixStack, this.darker(), ratio, clockwiseDegree);
+	public TintedRect drawFocusedShadow(MatrixStack matrixStack, TintedRect shadowRect, double ratio) {
+		return drawFocusedShadow(matrixStack, shadowRect.lu.nodeColor, shadowRect.ld.nodeColor, shadowRect.rd.nodeColor, shadowRect.ru.nodeColor, ratio);
 	}
 
 	public TintedRect drawFocusedShadow(MatrixStack matrixStack, double ratio) {
-		return drawFocusedShadow(matrixStack, this.darker(), ratio, 0);
+		return drawFocusedShadow(matrixStack, this.darker(), ratio);
 	}
 
 	public TintedRect drawFocusedShadow(MatrixStack matrixStack) {

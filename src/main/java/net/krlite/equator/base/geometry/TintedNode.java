@@ -1,6 +1,8 @@
 package net.krlite.equator.base.geometry;
 
 import net.krlite.equator.base.color.PreciseColor;
+import net.krlite.equator.render.Equator;
+import net.minecraft.client.util.math.MatrixStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -23,6 +25,10 @@ public class TintedNode extends Node {
 		this(node, PreciseColor.TRANSPARENT);
 	}
 
+	public TintedNode(PreciseColor nodeColor) {
+		this(ORIGIN, nodeColor);
+	}
+
 	public TintedNode(double x, double y) {
 		this(x, y, PreciseColor.TRANSPARENT);
 	}
@@ -31,11 +37,11 @@ public class TintedNode extends Node {
 		this(0, 0);
 	}
 
-	public TintedNode replace(@NotNull Node other) {
+	public TintedNode swap(@NotNull Node other) {
 		return new TintedNode(other, nodeColor);
 	}
 
-	public TintedNode replace(@NotNull PreciseColor other) {
+	public TintedNode swap(@NotNull PreciseColor other) {
 		return new TintedNode(this, other);
 	}
 
@@ -60,19 +66,27 @@ public class TintedNode extends Node {
 	}
 
 	public TintedNode shiftTo(@NotNull Node other) {
-		return new TintedNode(other, nodeColor);
+		return swap(other);
+	}
+
+	public TintedNode shiftTo(double x, double y) {
+		return shiftTo(new Node(x, y));
+	}
+
+	public TintedNode shiftOf(double distance, double clockwiseDegree) {
+		return swap(super.shiftOf(distance, clockwiseDegree));
 	}
 
 	public TintedNode scale(@NotNull Node other, double x, double y) {
-		return replace(super.scale(other, x, y));
+		return swap(super.scale(other, x, y));
 	}
 
 	public TintedNode scale(@NotNull Node other, double scale) {
-		return replace(super.scale(other, scale));
+		return swap(super.scale(other, scale));
 	}
 
 	public TintedNode scale(@NotNull Node other) {
-		return replace(super.scale(other));
+		return swap(super.scale(other));
 	}
 
 	public TintedNode interpolate(@NotNull TintedNode other, double ratio) {
@@ -83,8 +97,12 @@ public class TintedNode extends Node {
 		return interpolate(other, 0.5);
 	}
 
-	public TintedNode rotate(@NotNull Node origin, double clockwiseDegree) {
-		return replace(super.rotate(origin, clockwiseDegree));
+	public TintedNode rotateBy(@NotNull Node origin, double clockwiseDegree) {
+		return swap(super.rotateBy(origin, clockwiseDegree));
+	}
+
+	public TintedNode rotate(@NotNull Node other, double clockwiseDegree) {
+		return swap(super.rotate(other, clockwiseDegree));
 	}
 
 	public boolean hasColor() {
@@ -92,7 +110,7 @@ public class TintedNode extends Node {
 	}
 
 	public TintedNode orElse(PreciseColor fallback) {
-		return replace(nodeColor.orElse(fallback));
+		return swap(nodeColor.orElse(fallback));
 	}
 
 	public boolean isTranslucent() {
@@ -153,6 +171,35 @@ public class TintedNode extends Node {
 
 	public TintedNode darker() {
 		return new TintedNode(this, nodeColor.darker());
+	}
+
+	// === Drawers ===
+	public TintedNode drawDebug(@NotNull MatrixStack matrixStack) {
+		new Equator.Drawer(matrixStack).point(this.swap(PreciseColor.WHITE), 1.3).point(this.swap(nodeColor.dimmer()));
+		return this;
+	}
+
+	public TintedNode draw(@NotNull MatrixStack matrixStack) {
+		new Equator.Drawer(matrixStack).point(this);
+		return this;
+	}
+
+	public TintedNode connectFrom(@NotNull TintedNode other, @NotNull MatrixStack matrixStack, double boldness) {
+		new Equator.Drawer(matrixStack).line(other, this, boldness);
+		return this;
+	}
+
+	public TintedNode connectFrom(@NotNull TintedNode other, @NotNull MatrixStack matrixStack) {
+		return connectFrom(other, matrixStack, 1);
+	}
+
+	public TintedNode connect(@NotNull TintedNode other, @NotNull MatrixStack matrixStack, double boldness) {
+		new Equator.Drawer(matrixStack).line(this, other, boldness);
+		return other;
+	}
+
+	public TintedNode connect(@NotNull TintedNode other, @NotNull MatrixStack matrixStack) {
+		return connect(other, matrixStack, 1);
 	}
 
 	public boolean equals(@NotNull TintedNode other) {

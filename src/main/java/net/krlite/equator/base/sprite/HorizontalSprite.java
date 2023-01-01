@@ -14,10 +14,7 @@ public record HorizontalSprite(Identifier identifier, int step) {
      * @param identifier    The dedicated {@link Identifier}.
      * @param step          The number of slices.
      */
-    public HorizontalSprite(Identifier identifier, int step) {
-        this.identifier = identifier;
-        this.step = step;
-    }
+    public HorizontalSprite {}
 
     /**
      * Creates a {@link HorizontalSprite} by splitting an {@link Identifier} horizontally into square slices.
@@ -47,7 +44,7 @@ public record HorizontalSprite(Identifier identifier, int step) {
 
     @Override
     public String toString() {
-        return getClass().getName() + "{" +
+        return "HorizontalSprite" + "{" +
                 "identifier=" + identifier +
                 ", step=" + step +
                 "}";

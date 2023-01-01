@@ -1,18 +1,31 @@
 package net.krlite.equator.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.krlite.equator.EquatorLib;
 import net.krlite.equator.base.color.PreciseColor;
+import net.krlite.equator.base.color.PreciseColors;
 import net.krlite.equator.base.geometry.Rect;
 import net.krlite.equator.base.geometry.TintedNode;
 import net.krlite.equator.base.geometry.TintedRect;
 import net.krlite.equator.base.sprite.IdentifierSprite;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 public class Equator {
-	public record Renderer(MatrixStack matrixStack, IdentifierSprite identifierSprite) {
-		public Renderer rect(Rect rect, PreciseColor textureColor) {
+	public record Renderer(@NotNull MatrixStack matrixStack, @NotNull IdentifierSprite identifierSprite) {
+		public Renderer swap(@NotNull MatrixStack matrixStack) {
+			return new Renderer(matrixStack, identifierSprite);
+		}
+
+		public Renderer swap(@NotNull IdentifierSprite identifierSprite) {
+			return new Renderer(matrixStack, identifierSprite);
+		}
+
+		public Renderer rect(@NotNull Rect rect, @NotNull PreciseColor textureColor) {
 			Tessellator tessellator = prepare(textureColor);
 			BufferBuilder builder = tessellator.getBuffer();
 			builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
@@ -23,11 +36,11 @@ public class Equator {
 			return this;
 		}
 
-		public Renderer rect(Rect rect) {
+		public Renderer rect(@NotNull Rect rect) {
 			return rect(rect, PreciseColor.WHITE);
 		}
 
-		public Renderer rect(double x, double y, double width, double height, PreciseColor textureColor) {
+		public Renderer rect(double x, double y, double width, double height, @NotNull PreciseColor textureColor) {
 			return rect(new Rect(x, y, width, height), textureColor);
 		}
 
@@ -35,7 +48,7 @@ public class Equator {
 			return rect(x, y, width, height, PreciseColor.WHITE);
 		}
 
-		public Renderer centeredRect(double xCentered, double yCentered, double width, double height, PreciseColor textureColor) {
+		public Renderer centeredRect(double xCentered, double yCentered, double width, double height, @NotNull PreciseColor textureColor) {
 			return rect(xCentered - width / 2, yCentered - height / 2, width, height, textureColor);
 		}
 
@@ -43,18 +56,198 @@ public class Equator {
 			return centeredRect(xCentered, yCentered, width, height, PreciseColor.WHITE);
 		}
 
+		public Renderer overlay(@NotNull PreciseColor textureColor) {
+			return rect(Rect.full(), textureColor);
+		}
+
+		public Renderer overlay() {
+			return overlay(PreciseColor.WHITE);
+		}
+
+		public Renderer fixedOverlay(@NotNull PreciseColor textureColor) {
+			int
+					width = MinecraftClient.getInstance().getWindow().getScaledWidth(),
+					height = MinecraftClient.getInstance().getWindow().getScaledHeight();
+
+			double fixedSize = Math.min(width / 2.0, height / 2.0);
+
+			// Upper
+			if (width > height)
+				swap(identifierSprite.mask(0.5F, 0, 0.5F, 0.5F))
+						.rect(fixedSize, 0, width - fixedSize * 2, fixedSize, textureColor);
+			// Left upper
+			swap(identifierSprite.mask(0, 0, 0.5F, 0.5F))
+					.rect(0, 0, fixedSize, fixedSize, textureColor);
+
+			// Left
+			if (height > width)
+				swap(identifierSprite.mask(0, 0.5F, 0.5F, 0.5F))
+						.rect(0, fixedSize, fixedSize, height - fixedSize * 2, textureColor);
+			// Left lower
+			swap(identifierSprite.mask(0, 0.5F, 0.5F, 1))
+					.rect(0, height - fixedSize, fixedSize, fixedSize, textureColor);
+
+			// Lower
+			if (width > height)
+				swap(identifierSprite.mask(0.5F, 0.5F, 0.5F, 1))
+						.rect(fixedSize, height - fixedSize, width - fixedSize * 2, fixedSize, textureColor);
+			// Right lower
+			swap(identifierSprite.mask(0.5F, 0.5F, 1, 1))
+					.rect(width - fixedSize, height - fixedSize, fixedSize, fixedSize, textureColor);
+
+			// Right
+			if (height > width)
+				swap(identifierSprite.mask(0.5F, 0.5F, 1, 0.5F))
+						.rect(width - fixedSize, fixedSize, fixedSize, height - fixedSize * 2, textureColor);
+			// Right upper
+			swap(identifierSprite.mask(0.5F, 0, 1, 0.5F))
+					.rect(width - fixedSize, 0, fixedSize, fixedSize, textureColor);
+
+			// Center
+			if (width != height)
+				swap(identifierSprite.mask(0.5F, 0.5F, 0.5F, 0.5F))
+						.rect(fixedSize, fixedSize, width - fixedSize * 2, height - fixedSize * 2, textureColor);
+
+			return this;
+		}
+
+		public Renderer fixedOverlay() {
+			return fixedOverlay(PreciseColor.WHITE);
+		}
+
+		public Renderer scaledOverlay(@NotNull PreciseColor textureColor, float aspectRatio) {
+        	float screenAspectRatio = (float) MinecraftClient.getInstance().getWindow().getScaledHeight() / (float) MinecraftClient.getInstance().getWindow().getScaledWidth();
+
+			return swap(identifierSprite.mask(
+						(1 - Math.min(aspectRatio / screenAspectRatio, 1)) / 2, (1 - Math.min(screenAspectRatio / aspectRatio, 1)) / 2,
+                        	(1 + Math.min(aspectRatio / screenAspectRatio, 1)) / 2, (1 + Math.min(screenAspectRatio / aspectRatio, 1)) / 2
+					)).overlay(textureColor);
+		}
+
+		public Renderer scaledOverlay(@NotNull PreciseColor textureColor) {
+			return scaledOverlay(textureColor, 1);
+		}
+
+		public Renderer scaledOverlay(float aspectRatio) {
+			return scaledOverlay(PreciseColor.WHITE, aspectRatio);
+		}
+
+		public Renderer scaledOverlay() {
+			return scaledOverlay(PreciseColor.WHITE);
+		}
+
+		public Renderer scaledOverlay(@NotNull PreciseColor textureColor, double width, double height) {
+			return scaledOverlay(textureColor, (float) (height / width));
+		}
+
+		public Renderer scaledOverlay(double width, double height) {
+			return scaledOverlay(PreciseColor.WHITE, width, height);
+		}
+
+		public Renderer clampedOverlay(@NotNull PreciseColor textureColor, float aspectRatio) {
+			float screenAspectRatio = (float) MinecraftClient.getInstance().getWindow().getScaledHeight() / (float) MinecraftClient.getInstance().getWindow().getScaledWidth();
+
+			return rect(Rect.ofScaled(
+					Math.max(0, (1 - Math.min(screenAspectRatio / aspectRatio, 1)) / 2),
+					Math.max(0, (1 - Math.min(aspectRatio / screenAspectRatio, 1)) / 2),
+					Math.min(1, (1 + Math.min(screenAspectRatio / aspectRatio, 1)) / 2),
+					Math.min(1, (1 + Math.min(aspectRatio / screenAspectRatio, 1)) / 2)
+			), textureColor);
+		}
+
+		public Renderer clampedOverlay(@NotNull PreciseColor textureColor) {
+			return clampedOverlay(textureColor, 1);
+		}
+
+		public Renderer clampedOverlay(float aspectRatio) {
+			return clampedOverlay(PreciseColor.WHITE, aspectRatio);
+		}
+
+		public Renderer clampedOverlay() {
+			return clampedOverlay(PreciseColor.WHITE);
+		}
+
+		public Renderer clampedOverlay(@NotNull PreciseColor textureColor, double width, double height) {
+			return clampedOverlay(textureColor, (float) (height / width));
+		}
+
+		public Renderer clampedOverlay(double width, double height) {
+			return clampedOverlay(PreciseColor.WHITE, width, height);
+		}
+
+		public Renderer tiledOverlay(@NotNull PreciseColor textureColor, float aspectRatio) {
+			float screenAspectRatio = (float) MinecraftClient.getInstance().getWindow().getScaledHeight() / (float) MinecraftClient.getInstance().getWindow().getScaledWidth();
+
+			return swap(identifierSprite.mask(
+					(1 - Math.max(aspectRatio / screenAspectRatio, 1)) / 2, (1 - Math.max(screenAspectRatio / aspectRatio, 1)) / 2,
+					(1 + Math.max(aspectRatio / screenAspectRatio, 1)) / 2, (1 + Math.max(screenAspectRatio / aspectRatio, 1)) / 2
+			)).overlay(textureColor);
+		}
+
+		public Renderer tiledOverlay(@NotNull PreciseColor textureColor) {
+			return tiledOverlay(textureColor, 1);
+		}
+
+		public Renderer tiledOverlay(float aspectRatio) {
+			return tiledOverlay(PreciseColor.WHITE, aspectRatio);
+		}
+
+		public Renderer tiledOverlay() {
+			return tiledOverlay(PreciseColor.WHITE);
+		}
+
+		public Renderer tiledOverlay(@NotNull PreciseColor textureColor, double width, double height) {
+			return tiledOverlay(textureColor, (float) (height / width));
+		}
+
+		public Renderer tiledOverlay(double width, double height) {
+			return tiledOverlay(PreciseColor.WHITE, width, height);
+		}
+
+		public Renderer tiledBackground(@NotNull PreciseColor textureColor, float aspectRatio, float contraction, float uOffset, float vOffset) {
+			int
+					width = MinecraftClient.getInstance().getWindow().getScaledWidth(),
+					height = MinecraftClient.getInstance().getWindow().getScaledHeight();
+
+			float scale = aspectRatio / ((float) height / (float) width), ratio = -0.5F * contraction, u = ratio, v = ratio;
+
+			if(scale > 1) u *= scale;
+			else v /= scale;
+
+			return swap(identifierSprite.mask(
+					0.5F + u + uOffset, 0.5F + v + vOffset, 0.5F - u + uOffset, 0.5F - v + vOffset
+			)).overlay(textureColor);
+		}
+
+		public Renderer tiledBackground(@NotNull PreciseColor textureColor, float aspectRatio, float contraction) {
+			return tiledBackground(textureColor, aspectRatio, contraction, 0, 0);
+		}
+
+		public Renderer tiledBackground(@NotNull PreciseColor textureColor, float aspectRatio) {
+			return tiledBackground(textureColor, aspectRatio, 7);
+		}
+
+		public Renderer tiledBackground(@NotNull PreciseColor textureColor) {
+			return tiledBackground(textureColor, 1);
+		}
+
+		public Renderer tiledBackground() {
+			return tiledBackground(PreciseColor.WHITE);
+		}
+
 		// === Utilities ===
 		private Tessellator prepare() {
 			return prepare(PreciseColor.WHITE);
 		}
 
-		private Tessellator prepare(PreciseColor shaderColor) {
+		private Tessellator prepare(@NotNull PreciseColor shaderColor) {
 			RenderSystem.disableDepthTest();
 			RenderSystem.depthMask(false);
 
 			RenderSystem.enableTexture();
 			RenderSystem.enableBlend();
 
+			RenderSystem.defaultBlendFunc();
 			RenderSystem.setShader(GameRenderer::getPositionTexProgram);
 			RenderSystem.setShaderColor(shaderColor.redFloat(), shaderColor.greenFloat(), shaderColor.blueFloat(), shaderColor.alphaFloat());
 			RenderSystem.setShaderTexture(0, identifierSprite.identifier());
@@ -62,7 +255,7 @@ public class Equator {
 			return Tessellator.getInstance();
 		}
 
-		private void cleanup(Tessellator tessellator) {
+		private void cleanup(@NotNull Tessellator tessellator) {
 			tessellator.draw();
         	RenderSystem.depthMask(true);
 			RenderSystem.enableDepthTest();
@@ -70,7 +263,7 @@ public class Equator {
 			RenderSystem.setShaderColor(1, 1, 1, 1);
 		}
 
-		private void renderVertex(BufferBuilder builder, TintedNode vertex, float u, float v) {
+		private void renderVertex(@NotNull BufferBuilder builder, @NotNull TintedNode vertex, float u, float v) {
 			builder.vertex(matrixStack.peek().getPositionMatrix(), (float) vertex.x, (float) vertex.y, 0)
 					.texture(u, v)
 					.color(
@@ -79,16 +272,31 @@ public class Equator {
 					).next();
 		}
 
-		private void renderTexturedRect(BufferBuilder builder, Rect rect, PreciseColor textureColor) {
-			renderVertex(builder, rect.ru.bound(textureColor), identifierSprite.uBegin(), identifierSprite.vEnd());
+		private void renderTexturedRect(@NotNull BufferBuilder builder, @NotNull Rect rect, @NotNull PreciseColor textureColor) {
+			renderVertex(builder, rect.ru.bound(textureColor), identifierSprite.uEnd(), identifierSprite.vBegin());
 			renderVertex(builder, rect.lu.bound(textureColor), identifierSprite.uBegin(), identifierSprite.vBegin());
-			renderVertex(builder, rect.ld.bound(textureColor), identifierSprite.uEnd(), identifierSprite.vBegin());
+			renderVertex(builder, rect.ld.bound(textureColor), identifierSprite.uBegin(), identifierSprite.vEnd());
 			renderVertex(builder, rect.rd.bound(textureColor), identifierSprite.uEnd(), identifierSprite.vEnd());
+		}
+
+		private void renderFixedTexturedRect(
+				@NotNull BufferBuilder builder, @NotNull Rect rect, @NotNull PreciseColor textureColor,
+				float uBegin, float vBegin, float uEnd, float vEnd
+		) {
+			renderVertex(builder, rect.ru.bound(textureColor), uEnd, vBegin);
+			renderVertex(builder, rect.lu.bound(textureColor), uBegin, vBegin);
+			renderVertex(builder, rect.ld.bound(textureColor), uBegin, vEnd);
+			renderVertex(builder, rect.rd.bound(textureColor), uEnd, vEnd);
 		}
 	}
 
-	public record Drawer(MatrixStack matrixStack) {
-		public Drawer tintedRect(TintedRect tintedRect) {
+	public record Drawer(@NotNull MatrixStack matrixStack) {
+		public Drawer swap(@NotNull MatrixStack matrixStack) {
+			return new Drawer(matrixStack);
+		}
+
+		@Contract("_ -> this")
+		public Drawer tintedRect(@NotNull TintedRect tintedRect) {
 			Tessellator tessellator = prepare();
 			BufferBuilder builder = tessellator.getBuffer();
 			builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
@@ -99,35 +307,70 @@ public class Equator {
 			return this;
 		}
 
-		public Drawer tintedRect(Rect rect, PreciseColor lu, PreciseColor ld, PreciseColor rd, PreciseColor ru) {
+		public Drawer tintedRect(@NotNull Rect rect, @NotNull PreciseColor lu, @NotNull PreciseColor ld, @NotNull PreciseColor rd, @NotNull PreciseColor ru) {
 			return tintedRect(new TintedRect(rect, lu, ld, rd, ru));
 		}
 
-		public Drawer tintedRect(Rect rect, PreciseColor fillColor) {
+		public Drawer tintedRect(@NotNull Rect rect, @NotNull PreciseColor fillColor) {
 			return tintedRect(rect, fillColor, fillColor, fillColor, fillColor);
 		}
 
-		public Drawer tintedRect(PreciseColor preciseColor) {
-			return tintedRect(new Rect(), preciseColor);
+		public Drawer tintedRect(@NotNull PreciseColor preciseColor) {
+			return tintedRect(Rect.full(), preciseColor);
 		}
 
-		public Drawer verticalGradiant(Rect rect, PreciseColor upper, PreciseColor lower) {
+		public Drawer point(@NotNull TintedNode tintedNode, double size) {
+			new TintedRect(new Rect(tintedNode.x - size / 2, tintedNode.y - size / 2, size, size), tintedNode.nodeColor)
+					.draw(matrixStack);
+			return this;
+		}
+
+		public Drawer missingTexture(@NotNull Rect rect) {
+			tintedRect(rect.grid(2, 2, 1, 1), PreciseColors.MINECRAFT_MISSING_TEXTURE_PURPLE);
+			tintedRect(rect.grid(2, 2, 1, 2), PreciseColors.MINECRAFT_MISSING_TEXTURE_BLACK);
+			tintedRect(rect.grid(2, 2, 2, 1), PreciseColors.MINECRAFT_MISSING_TEXTURE_BLACK);
+			tintedRect(rect.grid(2, 2, 2, 2), PreciseColors.MINECRAFT_MISSING_TEXTURE_PURPLE);
+			return this;
+		}
+
+		public Drawer point(@NotNull TintedNode tintedNode) {
+			return point(tintedNode, 1);
+		}
+
+		public Drawer line(@NotNull TintedNode start, @NotNull TintedNode end, double boldness) {
+			double direction = start.getClockwiseDegree(end);
+			EquatorLib.LOGGER.info(String.valueOf(direction));
+			new TintedRect(
+					start.rotate(start.shift(0, -boldness / 2), direction),
+					start.rotate(start.shift(0, boldness / 2), direction),
+					end.rotate(end.shift(0, boldness / 2), direction),
+					end.rotate(end.shift(0, -boldness / 2), direction)
+			).draw(matrixStack);
+			return this;
+		}
+
+		public Drawer line(@NotNull TintedNode start, @NotNull TintedNode end) {
+			return line(start, end, 1);
+		}
+
+		public Drawer verticalGradiant(@NotNull Rect rect, @NotNull PreciseColor upper, @NotNull PreciseColor lower) {
 			return tintedRect(rect, upper, lower, lower, upper);
 		}
 
-		public Drawer horizontalGradiant(Rect rect, PreciseColor left, PreciseColor right) {
+		public Drawer horizontalGradiant(@NotNull Rect rect, @NotNull PreciseColor left, @NotNull PreciseColor right) {
 			return tintedRect(rect, left, left, right, right);
 		}
 
-		public Drawer verticalGradiant(PreciseColor upper, PreciseColor lower) {
-			return verticalGradiant(new Rect(), upper, lower);
+		public Drawer verticalGradiant(@NotNull PreciseColor upper, @NotNull PreciseColor lower) {
+			return verticalGradiant(Rect.full(), upper, lower);
 		}
 
-		public Drawer horizontalGradiant(PreciseColor left, PreciseColor right) {
-			return horizontalGradiant(new Rect(), left, right);
+		public Drawer horizontalGradiant(@NotNull PreciseColor left, @NotNull PreciseColor right) {
+			return horizontalGradiant(Rect.full(), left, right);
 		}
 
-		public Drawer verticalGradiant(TintedRect tintedRect, double upperToLowerAttenuation) {
+		@Contract("_, _ -> this")
+		public Drawer verticalGradiant(@NotNull TintedRect tintedRect, double upperToLowerAttenuation) {
 			upperToLowerAttenuation = nonLinearProjection(upperToLowerAttenuation);
 			tintedRect = tintedRect.cut();
 
@@ -136,18 +379,19 @@ public class Equator {
 				return this;
 			}
 
-			verticalGradiant(tintedRect.squeezeFromBottom(0.5).replace(
+			verticalGradiant(tintedRect.squeezeFromBottom(0.5).swap(
 					tintedRect.lu.nodeColor, tintedRect.ld.nodeColor.blend(tintedRect.lu.nodeColor, upperToLowerAttenuation),
 					tintedRect.rd.nodeColor.blend(tintedRect.ru.nodeColor, upperToLowerAttenuation), tintedRect.ru.nodeColor
 			), upperToLowerAttenuation);
-			verticalGradiant(tintedRect.squeezeFromTop(0.5).replace(
+			verticalGradiant(tintedRect.squeezeFromTop(0.5).swap(
 					tintedRect.lu.nodeColor.blend(tintedRect.ld.nodeColor, 1 - upperToLowerAttenuation), tintedRect.ld.nodeColor,
 					tintedRect.rd.nodeColor, tintedRect.ru.nodeColor.blend(tintedRect.rd.nodeColor, 1 - upperToLowerAttenuation)
 			), upperToLowerAttenuation);
 			return this;
 		}
 
-		public Drawer horizontalGradiant(TintedRect tintedRect, double leftToRightAttenuation) {
+		@Contract("_, _ -> this")
+		public Drawer horizontalGradiant(@NotNull TintedRect tintedRect, double leftToRightAttenuation) {
 			leftToRightAttenuation = nonLinearProjection(leftToRightAttenuation);
 			tintedRect = tintedRect.cut();
 
@@ -156,12 +400,12 @@ public class Equator {
 				return this;
 			}
 
-			horizontalGradiant(tintedRect.squeezeFromRight(0.5).replace(
+			horizontalGradiant(tintedRect.squeezeFromRight(0.5).swap(
 					tintedRect.lu.nodeColor, tintedRect.ld.nodeColor,
 					tintedRect.rd.nodeColor.blend(tintedRect.ld.nodeColor, leftToRightAttenuation),
 					tintedRect.ru.nodeColor.blend(tintedRect.lu.nodeColor, leftToRightAttenuation)
 			), leftToRightAttenuation);
-			horizontalGradiant(tintedRect.squeezeFromLeft(0.5).replace(
+			horizontalGradiant(tintedRect.squeezeFromLeft(0.5).swap(
 					tintedRect.lu.nodeColor.blend(tintedRect.ru.nodeColor, 1 - leftToRightAttenuation),
 					tintedRect.ld.nodeColor.blend(tintedRect.rd.nodeColor, 1 - leftToRightAttenuation),
 					tintedRect.rd.nodeColor, tintedRect.ru.nodeColor
@@ -169,7 +413,7 @@ public class Equator {
 			return this;
 		}
 
-		public Drawer rectShadowWithScissor(TintedRect tintedRect, TintedRect scissor) {
+		public Drawer rectShadowWithScissor(@NotNull TintedRect tintedRect, @NotNull TintedRect scissor) {
 			tintedRect = tintedRect.cut();
 			scissor = scissor.cut();
 			// Upper
@@ -183,11 +427,11 @@ public class Equator {
 			return this;
 		}
 
-		public Drawer rectShadowWithScissor(TintedRect scissor) {
+		public Drawer rectShadowWithScissor(@NotNull TintedRect scissor) {
 			return rectShadowWithScissor(new TintedRect(), scissor);
 		}
 
-		public Drawer rectShadowWithScissor(TintedRect tintedRect, TintedRect scissor, double attenuation) {
+		public Drawer rectShadowWithScissor(@NotNull TintedRect tintedRect, @NotNull TintedRect scissor, double attenuation) {
 			tintedRect = tintedRect.cut();
 			scissor = scissor.cut();
 			// Upper
@@ -201,26 +445,26 @@ public class Equator {
 			return this;
 		}
 
-		public Drawer rectShadowWithScissor(TintedRect scissor, double attenuation) {
+		public Drawer rectShadowWithScissor(@NotNull TintedRect scissor, double attenuation) {
 			return rectShadowWithScissor(new TintedRect(), scissor, attenuation);
 		}
 
-		public Drawer rectShadow(TintedRect outer, TintedRect inner) {
-			rectShadowWithScissor(outer, inner);
-			return tintedRect(inner);
-		}
-
-		public Drawer rectShadow(TintedRect outer, TintedRect inner, double attenuation) {
+		public Drawer rectShadow(@NotNull TintedRect outer, @NotNull TintedRect inner, double attenuation) {
 			rectShadowWithScissor(outer, inner, attenuation);
 			return tintedRect(inner);
 		}
 
-		public Drawer rectShadow(TintedRect inner) {
-			return rectShadow(new TintedRect(), inner);
+		public Drawer rectShadow(@NotNull TintedRect outer, @NotNull TintedRect inner) {
+			rectShadowWithScissor(outer, inner);
+			return tintedRect(inner);
 		}
 
-		public Drawer rectShadow(TintedRect inner, double attenuation) {
+		public Drawer rectShadow(@NotNull TintedRect inner, double attenuation) {
 			return rectShadow(new TintedRect(), inner, attenuation);
+		}
+
+		public Drawer rectShadow(@NotNull TintedRect inner) {
+			return rectShadow(new TintedRect(), inner);
 		}
 
 		// === Utilities ===
@@ -228,12 +472,13 @@ public class Equator {
 			RenderSystem.disableTexture();
 			RenderSystem.enableBlend();
 
+			RenderSystem.defaultBlendFunc();
 			RenderSystem.setShader(GameRenderer::getPositionColorProgram);
 
 			return Tessellator.getInstance();
 		}
 
-		private void cleanup(Tessellator tessellator) {
+		private void cleanup(@NotNull Tessellator tessellator) {
 			tessellator.draw();
 			RenderSystem.enableTexture();
 		}
@@ -242,7 +487,7 @@ public class Equator {
 			return 0.5 + Math.sin(MathHelper.clamp(value, 0, 1) * Math.PI - Math.PI / 2) * 0.3;
 		}
 
-		private void drawVertex(BufferBuilder builder, TintedNode vertex) {
+		private void drawVertex(@NotNull BufferBuilder builder, @NotNull TintedNode vertex) {
 			builder.vertex(matrixStack.peek().getPositionMatrix(), (float) vertex.x, (float) vertex.y, 0)
 					.color(
 							vertex.nodeColor.redFloat(), vertex.nodeColor.greenFloat(),
@@ -250,7 +495,7 @@ public class Equator {
 					).next();
 		}
 
-		private void drawTintedRect(BufferBuilder builder, TintedRect tintedRect) {
+		private void drawTintedRect(@NotNull BufferBuilder builder, @NotNull TintedRect tintedRect) {
 			if (!tintedRect.anyNodeHasColor()) return;
 			drawVertex(builder, tintedRect.ru);
 			drawVertex(builder, tintedRect.lu);
@@ -258,11 +503,11 @@ public class Equator {
 			drawVertex(builder, tintedRect.rd);
 		}
 
-		private void drawTintedRect(BufferBuilder builder, Rect rect, PreciseColor fillColor) {
+		private void drawTintedRect(@NotNull BufferBuilder builder, @NotNull Rect rect, @NotNull PreciseColor fillColor) {
 			drawTintedRect(builder, rect, fillColor, fillColor, fillColor, fillColor);
 		}
 
-		private void drawTintedRect(BufferBuilder builder, Rect rect, PreciseColor lu, PreciseColor ld, PreciseColor rd, PreciseColor ru) {
+		private void drawTintedRect(@NotNull BufferBuilder builder, @NotNull Rect rect, @NotNull PreciseColor lu, @NotNull PreciseColor ld, @NotNull PreciseColor rd, @NotNull PreciseColor ru) {
 			drawTintedRect(builder, new TintedRect(rect, lu, ld, rd, ru));
 		}
 	}

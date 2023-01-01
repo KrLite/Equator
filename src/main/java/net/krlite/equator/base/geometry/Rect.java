@@ -1,14 +1,70 @@
 package net.krlite.equator.base.geometry;
 
 import net.krlite.equator.base.color.PreciseColor;
+import net.krlite.equator.render.Equator;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec2f;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2d;
 
 import java.util.Objects;
 
 public class Rect {
+	// === Basic ===
+	public static final Rect EMPTY = new Rect();
+
+	// === Utilities ===
+	private static double clampValue(double value) {
+		return MathHelper.clamp(value, 0, 1);
+	}
+
+	// === Static constructors ===
+	public static Rect of(double x1, double y1, double x2, double y2) {
+		return new Rect(
+				new Node(Math.min(x1, x2), Math.min(y1, y2)),
+				new Node(Math.max(x1, x2), Math.max(y1, y2))
+		);
+	}
+
+	public static Rect full() {
+		return new Rect(
+				0, 0,
+				MinecraftClient.getInstance().getWindow().getScaledWidth(),
+				MinecraftClient.getInstance().getWindow().getScaledHeight()
+		);
+	}
+
+	public static Rect line() {
+		return new Rect(
+				0, 0,
+				MinecraftClient.getInstance().getWindow().getScaledWidth(), 1
+		);
+	}
+
+	public static Rect column() {
+		return new Rect(
+				0, 0,
+				1, MinecraftClient.getInstance().getWindow().getScaledHeight()
+		);
+	}
+
+	public static Rect ofScaled(double x1, double y1, double x2, double y2) {
+		int
+				width = MinecraftClient.getInstance().getWindow().getScaledWidth(),
+				height = MinecraftClient.getInstance().getWindow().getScaledHeight();
+
+		return Rect.of(
+				x1 * width,
+				y1 * height,
+				x2 * width,
+				y2 * height
+		);
+	}
+
+	// === Instance ===
 	public final Node lu, ld, rd, ru;
 
 	public Rect(@NotNull Node lu, @NotNull Node ld, @NotNull Node rd, @NotNull Node ru) {
@@ -22,12 +78,19 @@ public class Rect {
 		this(lu, new Node(lu.x, rd.y), rd, new Node(rd.x, lu.y));
 	}
 
+	public Rect(@NotNull Node center, double width, double height) {
+		this(
+				new Node(center.x - width / 2, center.y - height / 2),
+				new Node(center.x + width / 2, center.y + height / 2)
+		);
+	}
+
 	public Rect(double x, double y, double width, double height) {
 		this(new Node(x, y), new Node(x + width, y + height));
 	}
 
 	public Rect() {
-		this(new Node(), new Node(MinecraftClient.getInstance().getWindow().getScaledWidth(), MinecraftClient.getInstance().getWindow().getScaledHeight()));
+		this(0, 0, 0, 0);
 	}
 
 	public TintedRect bound(PreciseColor preciseColor) {
@@ -76,6 +139,10 @@ public class Rect {
 		return shift(node.x - center().x, node.y - center().y);
 	}
 
+	public Rect shiftToCenter(double x, double y) {
+		return shiftToCenter(new Node(x, y));
+	}
+
 	public Rect scale(@NotNull Node origin, double scale) {
 		return scale(origin, scale, scale);
 	}
@@ -109,11 +176,31 @@ public class Rect {
 	}
 
 	public Rect rotate(@NotNull Node origin, double clockwiseDegree) {
-		return new Rect(lu.rotate(origin, clockwiseDegree), ld.rotate(origin, clockwiseDegree), rd.rotate(origin, clockwiseDegree), ru.rotate(origin, clockwiseDegree));
+		return new Rect(lu.rotateBy(origin, clockwiseDegree), ld.rotateBy(origin, clockwiseDegree), rd.rotateBy(origin, clockwiseDegree), ru.rotateBy(origin, clockwiseDegree));
 	}
 
 	public Rect rotate(double clockwiseDegree) {
 		return rotate(center(), clockwiseDegree);
+	}
+
+	public Rect grid(int stepX, int stepY, int x, int y) {
+		stepX = Math.max(stepX, 1);
+		stepY = Math.max(stepY, 1);
+		x = MathHelper.clamp(x, 1, stepX);
+		y = MathHelper.clamp(y, 1, stepY);
+
+		Node
+				upperLeft = lu.shiftOf(lu.distance(ru) * (x - 1) / stepX, lu.getClockwiseDegree(ru)),
+				upperRight = lu.shiftOf(lu.distance(ru) * x / stepX, lu.getClockwiseDegree(ru)),
+				lowerLeft = ld.shiftOf(ld.distance(rd) * (x - 1) / stepX, ld.getClockwiseDegree(rd)),
+				lowerRight = ld.shiftOf(ld.distance(rd) * x / stepX, ld.getClockwiseDegree(rd));
+
+		return new Rect(
+				upperLeft.shiftOf(upperLeft.distance(lowerLeft) * (y - 1) / stepY, upperLeft.getClockwiseDegree(lowerLeft)),
+				upperLeft.shiftOf(upperLeft.distance(lowerLeft) * y / stepY, upperLeft.getClockwiseDegree(lowerLeft)),
+				upperRight.shiftOf(upperRight.distance(lowerRight) * y / stepY, upperRight.getClockwiseDegree(lowerRight)),
+				upperRight.shiftOf(upperRight.distance(lowerRight) * (y - 1) / stepY, upperRight.getClockwiseDegree(lowerRight))
+		);
 	}
 
 	public Rect stretchLu(@NotNull Node lu, double ratio) {
@@ -226,6 +313,12 @@ public class Rect {
 
 	public Rect flipDiagonalRuLd() {
 		return flipDiagonalRuLd(1);
+	}
+
+	// === Drawers ===
+	public Rect missingTexture(@NotNull MatrixStack matrixStack) {
+		new Equator.Drawer(matrixStack).missingTexture(this);
+		return this;
 	}
 
 	public boolean equals(@Nullable Rect other) {

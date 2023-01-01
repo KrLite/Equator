@@ -10,7 +10,7 @@ public class IdentifierBuilder {
 	}
 
 	public static Identifier png(@NotNull String namespace, @NotNull String... paths) {
-		return new Identifier(namespace, String.join("/", paths) + ".png");
+		return new Identifier(namespace, "textures/" + String.join("/", paths) + ".png");
 	}
 
 	public static Text localization(@NotNull String prefix, @NotNull String namespace, @NotNull String... paths) {

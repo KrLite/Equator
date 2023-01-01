@@ -4,9 +4,12 @@ import net.krlite.equator.base.geometry.Node;
 import net.krlite.equator.base.geometry.Rect;
 import net.krlite.equator.base.geometry.TintedNode;
 import net.krlite.equator.base.geometry.TintedRect;
+import net.krlite.equator.render.Equator;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -26,6 +29,7 @@ public class PreciseColor {
 	// === Transparent ===
 	public static final PreciseColor TRANSPARENT = new PreciseColor(0 , 0, 0, 0, true); // Transparent and will only participate in alpha blending
 
+	// === Utilities ===
 	private static double clampValue(double value) {
 		return MathHelper.clamp(value, 0, 1);
 	}
@@ -38,6 +42,7 @@ public class PreciseColor {
 		return first * (1 - clampValue(ratio)) + second * clampValue(ratio);
 	}
 
+	// === Static constructors ===
 	public static PreciseColor average(@NotNull PreciseColor... preciseColors) {
 		return new PreciseColor(
 				Arrays.stream(preciseColors).mapToDouble(PreciseColor::red).average().orElse(0),
@@ -53,22 +58,38 @@ public class PreciseColor {
 	}
 
 	public static PreciseColor of(@Nullable String hexColor) {
-		if (hexColor == null) return TRANSPARENT;
+		if (hexColor == null || hexColor.isEmpty()) return TRANSPARENT;
 		return PreciseColor.of(Color.decode(hexColor));
 	}
 
-	public static PreciseColor of(int integerColor) {
-		return PreciseColor.of(new Color(integerColor, integerColor > 0xFFFFFF));
+	public static PreciseColor of(@Range(from = 0x0, to = 0xFFFFFFFFL) long integerColor) {
+		return new PreciseColor(
+				((integerColor >> 16) & 0xFF) / 255.0,
+				((integerColor >> 8) & 0xFF) / 255.0,
+				(integerColor & 0xFF) / 255.0,
+				 integerColor > 0xFFFFFF ? ((integerColor >> 24) & 0xFF) / 255.0 : 0xFF
+		);
 	}
 
-	public static PreciseColor of(int red, int green, int blue, int alpha) {
+	public static PreciseColor of(
+			@Range(from = 0, to = 255) int red, @Range(from = 0, to = 255) int green,
+			@Range(from = 0, to = 255) int blue, @Range(from = 0, to = 255) int alpha
+	) {
 		return new PreciseColor(red / 255.0, green / 255.0, blue / 255.0, alpha / 255.0);
 	}
 
-	public static PreciseColor of(int red, int green, int blue) {
+	public static PreciseColor of(
+			@Range(from = 0, to = 255) int red, @Range(from = 0, to = 255) int green,
+			@Range(from = 0, to = 255) int blue
+	) {
 		return new PreciseColor(red / 255.0, green / 255.0, blue / 255.0);
 	}
 
+	public static PreciseColor ofGrayscale(@Range(from = 0, to = 255) int grayscale) {
+		return new PreciseColor(grayscale / 255.0);
+	}
+
+	// === Instance ===
 	private final double r, g, b, a;
 	private final boolean transparent;
 
@@ -187,9 +208,9 @@ public class PreciseColor {
 		return blend(average(others));
 	}
 
-	public PreciseColor withAlpha(int alpha) {
+	public PreciseColor withAlpha(@Range(from = 0, to = 255) int alpha) {
 		if (transparent) return TRANSPARENT;
-		return new PreciseColor(r, g, b, clampValue(alpha) / 255.0);
+		return new PreciseColor(r, g, b, alpha / 255.0);
 	}
 
 	public PreciseColor withOpacity(double opacity) {
@@ -249,6 +270,17 @@ public class PreciseColor {
 				Math.min(Math.pow(r, 2), 0.27), Math.min(Math.pow(g, 2), 0.27),
 				Math.min(Math.pow(b, 2), 0.27), a
 		);
+	}
+
+	// === Drawer ===
+	public PreciseColor tintedRect(@NotNull MatrixStack matrixStack, @NotNull Rect rect) {
+		new Equator.Drawer(matrixStack).tintedRect(rect, this);
+		return this;
+	}
+
+	public PreciseColor tintedRect(@NotNull MatrixStack matrixStack) {
+		new Equator.Drawer(matrixStack).tintedRect(this);
+		return this;
 	}
 
 	public boolean equals(@NotNull PreciseColor other) {

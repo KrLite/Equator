@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
  * A class that provides different kinds of easing functions.
  */
 public class EasingFunctions {
+    // === Utilities ===
     /**
      * Clamps the value between zero and one.
      * @param value The dedicated value.
@@ -33,8 +34,40 @@ public class EasingFunctions {
         return Math.pow(value, exp);
     }
 
+    // === Basic functions ===
+    public static double sin() {
+        return Math.sin(System.currentTimeMillis() / 1000.0);
+    }
 
-    
+    public static double cos() {
+        return Math.cos(System.currentTimeMillis() / 1000.0);
+    }
+
+    public static double tan() {
+        return Math.tan(System.currentTimeMillis() / 1000.0);
+    }
+
+    public static double sinPositive() {
+        return Math.abs(sin());
+    }
+
+    public static double cosPositive() {
+        return Math.abs(cos());
+    }
+
+    public static double sinNormal() {
+        return sin() / 2 + 0.5;
+    }
+
+    public static double cosNormal() {
+        return cos() / 2 + 0.5;
+    }
+
+    public static double tanReciprocal() {
+        return 1 / tan();
+    }
+
+    // === Easing functions ===
     // Linear f(x)=x
     public static class Linear {
         /**

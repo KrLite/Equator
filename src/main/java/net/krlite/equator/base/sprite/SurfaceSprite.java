@@ -15,11 +15,7 @@ public record SurfaceSprite(Identifier identifier, int stepX, int stepY) {
      * @param stepX         The number of pieces horizontally.
      * @param stepY         The number of pieces vertically.
      */
-    public SurfaceSprite(Identifier identifier, int stepX, int stepY) {
-        this.identifier = identifier;
-        this.stepX = stepX;
-        this.stepY = stepY;
-    }
+    public SurfaceSprite {}
 
     /**
      * Creates a {@link SurfaceSprite} by splitting an {@link Identifier} into square pieces.
@@ -60,7 +56,7 @@ public record SurfaceSprite(Identifier identifier, int stepX, int stepY) {
 
     @Override
     public String toString() {
-        return getClass().getName() + "{" +
+        return "SurfaceSprite" + "{" +
                 "identifier=" + identifier +
                 ", stepX=" + stepX +
                 ", stepY=" + stepY +
