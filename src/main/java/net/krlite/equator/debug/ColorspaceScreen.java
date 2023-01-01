@@ -1,9 +1,9 @@
 package net.krlite.equator.debug;
 
-import net.krlite.equator.base.color.PreciseColor;
-import net.krlite.equator.base.color.PreciseColors;
-import net.krlite.equator.base.geometry.Rect;
-import net.krlite.equator.base.geometry.TintedRect;
+import net.krlite.equator.color.PreciseColor;
+import net.krlite.equator.color.PreciseColors;
+import net.krlite.equator.geometry.Rect;
+import net.krlite.equator.geometry.TintedRect;
 import net.krlite.equator.util.Pusher;
 import net.krlite.equator.util.Timer;
 import net.minecraft.client.MinecraftClient;

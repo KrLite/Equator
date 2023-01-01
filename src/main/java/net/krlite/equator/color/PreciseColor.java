@@ -1,9 +1,9 @@
-package net.krlite.equator.base.color;
+package net.krlite.equator.color;
 
-import net.krlite.equator.base.geometry.Node;
-import net.krlite.equator.base.geometry.Rect;
-import net.krlite.equator.base.geometry.TintedNode;
-import net.krlite.equator.base.geometry.TintedRect;
+import net.krlite.equator.geometry.Node;
+import net.krlite.equator.geometry.Rect;
+import net.krlite.equator.geometry.TintedNode;
+import net.krlite.equator.geometry.TintedRect;
 import net.krlite.equator.render.Equator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
@@ -67,7 +67,7 @@ public class PreciseColor {
 				((integerColor >> 16) & 0xFF) / 255.0,
 				((integerColor >> 8) & 0xFF) / 255.0,
 				(integerColor & 0xFF) / 255.0,
-				 integerColor > 0xFFFFFF ? ((integerColor >> 24) & 0xFF) / 255.0 : 0xFF
+				integerColor > 0xFFFFFF ? ((integerColor >> 24) & 0xFF) / 255.0 : 0xFF
 		);
 	}
 

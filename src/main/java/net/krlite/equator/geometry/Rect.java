@@ -1,14 +1,12 @@
-package net.krlite.equator.base.geometry;
+package net.krlite.equator.geometry;
 
-import net.krlite.equator.base.color.PreciseColor;
+import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.render.Equator;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec2f;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector2d;
 
 import java.util.Objects;
 

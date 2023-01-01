@@ -1,6 +1,5 @@
-package net.krlite.equator.base;
+package net.krlite.equator.math;
 
-import net.krlite.equator.math.CoordinateSolver;
 import net.minecraft.entity.Entity;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.GlobalPos;

@@ -1,7 +1,7 @@
-package net.krlite.equator.base.sprite;
+package net.krlite.equator.sprite;
 
-import net.krlite.equator.base.color.PreciseColor;
-import net.krlite.equator.base.geometry.Rect;
+import net.krlite.equator.geometry.Rect;
+import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.render.Equator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;

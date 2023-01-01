@@ -1,6 +1,6 @@
-package net.krlite.equator.base.geometry;
+package net.krlite.equator.geometry;
 
-import net.krlite.equator.base.color.PreciseColor;
+import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.math.AngleSolver;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;

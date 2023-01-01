@@ -2,12 +2,12 @@ package net.krlite.equator.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.krlite.equator.EquatorLib;
-import net.krlite.equator.base.color.PreciseColor;
-import net.krlite.equator.base.color.PreciseColors;
-import net.krlite.equator.base.geometry.Rect;
-import net.krlite.equator.base.geometry.TintedNode;
-import net.krlite.equator.base.geometry.TintedRect;
-import net.krlite.equator.base.sprite.IdentifierSprite;
+import net.krlite.equator.color.PreciseColor;
+import net.krlite.equator.color.PreciseColors;
+import net.krlite.equator.geometry.Rect;
+import net.krlite.equator.geometry.TintedNode;
+import net.krlite.equator.geometry.TintedRect;
+import net.krlite.equator.sprite.IdentifierSprite;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;

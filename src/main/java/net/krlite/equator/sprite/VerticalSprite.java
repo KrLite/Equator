@@ -1,4 +1,4 @@
-package net.krlite.equator.base.sprite;
+package net.krlite.equator.sprite;
 
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;

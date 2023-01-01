@@ -1,4 +1,4 @@
-package net.krlite.equator.base.color;
+package net.krlite.equator.color;
 
 @SuppressWarnings("unused")
 public class PreciseColors {
