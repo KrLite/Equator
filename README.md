@@ -50,3 +50,14 @@ And finally, don't forget to add Equator as a mod dependent in your `fabric.mod.
     "equator": "*"
 }
 ```
+
+If your mod is a quilt mod, add these to your `quilt.mod.json:`
+
+``json
+"depends": [
+      {
+        "id": "equator",
+        "versions": "*"
+      }
+    ]
+```
