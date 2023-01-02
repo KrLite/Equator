@@ -11,41 +11,42 @@ also get access to some useful rendering utilities.
 
 ## Features
 
-- **Equator** - A simple rendering class that allows you to render quads and 
-  textured quads with ease.
-- **Math** - Use easing functions and solve annoying angles and coordinates in a second.
-- **Utilities** - Get access to some useful classes such as **IdentifierBuilder** to easily create identifiers for your textures and translation keys.
-- **Management** - Manage your textures as **IdentifierSprites** and render them with **MatrixWrapper** to avoid the hassle of matrix coordinate transformations.
+- **Equator** - The main class for rendering, including **Renderer** for sprites, and **Drawer** for colors and shapes.
+- **Math** - Access easing functions and analyse angles with ease.
+- **Utilities** - Use **Pusher** and **Timer** to handle animations and rendering rules in a simpler way.
+- **Management** - Manage your textures as **IdentifierSprites** and render them with **Rect**s and **TintedRect**s.
 - **More** - Equator Lib is in active development! More features will be added soon.
 
 ## Implementation
 
-Equator Lib is using the **[Modrinth Maven.](https://docs.modrinth.com/docs/tutorials/maven/#loom-fabric-quilt-architectury)**
+You can use **[Modrinth Maven](https://docs.modrinth.com/docs/tutorials/maven/)** or **[JitPack](https://jitpack.io)** to implement Equator.
 
 Add the content below to your `build.gradle` file:
 
 ```groovy
 repositories {
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "Modrinth"
-                url = "https://api.modrinth.com/maven"
-            }
-        }
-        filter {
-            includeGroup "maven.modrinth"
-        }
-    }
+    // If you are using Modrinth Maven
+    maven { url = "https://api.modrinth.com/maven" }
+    
+    // If you are using JitPack
+    maven { url 'https://jitpack.io' }
 }
-```
 
-```groovy
 dependencies {
-    modAImplementation "maven.modrinth:equator:xxx"
+    // Modrinth Maven
+    modImplementation "maven.modrinth:equator:xxx"
+    
+    // JitPack
+    implementation "com.github.KrLite:Equator:xxx"
 }
 ```
 
-Remember to replace `xxx` above with the latest [`version id`](https://modrinth.com/mod/equator/versions) of Equator Lib.
+Remember to replace `xxx` above with the latest [`version id,`](https://modrinth.com/mod/equator/versions) or the [`tag name`](https://github.com/KrLite/Equator/tags) if you are using JitPack, of Equator.
 
-> It's recommended to use the `version id` instead of the `version number.` For example, using `equator:nFvoDWks` is better than using `equator:1.19-1.0.0-beta.`
+And finally, don't forget to add Equator as a mod dependent in your `fabric.mod.json:`
+
+```json
+"depends": {
+    "equator": "*"
+}
+```
