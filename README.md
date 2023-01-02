@@ -4,10 +4,9 @@
 
 ### A Simple Rendering Library for Minecraft.
 
-Equator Lib is a lightweight library designed to make rendering in Minecraft easier.
+**Equator** is a lightweight library designed to make rendering in Minecraft easier.
 
-With Equator Lib, you can render and manage texture resources with ease, and 
-also get access to some useful rendering utilities.
+With **Equator,** you can render and manage texture resources with ease, and get access to many useful rendering utilities.
 
 ## Features
 
