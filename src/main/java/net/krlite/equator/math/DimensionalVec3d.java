@@ -1,9 +1,9 @@
 package net.krlite.equator.math;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.GlobalPos;
+import net.minecraft.util.dynamic.GlobalPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.registry.RegistryKey;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

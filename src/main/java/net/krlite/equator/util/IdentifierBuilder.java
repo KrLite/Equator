@@ -2,6 +2,7 @@ package net.krlite.equator.util;
 
 import net.krlite.equator.render.sprite.IdentifierSprite;
 import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +23,7 @@ public class IdentifierBuilder {
 	}
 
 	public static Text localization(@NotNull String prefix, @NotNull String namespace, @NotNull String... paths) {
-		return Text.translatable(translationKey(prefix, namespace, paths));
+		return new TranslatableText(translationKey(prefix, namespace, paths));
 	}
 
 	public static String translationKey(@NotNull String prefix, @NotNull String namespace, @NotNull String... paths) {

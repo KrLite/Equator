@@ -9,6 +9,7 @@ import net.krlite.equator.util.Timer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
@@ -42,7 +43,7 @@ public class ColorspaceScreen extends Screen {
 	 * @param speed The speed in milliseconds per color.
 	 */
 	public ColorspaceScreen(long speed) {
-		super(Text.literal("Colorspace"));
+		super(new LiteralText("Colorspace"));
 		this.fieldIterator = Arrays.stream(PreciseColors.class.getFields()).iterator();
 		this.timer = new Timer(501 - MathHelper.clamp(speed, 1, 500));
 		this.current = PreciseColor.BLACK;
@@ -102,18 +103,18 @@ public class ColorspaceScreen extends Screen {
 
 		drawTextWithShadow(
 				matrixStack, textRenderer,
-				Text.literal(currentName), 2,
+				new LiteralText(currentName), 2,
 				MinecraftClient.getInstance().getWindow().getScaledHeight() - 12, 0xFFFFFF
 		);
 
 		drawTextWithShadow(
 				matrixStack, textRenderer,
-				Text.literal(current.toPerfectString()), MinecraftClient.getInstance().getWindow().getScaledWidth() - 2 - textRenderer.getWidth(current.toPerfectString()),
+				new LiteralText(current.toPerfectString()), MinecraftClient.getInstance().getWindow().getScaledWidth() - 2 - textRenderer.getWidth(current.toPerfectString()),
 				MinecraftClient.getInstance().getWindow().getScaledHeight() - 12, 0xFFFFFF
 		);
 
-		if (isSpeedUp && !isPaused) drawCenteredText(matrixStack, textRenderer, Text.literal("§b×4"), MinecraftClient.getInstance().getWindow().getScaledWidth() / 2, MinecraftClient.getInstance().getWindow().getScaledHeight() - 12, 0xFFFFFF);
+		if (isSpeedUp && !isPaused) drawCenteredText(matrixStack, textRenderer, new LiteralText("§b×4"), MinecraftClient.getInstance().getWindow().getScaledWidth() / 2, MinecraftClient.getInstance().getWindow().getScaledHeight() - 12, 0xFFFFFF);
 
-		if (isPaused) drawCenteredText(matrixStack, textRenderer, Text.literal("PAUSED"), MinecraftClient.getInstance().getWindow().getScaledWidth() / 2, MinecraftClient.getInstance().getWindow().getScaledHeight() - 12, 0xFFFFFF);
+		if (isPaused) drawCenteredText(matrixStack, textRenderer, new LiteralText("PAUSED"), MinecraftClient.getInstance().getWindow().getScaledWidth() / 2, MinecraftClient.getInstance().getWindow().getScaledHeight() - 12, 0xFFFFFF);
 	}
 }
