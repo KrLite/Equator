@@ -258,7 +258,7 @@ public class Equator {
 			RenderSystem.enableBlend();
 
 			RenderSystem.defaultBlendFunc();
-			RenderSystem.setShader(GameRenderer::getPositionTexProgram);
+			RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
 			RenderSystem.setShaderColor(shaderColor.redFloat(), shaderColor.greenFloat(), shaderColor.blueFloat(), shaderColor.alphaFloat());
 			RenderSystem.setShaderTexture(0, identifierSprite.identifier());
 
