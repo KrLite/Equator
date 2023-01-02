@@ -17,6 +17,10 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Iterator;
 
+/**
+ * A screen that displays the colors.
+ * @see PreciseColors
+ */
 public class ColorspaceScreen extends Screen {
 	private final Iterator<Field> fieldIterator;
 	private Timer timer;
@@ -25,10 +29,18 @@ public class ColorspaceScreen extends Screen {
 	private String currentName;
 	private boolean isPaused, isSpeedUp;
 
+	/**
+	 * Creates a new colorspace screen with the default speed
+	 * of 350 milliseconds per color.
+	 */
 	public ColorspaceScreen() {
 		this(350);
 	}
 
+	/**
+	 * Creates a new colorspace screen with the specified speed.
+	 * @param speed The speed in milliseconds per color.
+	 */
 	public ColorspaceScreen(long speed) {
 		super(Text.literal("Colorspace"));
 		this.fieldIterator = Arrays.stream(PreciseColors.class.getFields()).iterator();

@@ -1,5 +1,8 @@
 package net.krlite.equator.math;
 
+/**
+ * A class that solves for the angle between two points.
+ */
 public class AngleSolver {
     /**
      * Solves the included angle between a <b>positive</b> {@link Double} angle and a <b>negative</b> {@link Double} angle.
@@ -42,7 +45,7 @@ public class AngleSolver {
     }
 
     /**
-     * Reverts a {@link Double} angle.
+     * Reverts an angle.
      * @param angle The angle to revert.
      * @return      The reverted angle.
      */
@@ -53,18 +56,28 @@ public class AngleSolver {
     }
 
     /**
-     * Reverts a {@link Double} angle by <b>clockwise</b>.
+     * Reverts an angle by <b>clockwise</b>.
      * @param angle The angle to revert.
      * @return      The reverted <b>clockwise</b> angle.
      */
     public static double revertByClockwise(double angle) {
         return 360 - castByClockwise(angle);
     }
-
+    
+    /**
+     * Reverts an angle by <b>positive</b>.
+     * @param angle The angle to revert.
+     * @return      The reverted <b>positive</b> angle.
+     */
     public static double opposite(double angle) {
         return cast(angle + 180);
     }
 
+    /**
+     * Reverts an angle by <b>clockwise</b>
+     * @param angle The angle to revert.
+     * @return      The reverted <b>clockwise</b> angle.
+     */
     public static double oppositeByClockwise(double angle) {
         return castByClockwise(angle + 180);
     }
@@ -79,7 +92,7 @@ public class AngleSolver {
     }
 
     /**
-     * Casts a {@link Double} angle to <b>negative: <code>[180, -180]</code></b>.
+     * Casts an angle to <b>negative: <code>[180, -180]</code></b>.
      * @param angle The angle to cast.
      * @return      The cast <b>negative</b> angle.
      */
@@ -88,7 +101,7 @@ public class AngleSolver {
     }
 
     /**
-     * Casts a {@link Double} angle to <b>positive: <code>[-180, 180]</code></b>.
+     * Casts an angle to <b>positive: <code>[-180, 180]</code></b>.
      * @param angle The angle to cast.
      * @return      The cast <b>positive</b> angle.
      */
@@ -99,7 +112,7 @@ public class AngleSolver {
     }
 
     /**
-     * Casts a {@link Double} angle to <b>clockwise: <code>[0, 360)</code></b>.
+     * Casts an angle to <b>clockwise: <code>[0, 360)</code></b>.
      * @param angle The angle to cast.
      * @return      The cast <b>clockwise</b> angle.
      */

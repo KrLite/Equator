@@ -4,6 +4,9 @@ import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.Optional;
 
+/**
+ * A class that solves for the coordinates in the world.
+ */
 public class CoordinateSolver {
     /**
      * Solves the <b>reverted</b> angle between the {@link PlayerEntity}'s vision and the destination {@link DimensionalVec3d}, without ignoring dimensions.

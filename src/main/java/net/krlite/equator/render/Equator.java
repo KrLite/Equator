@@ -15,7 +15,17 @@ import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * <h2>Equator</h2>
+ * A class that provides a set of methods to draw colors, shapes and sprites on the screen.
+ */
 public class Equator {
+	/**
+	 * <h2>Renderer</h2>
+	 * <h3>Renders the Sprites</h3>
+	 * @param matrixStack		The matrix stack to render the sprite on.
+	 * @param identifierSprite	The sprite to render.
+	 */
 	public record Renderer(@NotNull MatrixStack matrixStack, @NotNull IdentifierSprite identifierSprite) {
 		public Renderer swap(@NotNull MatrixStack matrixStack) {
 			return new Renderer(matrixStack, identifierSprite);
@@ -290,6 +300,11 @@ public class Equator {
 		}
 	}
 
+	/**
+	 * <h2>Drawer</h2>
+	 * <h3>Draws the Colors and Shapes</h3>
+	 * @param matrixStack	The MatrixStack to draw on.
+	 */
 	public record Drawer(@NotNull MatrixStack matrixStack) {
 		public Drawer swap(@NotNull MatrixStack matrixStack) {
 			return new Drawer(matrixStack);
@@ -339,7 +354,6 @@ public class Equator {
 
 		public Drawer line(@NotNull TintedNode start, @NotNull TintedNode end, double boldness) {
 			double direction = start.getClockwiseDegree(end);
-			EquatorLib.LOGGER.info(String.valueOf(direction));
 			new TintedRect(
 					start.rotate(start.shift(0, -boldness / 2), direction),
 					start.rotate(start.shift(0, boldness / 2), direction),

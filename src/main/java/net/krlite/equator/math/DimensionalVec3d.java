@@ -11,16 +11,36 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.Optional;
 
-public record DimensionalVec3d(RegistryKey<World> dimension, Vec3d vec3d) {
-    public DimensionalVec3d(@NotNull RegistryKey<World> dimension, @NotNull Vec3d vec3d) {
-        this.dimension = dimension;
+/**
+ * A class that represents a 3D vector with a dimension.
+ * @param dimension The dimension of the vector.
+ * @param vec3d     The 3D vector.
+ */
+public record DimensionalVec3d(@NotNull RegistryKey<World> dimension, @NotNull Vec3d vec3d) {
+    /**
+     * Creates a {@link DimensionalVec3d} from a {@link RegistryKey RegistryKey(Dimension)}
+     * and a {@link Vec3d}.
+     * @param dimension The dimension of the vector.
+     *                  If <code>null</code>, the dimension will be set to the overworld.
+     * @param vec3d     The 3D vector.
+     */
+    public DimensionalVec3d(@Nullable RegistryKey<World> dimension, @NotNull Vec3d vec3d) {
+        this.dimension = dimension == null ? World.OVERWORLD : dimension;
         this.vec3d = vec3d;
     }
 
+    /**
+     * Creates a {@link DimensionalVec3d} from a {@link Entity}.
+     * @param entity The {@link Entity} to get the dimension and the 3D vector from.
+     */
     public DimensionalVec3d(@NotNull Entity entity) {
         this(entity.world.getRegistryKey(), entity.getPos());
     }
 
+    /**
+     * Creates a {@link DimensionalVec3d} from a {@link GlobalPos}.
+     * @param globalPos The {@link GlobalPos} to get the dimension and the 3D vector from.
+     */
     public DimensionalVec3d(@NotNull GlobalPos globalPos) {
         this(globalPos.getDimension(), Vec3d.of(globalPos.getPos()));
     }

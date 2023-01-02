@@ -10,10 +10,19 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
+/**
+ * A class that represents an {@link Identifier} with specified uvs.
+ * @param identifier    The {@link Identifier}, which represents the texture.
+ * @param uBegin        The u begin.
+ * @param vBegin        The v begin.
+ * @param uEnd          The u end.
+ * @param vEnd          The v end.
+ */
 public record IdentifierSprite(@NotNull Identifier identifier, float uBegin, float vBegin, float uEnd, float vEnd) {
     /**
      * Creates a full sized {@link IdentifierSprite} from an {@link Identifier}.
      * @param identifier    The dedicated {@link Identifier}.
+     * @return              The full sized {@link IdentifierSprite}.
      */
     @Contract("_ -> new")
     public static IdentifierSprite of(@NotNull Identifier identifier) {
