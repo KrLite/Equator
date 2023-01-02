@@ -36,7 +36,7 @@ dependencies {
     modImplementation "maven.modrinth:equator:xxx"
     
     // JitPack
-    implementation "com.github.KrLite:Equator:xxx"
+    modImplementation "com.github.KrLite:Equator:xxx"
 }
 ```
 
