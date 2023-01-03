@@ -22,7 +22,7 @@ public class IdentifierBuilder {
 		return IdentifierSprite.of(png(namespace, paths));
 	}
 
-	public static Text localization(@NotNull String prefix, @NotNull String namespace, @NotNull String... paths) {
+	public static TranslatableText localization(@NotNull String prefix, @NotNull String namespace, @NotNull String... paths) {
 		return new TranslatableText(translationKey(prefix, namespace, paths));
 	}
 
@@ -47,7 +47,7 @@ public class IdentifierBuilder {
 			return IdentifierSprite.of(png(paths));
 		}
 
-		public Text localization(@NotNull String prefix, @NotNull String... paths) {
+		public TranslatableText localization(@NotNull String prefix, @NotNull String... paths) {
 			return IdentifierBuilder.localization(prefix, namespace, paths);
 		}
 
