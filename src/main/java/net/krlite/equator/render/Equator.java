@@ -1,7 +1,6 @@
 package net.krlite.equator.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.krlite.equator.EquatorLib;
 import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.color.PreciseColors;
 import net.krlite.equator.geometry.Rect;
