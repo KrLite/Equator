@@ -21,7 +21,7 @@ public class AngleSolver {
      * @return          The included angle.
      */
     public static double positiveIncludePositive(double srcAngle, double dstAngle) {
-        return AngleSolver.castByPositive(dstAngle - srcAngle);
+        return castByPositive(dstAngle - srcAngle);
     }
 
     /**
