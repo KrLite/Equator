@@ -1,4 +1,4 @@
-### <p align=right>[Modrinth →](https://modrinth.com/mod/equator)</p>
+### <p align=right>[`→` Modrinth](https://modrinth.com/mod/equator)</p>
 
 ![Banner](artwork/banner.png)
 
