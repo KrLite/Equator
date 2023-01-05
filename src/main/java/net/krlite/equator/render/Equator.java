@@ -282,20 +282,20 @@ public class Equator {
 		}
 
 		private void renderTexturedRect(@NotNull BufferBuilder builder, @NotNull Rect rect, @NotNull PreciseColor textureColor) {
-			renderVertex(builder, rect.ru.bound(textureColor), identifierSprite.uEnd(), identifierSprite.vBegin());
-			renderVertex(builder, rect.lu.bound(textureColor), identifierSprite.uBegin(), identifierSprite.vBegin());
-			renderVertex(builder, rect.ld.bound(textureColor), identifierSprite.uBegin(), identifierSprite.vEnd());
-			renderVertex(builder, rect.rd.bound(textureColor), identifierSprite.uEnd(), identifierSprite.vEnd());
+			renderVertex(builder, rect.ru.bind(textureColor), identifierSprite.uEnd(), identifierSprite.vBegin());
+			renderVertex(builder, rect.lu.bind(textureColor), identifierSprite.uBegin(), identifierSprite.vBegin());
+			renderVertex(builder, rect.ld.bind(textureColor), identifierSprite.uBegin(), identifierSprite.vEnd());
+			renderVertex(builder, rect.rd.bind(textureColor), identifierSprite.uEnd(), identifierSprite.vEnd());
 		}
 
 		private void renderFixedTexturedRect(
 				@NotNull BufferBuilder builder, @NotNull Rect rect, @NotNull PreciseColor textureColor,
 				float uBegin, float vBegin, float uEnd, float vEnd
 		) {
-			renderVertex(builder, rect.ru.bound(textureColor), uEnd, vBegin);
-			renderVertex(builder, rect.lu.bound(textureColor), uBegin, vBegin);
-			renderVertex(builder, rect.ld.bound(textureColor), uBegin, vEnd);
-			renderVertex(builder, rect.rd.bound(textureColor), uEnd, vEnd);
+			renderVertex(builder, rect.ru.bind(textureColor), uEnd, vBegin);
+			renderVertex(builder, rect.lu.bind(textureColor), uBegin, vBegin);
+			renderVertex(builder, rect.ld.bind(textureColor), uBegin, vEnd);
+			renderVertex(builder, rect.rd.bind(textureColor), uEnd, vEnd);
 		}
 	}
 
@@ -352,7 +352,7 @@ public class Equator {
 		}
 
 		public Drawer line(@NotNull TintedNode start, @NotNull TintedNode end, double boldness) {
-			double direction = start.getClockwiseDegree(end);
+			double direction = start.clockwiseDegree(end);
 			new TintedRect(
 					start.rotate(start.shift(0, -boldness / 2), direction),
 					start.rotate(start.shift(0, boldness / 2), direction),

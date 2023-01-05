@@ -1,230 +1,168 @@
 package net.krlite.equator.geometry;
 
 import net.krlite.equator.color.PreciseColor;
-import net.krlite.equator.render.Equator;
-import net.minecraft.client.util.math.MatrixStack;
+import net.krlite.equator.color.core.IPreciseColor;
+import net.krlite.equator.core.FieldFormattable;
+import net.krlite.equator.core.HashCodeComparable;
+import net.krlite.equator.geometry.core.INode;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
-import java.util.Objects;
+import java.awt.*;
 
-public class TintedNode extends Node {
+public class TintedNode extends HashCodeComparable
+		implements FieldFormattable, INode<TintedNode>, IPreciseColor<TintedNode> {
+	/*
+	 * FIELDS
+	 */
+
 	@NotNull
-	public final PreciseColor nodeColor;
+	private final Node node;
+	@NotNull
+	private final PreciseColor nodeColor;
 
-	public TintedNode(Node node, @NotNull PreciseColor nodeColor) {
-		super(node.x, node.y);
+	/*
+	 * CONSTRUCTORS
+	 */
+
+	public TintedNode(@NotNull Node node, @NotNull PreciseColor nodeColor) {
+		this.node = node;
 		this.nodeColor = nodeColor;
 	}
 
 	public TintedNode(double x, double y, @NotNull PreciseColor nodeColor) {
-		super(x, y);
-		this.nodeColor = nodeColor;
+		this(new Node(x, y), nodeColor);
 	}
 
-	public TintedNode(Node node) {
-		this(node, PreciseColor.TRANSPARENT);
+	public TintedNode(double x, double y, @NotNull Color nodeColor) {
+		this(x, y, PreciseColor.of(nodeColor));
 	}
 
-	public TintedNode(PreciseColor nodeColor) {
-		this(ORIGIN, nodeColor);
+	/*
+	 * CONVERSIONS
+	 */
+
+	public Node unBind() {
+		return node;
 	}
 
-	public TintedNode(double x, double y) {
-		this(x, y, PreciseColor.TRANSPARENT);
+	/*
+	 * ATTRIBUTES
+	 */
+
+	@Override
+	public double x() {
+		return node.x();
 	}
 
-	public TintedNode() {
-		this(0, 0);
+	@Override
+	public double y() {
+		return node.y();
 	}
 
-	public TintedNode swap(@NotNull Node other) {
-		return new TintedNode(other, nodeColor);
+	@Override
+	public double red() {
+		return nodeColor.red();
 	}
 
-	public TintedNode swap(@NotNull PreciseColor other) {
-		return new TintedNode(this, other);
+	@Override
+	public double green() {
+		return nodeColor.green();
 	}
 
-	public TintedNode blend(@NotNull PreciseColor other, double ratio) {
-		return new TintedNode(this, nodeColor.blend(other, ratio));
+	@Override
+	public double blue() {
+		return nodeColor.blue();
 	}
 
-	public TintedNode blend(@NotNull PreciseColor other) {
-		return blend(other, 0.5);
+	@Override
+	public double alpha() {
+		return nodeColor.alpha();
 	}
 
-	public TintedNode blendAll(@NotNull PreciseColor... others) {
-		return new TintedNode(this, nodeColor.blendAll(others));
+	/*
+	 * OBJECT OPERATIONS
+	 */
+
+	protected TintedNode swap(@NotNull Node another) {
+		return new TintedNode(another, nodeColor);
 	}
 
-	public TintedNode shift(double x, double y) {
-		return new TintedNode(this.x + x, this.y + y, nodeColor);
+	protected TintedNode swap(@NotNull PreciseColor another) {
+		return new TintedNode(node, another);
 	}
 
-	public TintedNode shiftBy(@NotNull Node other) {
-		return shift(other.x, other.y);
+	@Override
+	public TintedNode createNode(double x, double y) {
+		return new TintedNode(x, y, nodeColor);
 	}
 
-	public TintedNode shiftTo(@NotNull Node other) {
-		return swap(other);
+	@Override
+	public TintedNode createPreciseColor(double r, double g, double b, double a) {
+		return new TintedNode(node, new PreciseColor(r, g, b, a));
 	}
 
-	public TintedNode shiftTo(double x, double y) {
-		return shiftTo(new Node(x, y));
+	@Override
+	public TintedNode withAlpha(@Range(from = 0, to = 255) int alpha) {
+		return swap(nodeColor.withAlpha(alpha));
 	}
 
-	public TintedNode shiftOf(double distance, double clockwiseDegree) {
-		return swap(super.shiftOf(distance, clockwiseDegree));
-	}
-
-	public TintedNode scale(@NotNull Node other, double x, double y) {
-		return swap(super.scale(other, x, y));
-	}
-
-	public TintedNode scale(@NotNull Node other, double scale) {
-		return swap(super.scale(other, scale));
-	}
-
-	public TintedNode scale(@NotNull Node other) {
-		return swap(super.scale(other));
-	}
-
-	public TintedNode interpolate(@NotNull TintedNode other, double ratio) {
-		return new TintedNode(super.scale(other, ratio), nodeColor.blend(other.nodeColor, ratio));
-	}
-
-	public TintedNode interpolate(@NotNull TintedNode other) {
-		return interpolate(other, 0.5);
-	}
-
-	public TintedNode rotateBy(@NotNull Node origin, double clockwiseDegree) {
-		return swap(super.rotateBy(origin, clockwiseDegree));
-	}
-
-	public TintedNode rotate(@NotNull Node other, double clockwiseDegree) {
-		return swap(super.rotate(other, clockwiseDegree));
-	}
-
-	public boolean hasColor() {
-		return nodeColor.hasColor();
-	}
-
-	public TintedNode orElse(PreciseColor fallback) {
-		return swap(nodeColor.orElse(fallback));
-	}
-
-	public boolean isTranslucent() {
-		return nodeColor.isTranslucent();
-	}
-
-	public boolean isTransparent() {
-		return nodeColor.isTransparent();
-	}
-
-	public boolean isOpaque() {
-		return nodeColor.isOpaque();
-	}
-
-	public TintedNode withAlpha(int alpha) {
-		return new TintedNode(this, nodeColor.hasColor() ? nodeColor.withAlpha(alpha) : PreciseColor.TRANSPARENT);
-	}
-
+	@Override
 	public TintedNode withOpacity(double opacity) {
-		return new TintedNode(this, nodeColor.hasColor() ? nodeColor.withOpacity(opacity) : PreciseColor.TRANSPARENT);
+		return swap(nodeColor.withOpacity(opacity));
 	}
 
+	@Override
 	public TintedNode brighter() {
-		return new TintedNode(this, nodeColor.brighter());
+		return swap(nodeColor.brighter());
 	}
 
+	@Override
 	public TintedNode dimmer() {
-		return new TintedNode(this, nodeColor.dimmer());
+		return swap(nodeColor.dimmer());
 	}
 
+	@Override
 	public TintedNode moreTranslucent() {
-		return new TintedNode(this, nodeColor.moreTranslucent());
+		return swap(nodeColor.moreTranslucent());
 	}
 
+	@Override
 	public TintedNode lessTranslucent() {
-		return new TintedNode(this, nodeColor.lessTranslucent());
+		return swap(nodeColor.lessTranslucent());
 	}
 
+	@Override
 	public TintedNode transparent() {
-		return new TintedNode(this, nodeColor.transparent());
+		return swap(nodeColor.transparent());
 	}
 
+	@Override
 	public TintedNode opaque() {
-		return new TintedNode(this, nodeColor.opaque());
+		return swap(nodeColor.opaque());
 	}
 
-	public TintedNode halfTranslucent() {
-		return new TintedNode(this, nodeColor.halfTransparent());
+	@Override
+	public TintedNode halfTransparent() {
+		return swap(nodeColor.halfTransparent());
 	}
 
+	@Override
 	public TintedNode halfOpaque() {
-		return new TintedNode(this, nodeColor.halfOpaque());
+		return swap(nodeColor.halfOpaque());
 	}
 
-	public TintedNode lighter() {
-		return new TintedNode(this, nodeColor.lighter());
-	}
-
-	public TintedNode darker() {
-		return new TintedNode(this, nodeColor.darker());
-	}
-
-	// === Drawers ===
-	public TintedNode drawDebug(@NotNull MatrixStack matrixStack) {
-		new Equator.Drawer(matrixStack).point(this.swap(PreciseColor.WHITE), 1.3).point(this.swap(nodeColor.dimmer()));
-		return this;
-	}
-
-	public TintedNode draw(@NotNull MatrixStack matrixStack) {
-		new Equator.Drawer(matrixStack).point(this);
-		return this;
-	}
-
-	public TintedNode connectFrom(@NotNull TintedNode other, @NotNull MatrixStack matrixStack, double boldness) {
-		new Equator.Drawer(matrixStack).line(other, this, boldness);
-		return this;
-	}
-
-	public TintedNode connectFrom(@NotNull TintedNode other, @NotNull MatrixStack matrixStack) {
-		return connectFrom(other, matrixStack, 1);
-	}
-
-	public TintedNode connect(@NotNull TintedNode other, @NotNull MatrixStack matrixStack, double boldness) {
-		new Equator.Drawer(matrixStack).line(this, other, boldness);
-		return other;
-	}
-
-	public TintedNode connect(@NotNull TintedNode other, @NotNull MatrixStack matrixStack) {
-		return connect(other, matrixStack, 1);
-	}
-
-	public boolean equals(@NotNull TintedNode other) {
-		return hashCode() == other.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		if (this == other) return true;
-		if (other instanceof TintedNode) return equals((TintedNode) other);
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(x, y, nodeColor);
-	}
+	/*
+	 * PROPERTIES
+	 */
 
 	@Override
 	public String toString() {
-		return getClass().getName() + "{" + "x=" + x + ", y=" + y + ", nodeColor=" + nodeColor.toShortString() + "}";
+		return getClass().getSimpleName() + "{" + formatFields() + "}";
 	}
 
 	@Override
 	public String toShortString() {
-		return "TintedNode" + "(" + x + ", " + y + ", " + nodeColor.toShortString() + ")";
+		return "(" + formatFields(false) + ")";
 	}
 }

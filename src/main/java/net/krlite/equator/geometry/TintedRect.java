@@ -566,7 +566,7 @@ public class TintedRect {
 	}
 
 	public TintedRect drawFocusedShadow(MatrixStack matrixStack, PreciseColor lu, PreciseColor ld, PreciseColor rd, PreciseColor ru, double ratio) {
-		return drawFixedShadow(matrixStack, lu, ld, rd, ru, ratio, center().getClockwiseDegreeIncludeNegativeY());
+		return drawFixedShadow(matrixStack, lu, ld, rd, ru, ratio, center().clockwiseDegreeIncludeNegativeOrdinate());
 	}
 
 	public TintedRect drawFocusedShadow(MatrixStack matrixStack, TintedRect shadowRect, double ratio) {
