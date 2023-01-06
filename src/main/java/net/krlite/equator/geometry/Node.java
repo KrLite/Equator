@@ -11,7 +11,7 @@ import net.minecraft.client.MinecraftClient;
  * A class that represents a point which is constrained
  * with abscissa and ordinate.
  */
-public class Node extends HashCodeComparable implements FieldFormattable, INode<Node> {
+public class Node extends HashCodeComparable implements INode<Node>, FieldFormattable {
 	/*
 	 * BASICS
 	 */
@@ -111,7 +111,7 @@ public class Node extends HashCodeComparable implements FieldFormattable, INode<
 	}
 
 	/*
-	 * OBJECT OPERATIONS
+	 * OBJECT METHODS
 	 */
 
 	@Override

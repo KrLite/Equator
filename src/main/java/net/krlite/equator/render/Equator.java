@@ -3,6 +3,7 @@ package net.krlite.equator.render;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.color.PreciseColors;
+import net.krlite.equator.core.HashCodeComparable;
 import net.krlite.equator.geometry.Rect;
 import net.krlite.equator.geometry.TintedNode;
 import net.krlite.equator.geometry.TintedRect;
@@ -18,14 +19,14 @@ import org.jetbrains.annotations.NotNull;
  * <h2>Equator</h2>
  * A class that provides a set of methods to draw colors, shapes and sprites on the screen.
  */
-public class Equator {
+public class Equator extends HashCodeComparable {
 	/**
 	 * <h2>Renderer</h2>
 	 * <h3>Renders the Sprites</h3>
 	 * @param matrixStack		The matrix stack to render the sprite on.
 	 * @param identifierSprite	The sprite to render.
 	 */
-	public record Renderer(@NotNull MatrixStack matrixStack, @NotNull IdentifierSprite identifierSprite) {
+	protected record Renderer(@NotNull MatrixStack matrixStack, @NotNull IdentifierSprite identifierSprite) {
 		public Renderer swap(@NotNull MatrixStack matrixStack) {
 			return new Renderer(matrixStack, identifierSprite);
 		}
@@ -282,20 +283,20 @@ public class Equator {
 		}
 
 		private void renderTexturedRect(@NotNull BufferBuilder builder, @NotNull Rect rect, @NotNull PreciseColor textureColor) {
-			renderVertex(builder, rect.ru.bind(textureColor), identifierSprite.uEnd(), identifierSprite.vBegin());
-			renderVertex(builder, rect.lu.bind(textureColor), identifierSprite.uBegin(), identifierSprite.vBegin());
-			renderVertex(builder, rect.ld.bind(textureColor), identifierSprite.uBegin(), identifierSprite.vEnd());
-			renderVertex(builder, rect.rd.bind(textureColor), identifierSprite.uEnd(), identifierSprite.vEnd());
+			renderVertex(builder, rect.upperRight.bind(textureColor), identifierSprite.uEnd(), identifierSprite.vBegin());
+			renderVertex(builder, rect.upperLeft.bind(textureColor), identifierSprite.uBegin(), identifierSprite.vBegin());
+			renderVertex(builder, rect.lowerLeft.bind(textureColor), identifierSprite.uBegin(), identifierSprite.vEnd());
+			renderVertex(builder, rect.lowerRight.bind(textureColor), identifierSprite.uEnd(), identifierSprite.vEnd());
 		}
 
 		private void renderFixedTexturedRect(
 				@NotNull BufferBuilder builder, @NotNull Rect rect, @NotNull PreciseColor textureColor,
 				float uBegin, float vBegin, float uEnd, float vEnd
 		) {
-			renderVertex(builder, rect.ru.bind(textureColor), uEnd, vBegin);
-			renderVertex(builder, rect.lu.bind(textureColor), uBegin, vBegin);
-			renderVertex(builder, rect.ld.bind(textureColor), uBegin, vEnd);
-			renderVertex(builder, rect.rd.bind(textureColor), uEnd, vEnd);
+			renderVertex(builder, rect.upperRight.bind(textureColor), uEnd, vBegin);
+			renderVertex(builder, rect.upperLeft.bind(textureColor), uBegin, vBegin);
+			renderVertex(builder, rect.lowerLeft.bind(textureColor), uBegin, vEnd);
+			renderVertex(builder, rect.lowerRight.bind(textureColor), uEnd, vEnd);
 		}
 	}
 
@@ -304,7 +305,7 @@ public class Equator {
 	 * <h3>Draws the Colors and Shapes</h3>
 	 * @param matrixStack	The MatrixStack to draw on.
 	 */
-	public record Drawer(@NotNull MatrixStack matrixStack) {
+	protected record Drawer(@NotNull MatrixStack matrixStack) {
 		public Drawer swap(@NotNull MatrixStack matrixStack) {
 			return new Drawer(matrixStack);
 		}
@@ -387,18 +388,18 @@ public class Equator {
 			upperToLowerAttenuation = nonLinearProjection(upperToLowerAttenuation);
 			tintedRect = tintedRect.cut();
 
-			if (tintedRect.lu.distance(tintedRect.ld) <= 15 && tintedRect.ru.distance(tintedRect.rd) <= 15) {
+			if (tintedRect.upperLeft.distance(tintedRect.lowerLeft) <= 15 && tintedRect.upperRight.distance(tintedRect.lowerRight) <= 15) {
 				tintedRect(tintedRect);
 				return this;
 			}
 
 			verticalGradiant(tintedRect.squeezeFromBottom(0.5).swap(
-					tintedRect.lu.nodeColor, tintedRect.ld.nodeColor.blend(tintedRect.lu.nodeColor, upperToLowerAttenuation),
-					tintedRect.rd.nodeColor.blend(tintedRect.ru.nodeColor, upperToLowerAttenuation), tintedRect.ru.nodeColor
+					tintedRect.upperLeft.nodeColor, tintedRect.lowerLeft.nodeColor.blend(tintedRect.upperLeft.nodeColor, upperToLowerAttenuation),
+					tintedRect.lowerRight.nodeColor.blend(tintedRect.upperRight.nodeColor, upperToLowerAttenuation), tintedRect.upperRight.nodeColor
 			), upperToLowerAttenuation);
 			verticalGradiant(tintedRect.squeezeFromTop(0.5).swap(
-					tintedRect.lu.nodeColor.blend(tintedRect.ld.nodeColor, 1 - upperToLowerAttenuation), tintedRect.ld.nodeColor,
-					tintedRect.rd.nodeColor, tintedRect.ru.nodeColor.blend(tintedRect.rd.nodeColor, 1 - upperToLowerAttenuation)
+					tintedRect.upperLeft.nodeColor.blend(tintedRect.lowerLeft.nodeColor, 1 - upperToLowerAttenuation), tintedRect.lowerLeft.nodeColor,
+					tintedRect.lowerRight.nodeColor, tintedRect.upperRight.nodeColor.blend(tintedRect.lowerRight.nodeColor, 1 - upperToLowerAttenuation)
 			), upperToLowerAttenuation);
 			return this;
 		}
@@ -408,20 +409,20 @@ public class Equator {
 			leftToRightAttenuation = nonLinearProjection(leftToRightAttenuation);
 			tintedRect = tintedRect.cut();
 
-			if (tintedRect.lu.distance(tintedRect.ru) <= 15 && tintedRect.ld.distance(tintedRect.rd) <= 15) {
+			if (tintedRect.upperLeft.distance(tintedRect.upperRight) <= 15 && tintedRect.lowerLeft.distance(tintedRect.lowerRight) <= 15) {
 				tintedRect(tintedRect);
 				return this;
 			}
 
 			horizontalGradiant(tintedRect.squeezeFromRight(0.5).swap(
-					tintedRect.lu.nodeColor, tintedRect.ld.nodeColor,
-					tintedRect.rd.nodeColor.blend(tintedRect.ld.nodeColor, leftToRightAttenuation),
-					tintedRect.ru.nodeColor.blend(tintedRect.lu.nodeColor, leftToRightAttenuation)
+					tintedRect.upperLeft.nodeColor, tintedRect.lowerLeft.nodeColor,
+					tintedRect.lowerRight.nodeColor.blend(tintedRect.lowerLeft.nodeColor, leftToRightAttenuation),
+					tintedRect.upperRight.nodeColor.blend(tintedRect.upperLeft.nodeColor, leftToRightAttenuation)
 			), leftToRightAttenuation);
 			horizontalGradiant(tintedRect.squeezeFromLeft(0.5).swap(
-					tintedRect.lu.nodeColor.blend(tintedRect.ru.nodeColor, 1 - leftToRightAttenuation),
-					tintedRect.ld.nodeColor.blend(tintedRect.rd.nodeColor, 1 - leftToRightAttenuation),
-					tintedRect.rd.nodeColor, tintedRect.ru.nodeColor
+					tintedRect.upperLeft.nodeColor.blend(tintedRect.upperRight.nodeColor, 1 - leftToRightAttenuation),
+					tintedRect.lowerLeft.nodeColor.blend(tintedRect.lowerRight.nodeColor, 1 - leftToRightAttenuation),
+					tintedRect.lowerRight.nodeColor, tintedRect.upperRight.nodeColor
 			), leftToRightAttenuation);
 			return this;
 		}
@@ -430,13 +431,13 @@ public class Equator {
 			tintedRect = tintedRect.cut();
 			scissor = scissor.cut();
 			// Upper
-			tintedRect(new TintedRect(tintedRect.lu, scissor.lu, scissor.ru, tintedRect.ru));
+			tintedRect(new TintedRect(tintedRect.upperLeft, scissor.upperLeft, scissor.upperRight, tintedRect.upperRight));
 			// Lower
-			tintedRect(new TintedRect(scissor.ld, tintedRect.ld, tintedRect.rd, scissor.rd));
+			tintedRect(new TintedRect(scissor.lowerLeft, tintedRect.lowerLeft, tintedRect.lowerRight, scissor.lowerRight));
 			// Left
-			tintedRect(new TintedRect(tintedRect.lu, tintedRect.ld, scissor.ld, scissor.lu));
+			tintedRect(new TintedRect(tintedRect.upperLeft, tintedRect.lowerLeft, scissor.lowerLeft, scissor.upperLeft));
 			// Right
-			tintedRect(new TintedRect(scissor.ru, scissor.rd, tintedRect.rd, tintedRect.ru));
+			tintedRect(new TintedRect(scissor.upperRight, scissor.lowerRight, tintedRect.lowerRight, tintedRect.upperRight));
 			return this;
 		}
 
@@ -448,13 +449,13 @@ public class Equator {
 			tintedRect = tintedRect.cut();
 			scissor = scissor.cut();
 			// Upper
-			verticalGradiant(new TintedRect(tintedRect.lu, scissor.lu, scissor.ru, tintedRect.ru), 1 - attenuation);
+			verticalGradiant(new TintedRect(tintedRect.upperLeft, scissor.upperLeft, scissor.upperRight, tintedRect.upperRight), 1 - attenuation);
 			// Lower
-			verticalGradiant(new TintedRect(scissor.ld, tintedRect.ld, tintedRect.rd, scissor.rd), attenuation);
+			verticalGradiant(new TintedRect(scissor.lowerLeft, tintedRect.lowerLeft, tintedRect.lowerRight, scissor.lowerRight), attenuation);
 			// Left
-			horizontalGradiant(new TintedRect(tintedRect.lu, tintedRect.ld, scissor.ld, scissor.lu), 1 - attenuation);
+			horizontalGradiant(new TintedRect(tintedRect.upperLeft, tintedRect.lowerLeft, scissor.lowerLeft, scissor.upperLeft), 1 - attenuation);
 			// Right
-			horizontalGradiant(new TintedRect(scissor.ru, scissor.rd, tintedRect.rd, tintedRect.ru), attenuation);
+			horizontalGradiant(new TintedRect(scissor.upperRight, scissor.lowerRight, tintedRect.lowerRight, tintedRect.upperRight), attenuation);
 			return this;
 		}
 
@@ -510,10 +511,10 @@ public class Equator {
 
 		private void drawTintedRect(@NotNull BufferBuilder builder, @NotNull TintedRect tintedRect) {
 			if (!tintedRect.anyNodeHasColor()) return;
-			drawVertex(builder, tintedRect.ru);
-			drawVertex(builder, tintedRect.lu);
-			drawVertex(builder, tintedRect.ld);
-			drawVertex(builder, tintedRect.rd);
+			drawVertex(builder, tintedRect.upperRight);
+			drawVertex(builder, tintedRect.upperLeft);
+			drawVertex(builder, tintedRect.lowerLeft);
+			drawVertex(builder, tintedRect.lowerRight);
 		}
 
 		private void drawTintedRect(@NotNull BufferBuilder builder, @NotNull Rect rect, @NotNull PreciseColor fillColor) {

@@ -1,26 +1,24 @@
 package net.krlite.equator.color.core;
 
-import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.core.ShortStringable;
-import net.minecraft.util.math.MathHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Objects;
 
-@SuppressWarnings("unchecked")
-public interface IPreciseColor<T extends IPreciseColor<T>> extends ShortStringable {
+public interface IPreciseColor<C extends IPreciseColor<C>> extends ShortStringable {
 	/*
 	 * BASICS
 	 */
 
 	default int clampValue(int value) {
-		return MathHelper.clamp(value, 0, 255);
+		return Math.max(0, Math.min(255, value));
 	}
 
 	default double clampValue(double value) {
-		return MathHelper.clamp(value, 0, 1);
+		return Math.max(0, Math.min(1, value));
 	}
 
 	default double blendValue(double first, double second, double ratio) {
@@ -92,17 +90,21 @@ public interface IPreciseColor<T extends IPreciseColor<T>> extends ShortStringab
 	}
 
 	/*
-	 * OBJECT OPERATIONS
+	 * OBJECT METHODS
 	 */
 
-	T createPreciseColor(double r, double g, double b, double a);
+	C createPreciseColor(double r, double g, double b, double a);
 
-	default <R extends IPreciseColor<?>> T blend(@NotNull R another, double ratio) {
-		if (!hasColor()) {
-			return (T) another.withOpacity(blendValue(another.alpha(), alpha(), ratio));
-		}
+	default C self() {
+		return createPreciseColor(red(), green(), blue(), alpha());
+	}
+
+	default <AC extends IPreciseColor<AC>> C blend(@NotNull AC another, double ratio) {
 		if (!another.hasColor()) {
 			return withOpacity(blendValue(another.alpha(), alpha(), ratio));
+		}
+		if (!hasColor()) {
+			return createPreciseColor(another.red(), another.green(), another.blue(), blendValue(alpha(), another.alpha(), ratio));
 		}
 		return createPreciseColor(
 				blendValue(red(), another.red(), ratio),
@@ -112,13 +114,13 @@ public interface IPreciseColor<T extends IPreciseColor<T>> extends ShortStringab
 		);
 	}
 
-	default <R extends IPreciseColor<?>> T blend(@NotNull R another) {
+	default <AC extends IPreciseColor<AC>> C blend(@NotNull AC another) {
 		return blend(another, 0.5);
 	}
 
-	default <R extends IPreciseColor<?>> T blendAll(@NotNull R... others) {
+	default <AC extends IPreciseColor<AC>> C blendAll(@NotNull AC... others) {
 		if (others.length == 0) {
-			return (T) this;
+			return self();
 		}
 		return blend(
 				createPreciseColor(
@@ -130,15 +132,15 @@ public interface IPreciseColor<T extends IPreciseColor<T>> extends ShortStringab
 		);
 	}
 
-	default T withAlpha(@Range(from = 0, to = 255) int alpha) {
+	default C withAlpha(@Range(from = 0, to = 255) int alpha) {
 		return createPreciseColor(red(), green(), blue(), clampValue(alpha) / 255.0);
 	}
 
-	default T withOpacity(double opacity) {
+	default C withOpacity(double opacity) {
 		return createPreciseColor(red(), green(), blue(), clampValue(opacity));
 	}
 
-	default T brighter() {
+	default C brighter() {
 		return createPreciseColor(
 				blendValue(red(), 1, 0.1),
 				blendValue(green(), 1, 0.1),
@@ -147,7 +149,7 @@ public interface IPreciseColor<T extends IPreciseColor<T>> extends ShortStringab
 		);
 	}
 
-	default T dimmer() {
+	default C dimmer() {
 		return createPreciseColor(
 				blendValue(red(), 0, 0.1),
 				blendValue(green(), 0, 0.1),
@@ -156,31 +158,31 @@ public interface IPreciseColor<T extends IPreciseColor<T>> extends ShortStringab
 		);
 	}
 
-	default T moreTranslucent() {
+	default C moreTranslucent() {
 		return createPreciseColor(red(), green(), blue(), blendValue(alpha(), 0, 0.1));
 	}
 
-	default T lessTranslucent() {
+	default C lessTranslucent() {
 		return createPreciseColor(red(), green(), blue(), blendValue(alpha(), 1, 0.1));
 	}
 
-	default T transparent() {
+	default C transparent() {
 		return withOpacity(0);
 	}
 
-	default T opaque() {
+	default C opaque() {
 		return withOpacity(1);
 	}
 
-	default T halfTransparent() {
+	default C halfTransparent() {
 		return createPreciseColor(red(), green(), blue(), blendValue(alpha(), 0, 0.5));
 	}
 
-	default T halfOpaque() {
+	default C halfOpaque() {
 		return createPreciseColor(red(), green(), blue(), blendValue(alpha(), 1, 0.5));
 	}
 
-	default T lighter() {
+	default C lighter() {
 		return createPreciseColor(
 				Math.max(Math.sqrt(red()), 0.73),
 				Math.max(Math.sqrt(green()), 0.73),
@@ -189,7 +191,7 @@ public interface IPreciseColor<T extends IPreciseColor<T>> extends ShortStringab
 		);
 	}
 
-	default T darker() {
+	default C darker() {
 		return createPreciseColor(
 				Math.min(Math.pow(red(), 2), 0.27),
 				Math.min(Math.pow(green(), 2), 0.27),

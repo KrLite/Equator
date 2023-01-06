@@ -1,6 +1,9 @@
 package net.krlite.equator;
 
 import net.fabricmc.api.ModInitializer;
+import net.krlite.equator.color.PreciseColor;
+import net.krlite.equator.geometry.Node;
+import net.krlite.equator.geometry.TintedNode;
 import net.krlite.equator.render.sprite.IdentifierSprite;
 import net.krlite.equator.util.IdentifierBuilder;
 import org.slf4j.Logger;
@@ -19,5 +22,6 @@ public class EquatorLib implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		new Node(1, 2).rotateBy(new TintedNode(1, 2, PreciseColor.CYAN), 2);
 	}
 }

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Range;
 import java.awt.*;
 
 public class TintedNode extends HashCodeComparable
-		implements FieldFormattable, INode<TintedNode>, IPreciseColor<TintedNode> {
+		implements INode<TintedNode>, IPreciseColor<TintedNode>, FieldFormattable {
 	/*
 	 * FIELDS
 	 */
@@ -80,8 +80,12 @@ public class TintedNode extends HashCodeComparable
 		return nodeColor.alpha();
 	}
 
+	public PreciseColor nodeColor() {
+		return nodeColor;
+	}
+
 	/*
-	 * OBJECT OPERATIONS
+	 * OBJECT METHODS
 	 */
 
 	protected TintedNode swap(@NotNull Node another) {

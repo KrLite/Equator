@@ -1,6 +1,8 @@
 package net.krlite.equator.geometry;
 
 import net.krlite.equator.color.PreciseColor;
+import net.krlite.equator.core.HashCodeComparable;
+import net.krlite.equator.geometry.core.IRect;
 import net.krlite.equator.render.Equator;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.MathHelper;
@@ -10,35 +12,43 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.Objects;
 
-public class TintedRect {
-	public final TintedNode lu, ld, rd, ru;
+public class TintedRect extends HashCodeComparable implements IRect<TintedRect, TintedNode> {
+	/*
+	 * FIELDS
+	 */
+	
+	public final TintedNode upperLeft, lowerLeft, lowerRight, upperRight;
+	
+	/*
+	 * CONSTRUCTORS
+	 */
 
-	public TintedRect(@NotNull TintedNode lu, @NotNull TintedNode ld, @NotNull TintedNode rd, @NotNull TintedNode ru) {
-		this.lu = lu;
-		this.ld = ld;
-		this.rd = rd;
-		this.ru = ru;
+	public TintedRect(@NotNull TintedNode upperLeft, @NotNull TintedNode lowerLeft, @NotNull TintedNode lowerRight, @NotNull TintedNode upperRight) {
+		this.upperLeft = upperLeft;
+		this.lowerLeft = lowerLeft;
+		this.lowerRight = lowerRight;
+		this.upperRight = upperRight;
 	}
 
 	public TintedRect(
 			@NotNull Rect rect,
-			@NotNull PreciseColor lu, @NotNull PreciseColor ld,
-			@NotNull PreciseColor rd, @NotNull PreciseColor ru
+			@NotNull PreciseColor upperLeft, @NotNull PreciseColor lowerLeft,
+			@NotNull PreciseColor lowerRight, @NotNull PreciseColor upperRight
 	) {
 		this(
-				new TintedNode(rect.lu, lu),
-				new TintedNode(rect.ld, ld),
-				new TintedNode(rect.rd, rd),
-				new TintedNode(rect.ru, ru)
+				new TintedNode(rect.upperLeft, upperLeft),
+				new TintedNode(rect.lowerLeft, lowerLeft),
+				new TintedNode(rect.lowerRight, lowerRight),
+				new TintedNode(rect.upperRight, upperRight)
 		);
 	}
 
 	public TintedRect(
 			@NotNull Rect rect,
-			@NotNull Color lu, @NotNull Color ld,
-			@NotNull Color rd, @NotNull Color ru
+			@NotNull Color upperLeft, @NotNull Color lowerLeft,
+			@NotNull Color lowerRight, @NotNull Color upperRight
 	) {
-		this(rect, PreciseColor.of(lu), PreciseColor.of(ld), PreciseColor.of(rd), PreciseColor.of(ru));
+		this(rect, PreciseColor.of(upperLeft), PreciseColor.of(lowerLeft), PreciseColor.of(lowerRight), PreciseColor.of(upperRight));
 	}
 
 	public TintedRect(@NotNull Rect rect, @NotNull PreciseColor preciseColor) {
@@ -54,51 +64,58 @@ public class TintedRect {
 	}
 
 	public TintedRect(
-			@NotNull PreciseColor lu, @NotNull PreciseColor ld,
-			@NotNull PreciseColor rd, @NotNull PreciseColor ru
+			@NotNull PreciseColor upperLeft, @NotNull PreciseColor lowerLeft,
+			@NotNull PreciseColor lowerRight, @NotNull PreciseColor upperRight
 	) {
-		this(Rect.full(), lu, ld, rd, ru);
+		this(Rect.SCREEN(), upperLeft, lowerLeft, lowerRight, upperRight);
 	}
 
 	public TintedRect(
-			@Nullable Color lu, @Nullable Color ld,
-			@Nullable Color rd, @Nullable Color ru
+			@Nullable Color upperLeft, @Nullable Color lowerLeft,
+			@Nullable Color lowerRight, @Nullable Color upperRight
 	) {
-		this(Rect.full(), lu, ld, rd, ru);
+		this(Rect.SCREEN(), upperLeft, lowerLeft, lowerRight, upperRight);
 	}
 
 	public TintedRect(@NotNull PreciseColor preciseColor) {
-		this(Rect.full(), preciseColor);
+		this(Rect.SCREEN(), preciseColor);
 	}
 
 	public TintedRect(@Nullable Color color) {
-		this(Rect.full(), color);
+		this(Rect.SCREEN(), color);
 	}
 
 	public TintedRect() {
-		this(Rect.full());
+		this(Rect.SCREEN());
 	}
+	
+	/*
+	 * CONVERSIONS
+	 */
+	
+	/*
+	 * ATTRIBUTES
+	 */
 
-	public TintedRect min(@NotNull TintedRect other) {
-		return new TintedRect(
-				new TintedNode(Math.min(lu.x, other.lu.x), Math.min(lu.y, other.lu.y), lu.nodeColor),
-				new TintedNode(Math.max(ld.x, other.ld.x), Math.max(ld.y, other.ld.y), ld.nodeColor),
-				new TintedNode(Math.max(rd.x, other.rd.x), Math.max(rd.y, other.rd.y), rd.nodeColor),
-				new TintedNode(Math.min(ru.x, other.ru.x), Math.min(ru.y, other.ru.y), ru.nodeColor)
-		);
+	public PreciseColor meshColor(double abscissa, double ordinate) {
+		abscissa = Math.max(0, Math.min(1, abscissa));
+		ordinate = Math.max(0, Math.min(1, ordinate));
+
+		return upperLeft.nodeColor().blend(upperRight.nodeColor(), abscissa)
+					   .blend(lowerLeft.nodeColor().blend(lowerRight.nodeColor(), abscissa), ordinate);
 	}
+	
+	/*
+	 * OBJECT METHODS
+	 */
 
-	public TintedRect max(@NotNull TintedRect other) {
-		return new TintedRect(
-				new TintedNode(Math.max(lu.x, other.lu.x), Math.max(lu.y, other.lu.y), lu.nodeColor),
-				new TintedNode(Math.min(ld.x, other.ld.x), Math.min(ld.y, other.ld.y), ld.nodeColor),
-				new TintedNode(Math.min(rd.x, other.rd.x), Math.min(rd.y, other.rd.y), rd.nodeColor),
-				new TintedNode(Math.max(ru.x, other.ru.x), Math.max(ru.y, other.ru.y), ru.nodeColor)
-		);
+	@Override
+	public TintedNode createNode(double x, double y) {
+		return new TintedNode(x, y, PreciseColor.TRANSPARENT);
 	}
 
 	public Rect toRect() {
-		return new Rect(lu, ld, rd, ru);
+		return new Rect(upperLeft, lowerLeft, lowerRight, upperRight);
 	}
 
 	public boolean visible() {
@@ -106,52 +123,52 @@ public class TintedRect {
 	}
 
 	public boolean allNodesHaveColor() {
-		return lu.nodeColor.hasColor() && ld.nodeColor.hasColor() && rd.nodeColor.hasColor() && ru.nodeColor.hasColor();
+		return upperLeft.nodeColor.hasColor() && lowerLeft.nodeColor.hasColor() && lowerRight.nodeColor.hasColor() && upperRight.nodeColor.hasColor();
 	}
 
 	public boolean anyNodeHasColor() {
-		return lu.nodeColor.hasColor() || ld.nodeColor.hasColor() || rd.nodeColor.hasColor() || ru.nodeColor.hasColor();
+		return upperLeft.nodeColor.hasColor() || lowerLeft.nodeColor.hasColor() || lowerRight.nodeColor.hasColor() || upperRight.nodeColor.hasColor();
 	}
 
 	public boolean allNodesAreTranslucent() {
-		return lu.nodeColor.isTranslucent() && ld.nodeColor.isTranslucent() && rd.nodeColor.isTranslucent() && ru.nodeColor.isTranslucent();
+		return upperLeft.nodeColor.isTranslucent() && lowerLeft.nodeColor.isTranslucent() && lowerRight.nodeColor.isTranslucent() && upperRight.nodeColor.isTranslucent();
 	}
 
 	public boolean anyNodeIsTranslucent() {
-		return lu.nodeColor.isTranslucent() || ld.nodeColor.isTranslucent() || rd.nodeColor.isTranslucent() || ru.nodeColor.isTranslucent();
+		return upperLeft.nodeColor.isTranslucent() || lowerLeft.nodeColor.isTranslucent() || lowerRight.nodeColor.isTranslucent() || upperRight.nodeColor.isTranslucent();
 	}
 
 	public boolean allNodesAreTransparent() {
-		return lu.nodeColor.isTransparent() && ld.nodeColor.isTransparent() && rd.nodeColor.isTransparent() && ru.nodeColor.isTransparent();
+		return upperLeft.nodeColor.isTransparent() && lowerLeft.nodeColor.isTransparent() && lowerRight.nodeColor.isTransparent() && upperRight.nodeColor.isTransparent();
 	}
 
 	public boolean anyNodeIsTransparent() {
-		return lu.nodeColor.isTransparent() || ld.nodeColor.isTransparent() || rd.nodeColor.isTransparent() || ru.nodeColor.isTransparent();
+		return upperLeft.nodeColor.isTransparent() || lowerLeft.nodeColor.isTransparent() || lowerRight.nodeColor.isTransparent() || upperRight.nodeColor.isTransparent();
 	}
 
 	public boolean allNodesAreOpaque() {
-		return lu.nodeColor.isOpaque() && ld.nodeColor.isOpaque() && rd.nodeColor.isOpaque() && ru.nodeColor.isOpaque();
+		return upperLeft.nodeColor.isOpaque() && lowerLeft.nodeColor.isOpaque() && lowerRight.nodeColor.isOpaque() && upperRight.nodeColor.isOpaque();
 	}
 
 	public boolean anyNodeIsOpaque() {
-		return lu.nodeColor.isOpaque() || ld.nodeColor.isOpaque() || rd.nodeColor.isOpaque() || ru.nodeColor.isOpaque();
+		return upperLeft.nodeColor.isOpaque() || lowerLeft.nodeColor.isOpaque() || lowerRight.nodeColor.isOpaque() || upperRight.nodeColor.isOpaque();
 	}
 
 	public TintedRect withAlpha(int aLu, int aLd, int aRd, int aRu) {
 		return new TintedRect(
-				lu.withAlpha(aLu),
-				ld.withAlpha(aLd),
-				rd.withAlpha(aRd),
-				ru.withAlpha(aRu)
+				upperLeft.withAlpha(aLu),
+				lowerLeft.withAlpha(aLd),
+				lowerRight.withAlpha(aRd),
+				upperRight.withAlpha(aRu)
 		);
 	}
 
 	public TintedRect withOpacity(double oLu, double oLd, double oRd, double oRu) {
 		return new TintedRect(
-				lu.withOpacity(oLu),
-				ld.withOpacity(oLd),
-				rd.withOpacity(oRd),
-				ru.withOpacity(oRu)
+				upperLeft.withOpacity(oLu),
+				lowerLeft.withOpacity(oLd),
+				lowerRight.withOpacity(oRd),
+				upperRight.withOpacity(oRu)
 		);
 	}
 
@@ -165,107 +182,107 @@ public class TintedRect {
 
 	public TintedRect brighter() {
 		return new TintedRect(
-				lu.brighter(),
-				ld.brighter(),
-				rd.brighter(),
-				ru.brighter()
+				upperLeft.brighter(),
+				lowerLeft.brighter(),
+				lowerRight.brighter(),
+				upperRight.brighter()
 		);
 	}
 
 	public TintedRect dimmer() {
 		return new TintedRect(
-				lu.dimmer(),
-				ld.dimmer(),
-				rd.dimmer(),
-				ru.dimmer()
+				upperLeft.dimmer(),
+				lowerLeft.dimmer(),
+				lowerRight.dimmer(),
+				upperRight.dimmer()
 		);
 	}
 
 	public TintedRect translucent() {
 		return new TintedRect(
-				lu.moreTranslucent(),
-				ld.moreTranslucent(),
-				rd.moreTranslucent(),
-				ru.moreTranslucent()
+				upperLeft.moreTranslucent(),
+				lowerLeft.moreTranslucent(),
+				lowerRight.moreTranslucent(),
+				upperRight.moreTranslucent()
 		);
 	}
 
 	public TintedRect transparent() {
 		return new TintedRect(
-				lu.transparent(),
-				ld.transparent(),
-				rd.transparent(),
-				ru.transparent()
+				upperLeft.transparent(),
+				lowerLeft.transparent(),
+				lowerRight.transparent(),
+				upperRight.transparent()
 		);
 	}
 
 	public TintedRect opaque() {
 		return new TintedRect(
-				lu.opaque(),
-				ld.opaque(),
-				rd.opaque(),
-				ru.opaque()
+				upperLeft.opaque(),
+				lowerLeft.opaque(),
+				lowerRight.opaque(),
+				upperRight.opaque()
 		);
 	}
 
 	public TintedRect halfTransparent() {
 		return new TintedRect(
-				lu.halfTranslucent(),
-				ld.halfTranslucent(),
-				rd.halfTranslucent(),
-				ru.halfTranslucent()
+				upperLeft.halfTranslucent(),
+				lowerLeft.halfTranslucent(),
+				lowerRight.halfTranslucent(),
+				upperRight.halfTranslucent()
 		);
 	}
 
 	public TintedRect halfOpaque() {
 		return new TintedRect(
-				lu.halfOpaque(),
-				ld.halfOpaque(),
-				rd.halfOpaque(),
-				ru.halfOpaque()
+				upperLeft.halfOpaque(),
+				lowerLeft.halfOpaque(),
+				lowerRight.halfOpaque(),
+				upperRight.halfOpaque()
 		);
 	}
 
 	public TintedRect lighter() {
 		return new TintedRect(
-				lu.lighter(),
-				ld.lighter(),
-				rd.lighter(),
-				ru.lighter()
+				upperLeft.lighter(),
+				lowerLeft.lighter(),
+				lowerRight.lighter(),
+				upperRight.lighter()
 		);
 	}
 
 	public TintedRect darker() {
 		return new TintedRect(
-				lu.darker(),
-				ld.darker(),
-				rd.darker(),
-				ru.darker()
+				upperLeft.darker(),
+				lowerLeft.darker(),
+				lowerRight.darker(),
+				upperRight.darker()
 		);
 	}
 
 	public PreciseColor getAverageColor() {
-		return PreciseColor.average(lu.nodeColor, ld.nodeColor, rd.nodeColor, ru.nodeColor);
+		return PreciseColor.average(upperLeft.nodeColor, lowerLeft.nodeColor, lowerRight.nodeColor, upperRight.nodeColor);
 	}
 
 	public TintedRect cut() {
 		return swap(
-				lu.nodeColor.orElse(PreciseColor.average(ld.nodeColor, ru.nodeColor).transparent()),
-				ld.nodeColor.orElse(PreciseColor.average(lu.nodeColor, rd.nodeColor).transparent()),
-				rd.nodeColor.orElse(PreciseColor.average(ld.nodeColor, ru.nodeColor).transparent()),
-				ru.nodeColor.orElse(PreciseColor.average(lu.nodeColor, rd.nodeColor).transparent())
+				upperLeft.nodeColor.orElse(PreciseColor.average(lowerLeft.nodeColor, upperRight.nodeColor).transparent()),
+				lowerLeft.nodeColor.orElse(PreciseColor.average(upperLeft.nodeColor, lowerRight.nodeColor).transparent()),
+				lowerRight.nodeColor.orElse(PreciseColor.average(lowerLeft.nodeColor, upperRight.nodeColor).transparent()),
+				upperRight.nodeColor.orElse(PreciseColor.average(upperLeft.nodeColor, lowerRight.nodeColor).transparent())
 		);
 	}
 
 	public TintedRect cut(TintedRect fallback) {
 		return swap(
-				lu.nodeColor.orElse(fallback.lu.nodeColor), ld.nodeColor.orElse(fallback.ld.nodeColor),
-				rd.nodeColor.orElse(fallback.rd.nodeColor), ru.nodeColor.orElse(fallback.ru.nodeColor)
+				upperLeft.nodeColor.orElse(fallback.upperLeft.nodeColor), lowerLeft.nodeColor.orElse(fallback.lowerLeft.nodeColor),
+				lowerRight.nodeColor.orElse(fallback.lowerRight.nodeColor), upperRight.nodeColor.orElse(fallback.upperRight.nodeColor)
 		);
 	}
 
 	public TintedRect swap(@NotNull Rect rect) {
-		return new TintedRect(rect, lu.nodeColor, ld.nodeColor, rd.nodeColor, ru.nodeColor);
+		return new TintedRect(rect, upperLeft.nodeColor, lowerLeft.nodeColor, lowerRight.nodeColor, upperRight.nodeColor);
 	}
 
 	public TintedRect swap(@NotNull TintedNode lu, @NotNull TintedNode ld, @NotNull TintedNode rd, @NotNull TintedNode ru) {
@@ -274,10 +291,10 @@ public class TintedRect {
 
 	public TintedRect swap(@NotNull PreciseColor lu, @NotNull PreciseColor ld, @NotNull PreciseColor rd, @NotNull PreciseColor ru) {
 		return new TintedRect(
-				this.lu.swap(lu),
-				this.ld.swap(ld),
-				this.rd.swap(rd),
-				this.ru.swap(ru)
+				this.upperLeft.swap(lu),
+				this.lowerLeft.swap(ld),
+				this.lowerRight.swap(rd),
+				this.upperRight.swap(ru)
 		);
 	}
 
@@ -286,7 +303,7 @@ public class TintedRect {
 	}
 
 	public boolean contains(@NotNull Node node) {
-		return toRect().contains(node);
+		return toRect().inRect(node);
 	}
 
 	public TintedNode center() {
@@ -313,8 +330,8 @@ public class TintedRect {
 		return scale(toRect().center(), scale);
 	}
 
-	public TintedRect scale(double x, double y) {
-		return scale(toRect().center(), x, y);
+	public TintedRect scale(double abscissa, double ordinate) {
+		return scale(toRect().center(), abscissa, ordinate);
 	}
 
 	public TintedRect scale(@NotNull Node origin, double scale) {
@@ -343,10 +360,10 @@ public class TintedRect {
 
 	public TintedRect interpolate(@NotNull TintedRect other, double ratio) {
 		return swap(
-				lu.interpolate(other.lu, ratio),
-				ld.interpolate(other.ld, ratio),
-				rd.interpolate(other.rd, ratio),
-				ru.interpolate(other.ru, ratio)
+				upperLeft.interpolate(other.upperLeft, ratio),
+				lowerLeft.interpolate(other.lowerLeft, ratio),
+				lowerRight.interpolate(other.lowerRight, ratio),
+				upperRight.interpolate(other.upperRight, ratio)
 		);
 	}
 
@@ -363,19 +380,19 @@ public class TintedRect {
 	}
 
 	public TintedRect stretchLu(@NotNull TintedNode lu, double ratio) {
-		return interpolate(new TintedRect(lu, lu, rd, lu), ratio);
+		return interpolate(new TintedRect(lu, lu, lowerRight, lu), ratio);
 	}
 
 	public TintedRect stretchLd(@NotNull TintedNode ld, double ratio) {
-		return interpolate(new TintedRect(ld, ld, ld, ru), ratio);
+		return interpolate(new TintedRect(ld, ld, ld, upperRight), ratio);
 	}
 
 	public TintedRect stretchRd(@NotNull TintedNode rd, double ratio) {
-		return interpolate(new TintedRect(lu, rd, rd, rd), ratio);
+		return interpolate(new TintedRect(upperLeft, rd, rd, rd), ratio);
 	}
 
 	public TintedRect stretchRu(@NotNull TintedNode ru, double ratio) {
-		return interpolate(new TintedRect(ru, ld, ru, ru), ratio);
+		return interpolate(new TintedRect(ru, lowerLeft, ru, ru), ratio);
 	}
 
 	public TintedRect stretchLu(@NotNull TintedNode lu) {
@@ -395,19 +412,19 @@ public class TintedRect {
 	}
 
 	public TintedRect stretchFromTop(double y, double ratio) {
-		return interpolate(new TintedRect(new TintedNode(lu.x, y, lu.nodeColor), ld, rd, new TintedNode(ru.x, y, ru.nodeColor)), ratio);
+		return interpolate(new TintedRect(new TintedNode(upperLeft.x, y, upperLeft.nodeColor), lowerLeft, lowerRight, new TintedNode(upperRight.x, y, upperRight.nodeColor)), ratio);
 	}
 
 	public TintedRect stretchFromBottom(double y, double ratio) {
-		return interpolate(new TintedRect(lu, new TintedNode(ld.x, y, ld.nodeColor), new TintedNode(rd.x, y, rd.nodeColor), ru), ratio);
+		return interpolate(new TintedRect(upperLeft, new TintedNode(lowerLeft.x, y, lowerLeft.nodeColor), new TintedNode(lowerRight.x, y, lowerRight.nodeColor), upperRight), ratio);
 	}
 
 	public TintedRect stretchFromLeft(double x, double ratio) {
-		return interpolate(new TintedRect(new TintedNode(x, lu.y, lu.nodeColor), new TintedNode(x, ld.y, ld.nodeColor), rd, ru), ratio);
+		return interpolate(new TintedRect(new TintedNode(x, upperLeft.y, upperLeft.nodeColor), new TintedNode(x, lowerLeft.y, lowerLeft.nodeColor), lowerRight, upperRight), ratio);
 	}
 
 	public TintedRect stretchFromRight(double x, double ratio) {
-		return interpolate(new TintedRect(lu, ld, new TintedNode(x, rd.y, ld.nodeColor), new TintedNode(x, ru.y, ru.nodeColor)), ratio);
+		return interpolate(new TintedRect(upperLeft, lowerLeft, new TintedNode(x, lowerRight.y, lowerLeft.nodeColor), new TintedNode(x, upperRight.y, upperRight.nodeColor)), ratio);
 	}
 
 	public TintedRect stretchFromTop(double y) {
@@ -443,19 +460,19 @@ public class TintedRect {
 	}
 
 	public TintedRect flipHorizontal(double ratio) {
-		return interpolate(new TintedRect(ru, rd, ld, lu), ratio);
+		return interpolate(new TintedRect(upperRight, lowerRight, lowerLeft, upperLeft), ratio);
 	}
 
 	public TintedRect flipVertical(double ratio) {
-		return interpolate(new TintedRect(ld, lu, ru, rd), ratio);
+		return interpolate(new TintedRect(lowerLeft, upperLeft, upperRight, lowerRight), ratio);
 	}
 
 	public TintedRect flipDiagonalLuRd(double ratio) {
-		return interpolate(new TintedRect(rd, ld, lu, ru), ratio);
+		return interpolate(new TintedRect(lowerRight, lowerLeft, upperLeft, upperRight), ratio);
 	}
 
 	public TintedRect flipDiagonalRuLd(double ratio) {
-		return interpolate(new TintedRect(lu, ru, rd, ld), ratio);
+		return interpolate(new TintedRect(upperLeft, upperRight, lowerRight, lowerLeft), ratio);
 	}
 
 	public TintedRect flipHorizontal() {
@@ -550,7 +567,7 @@ public class TintedRect {
 	}
 
 	public TintedRect drawFixedShadow(MatrixStack matrixStack, TintedRect shadowRect, double ratio, double clockwiseDegree) {
-		return drawFixedShadow(matrixStack, shadowRect.lu.nodeColor, shadowRect.ld.nodeColor, shadowRect.rd.nodeColor, shadowRect.ru.nodeColor, ratio, clockwiseDegree);
+		return drawFixedShadow(matrixStack, shadowRect.upperLeft.nodeColor, shadowRect.lowerLeft.nodeColor, shadowRect.lowerRight.nodeColor, shadowRect.upperRight.nodeColor, ratio, clockwiseDegree);
 	}
 
 	public TintedRect drawFixedShadow(MatrixStack matrixStack, double ratio, double clockwiseDegree) {
@@ -570,7 +587,7 @@ public class TintedRect {
 	}
 
 	public TintedRect drawFocusedShadow(MatrixStack matrixStack, TintedRect shadowRect, double ratio) {
-		return drawFocusedShadow(matrixStack, shadowRect.lu.nodeColor, shadowRect.ld.nodeColor, shadowRect.rd.nodeColor, shadowRect.ru.nodeColor, ratio);
+		return drawFocusedShadow(matrixStack, shadowRect.upperLeft.nodeColor, shadowRect.lowerLeft.nodeColor, shadowRect.lowerRight.nodeColor, shadowRect.upperRight.nodeColor, ratio);
 	}
 
 	public TintedRect drawFocusedShadow(MatrixStack matrixStack, double ratio) {
@@ -596,7 +613,7 @@ public class TintedRect {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(lu, ld, rd, ru);
+		return Objects.hash(upperLeft, lowerLeft, lowerRight, upperRight);
 	}
 
 	public boolean equals(@NotNull TintedRect other) {
@@ -611,17 +628,17 @@ public class TintedRect {
 
 	@Override
 	public String toString() {
-		return getClass().getName() + "[" + ", lu=" + lu.toString() + ", ld=" + ld.toString() + ", rd=" + rd.toString() + ", ru=" + ru.toString() + "]";
+		return getClass().getName() + "[" + ", lu=" + upperLeft.toString() + ", ld=" + lowerLeft.toString() + ", rd=" + lowerRight.toString() + ", ru=" + upperRight.toString() + "]";
 	}
 
 	public String toString(boolean matrix) {
 		if (!matrix) return toString();
 		return getClass().getName() + ":\n" +
-					   "[" + lu.toString() + ", " + ru.toString() + "],\n" +
-					   "[" + ld.toString() + ", " + rd.toString() + "]";
+					   "[" + upperLeft.toString() + ", " + upperRight.toString() + "],\n" +
+					   "[" + lowerLeft.toString() + ", " + lowerRight.toString() + "]";
 	}
 
 	public String toShortString() {
-		return "TintedRect[" + lu.toShortString() + ", " + ld.toShortString() + ", " + rd.toShortString() + ", " + ru.toShortString() + "]";
+		return "TintedRect[" + upperLeft.toShortString() + ", " + lowerLeft.toShortString() + ", " + lowerRight.toShortString() + ", " + upperRight.toShortString() + "]";
 	}
 }

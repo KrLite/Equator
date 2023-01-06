@@ -118,11 +118,11 @@ public class PreciseColor extends HashCodeComparable implements FieldFormattable
 	 * CONVERSIONS
 	 */
 
-	public TintedNode bound(Node node) {
+	public TintedNode bind(Node node) {
 		return new TintedNode(node, this);
 	}
 
-	public TintedRect bound(Rect rect) {
+	public TintedRect bind(Rect rect) {
 		return new TintedRect(rect, this);
 	}
 
@@ -151,7 +151,7 @@ public class PreciseColor extends HashCodeComparable implements FieldFormattable
 	}
 
 	/*
-	 * OBJECT OPERATIONS
+	 * OBJECT METHODS
 	 */
 
 	@Override
