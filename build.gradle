@@ -38,7 +38,6 @@ java {
 	targetCompatibility = JavaVersion.VERSION_17
 
 	withSourcesJar()
-	withJavadocJar()
 }
 
 jar {
