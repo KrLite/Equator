@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version '0.12-SNAPSHOT'
 	id 'maven-publish'
+	id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 archivesBaseName = project.archives_base_name
@@ -19,6 +20,14 @@ dependencies {
 
 	/* Equator Utils */
 	api include("com.github.KrLite:Equator-Utils:${project.equator_utils_version}")
+}
+
+shadowJar {
+	dependencies {
+		include(dependency{
+			it.moduleGroup == "com.github.KrLite" && it.moduleName == "Equator-Utils"
+		})
+	}
 }
 
 processResources {
