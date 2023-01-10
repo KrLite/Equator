@@ -6,6 +6,8 @@ import net.krlite.equator.core.HashCodeComparable;
 import net.krlite.equator.geometry.core.IRect;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
+
 public class Rect extends HashCodeComparable implements IRect<Rect, Node>, FieldFormattable {
 	/*
 	 * BASICS
@@ -20,7 +22,7 @@ public class Rect extends HashCodeComparable implements IRect<Rect, Node>, Field
 	}
 
 	public static Rect CENTER(double width, double height) {
-		return new Rect(Node.CENTER().add(-width / 2, -height / 2), Node.CENTER().add(width / 2, height / 2));
+		return new Rect(Node.CENTER().append(-width / 2, -height / 2), Node.CENTER().append(width / 2, height / 2));
 	}
 
 	public static Rect SCALED(double scaling) {
@@ -35,7 +37,7 @@ public class Rect extends HashCodeComparable implements IRect<Rect, Node>, Field
 	 * FIELDS
 	 */
 
-	public final Node upperLeft, lowerLeft, lowerRight, upperRight;
+	private final Node upperLeft, lowerLeft, lowerRight, upperRight;
 
 	/*
 	 * CONSTRUCTORS
@@ -68,11 +70,16 @@ public class Rect extends HashCodeComparable implements IRect<Rect, Node>, Field
 	 */
 
 	public TintedRect bind(PreciseColor upperLeft, PreciseColor lowerLeft, PreciseColor lowerRight, PreciseColor upperRight) {
-		return new TintedRect(this, upperLeft, lowerLeft, lowerRight, upperRight);
+		return new TintedRect(
+				this.upperLeft.bind(upperLeft),
+				this.lowerLeft.bind(lowerLeft),
+				this.lowerRight.bind(lowerRight),
+				this.upperRight.bind(upperRight)
+		);
 	}
 
 	public TintedRect bind(PreciseColor tint) {
-		return new TintedRect(this, tint);
+		return bind(tint, tint, tint, tint);
 	}
 
 	/*
@@ -97,6 +104,38 @@ public class Rect extends HashCodeComparable implements IRect<Rect, Node>, Field
 	@Override
 	public Node upperRight() {
 		return upperRight;
+	}
+
+	public Node limit(Node node) {
+		if (inRect(node)) {
+			return node;
+		} else {
+			Line
+					uL = new Line(center(), upperLeft()),
+					lL = new Line(center(), lowerLeft()),
+					lR = new Line(center(), lowerRight()),
+					uR = new Line(center(), upperRight()),
+					line = new Line(center(), node);
+			if (uL.onLine(node)) {
+				return upperLeft;
+			} else if (lL.onLine(node)) {
+				return lowerLeft;
+			} else if (lR.onLine(node)) {
+				return lowerRight;
+			} else if (uR.onLine(node)) {
+				return upperRight;
+			} else if (line.isIncludedBy(uL, lL)) {
+				return upperLeft().interpolate(lowerLeft(), uL.positiveInclude(lL) / uL.positiveInclude(line));
+			} else if (line.isIncludedBy(lL, lR)) {
+				return lowerLeft().interpolate(lowerRight(), lL.positiveInclude(lR) / lL.positiveInclude(line));
+			} else if (line.isIncludedBy(lR, uR)) {
+				return lowerRight().interpolate(upperRight(), lR.positiveInclude(uR) / lR.positiveInclude(line));
+			} else if (line.isIncludedBy(uR, uL)) {
+				return upperRight().interpolate(upperLeft(), uR.positiveInclude(uL) / uR.positiveInclude(line));
+			} else {
+				return center();
+			}
+		}
 	}
 
 	/*

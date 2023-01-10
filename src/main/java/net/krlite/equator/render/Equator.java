@@ -20,12 +20,7 @@ import org.jetbrains.annotations.NotNull;
  * A class that provides a set of methods to draw colors, shapes and sprites on the screen.
  */
 public class Equator extends HashCodeComparable {
-	/**
-	 * <h2>Renderer</h2>
-	 * <h3>Renders the Sprites</h3>
-	 * @param matrixStack		The matrix stack to render the sprite on.
-	 * @param identifierSprite	The sprite to render.
-	 */
+	/*
 	protected record Renderer(@NotNull MatrixStack matrixStack, @NotNull IdentifierSprite identifierSprite) {
 		public Renderer swap(@NotNull MatrixStack matrixStack) {
 			return new Renderer(matrixStack, identifierSprite);
@@ -300,11 +295,6 @@ public class Equator extends HashCodeComparable {
 		}
 	}
 
-	/**
-	 * <h2>Drawer</h2>
-	 * <h3>Draws the Colors and Shapes</h3>
-	 * @param matrixStack	The MatrixStack to draw on.
-	 */
 	protected record Drawer(@NotNull MatrixStack matrixStack) {
 		public Drawer swap(@NotNull MatrixStack matrixStack) {
 			return new Drawer(matrixStack);
@@ -525,4 +515,6 @@ public class Equator extends HashCodeComparable {
 			drawTintedRect(builder, new TintedRect(rect, lu, ld, rd, ru));
 		}
 	}
+
+	 */
 }

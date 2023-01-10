@@ -6,6 +6,8 @@ import net.krlite.equator.core.HashCodeComparable;
 import net.krlite.equator.geometry.core.INode;
 import net.minecraft.client.MinecraftClient;
 
+import java.awt.*;
+
 /**
  * <h2>Node</h2>
  * A class that represents a point which is constrained
@@ -67,12 +69,12 @@ public class Node extends HashCodeComparable implements INode<Node>, FieldFormat
 
 	/**
 	 * Binds the node with a {@link PreciseColor}.
-	 * @param nodeColor	The {@link PreciseColor} to bind the node with.
-	 * @return			The {@link TintedNode} that represents the
-	 * 					bound node.
+	 * @param tint	The {@link PreciseColor} to bind the node with.
+	 * @return		The {@link TintedNode} that represents the
+	 * 				bound node.
 	 */
-	public TintedNode bind(PreciseColor nodeColor) {
-		return new TintedNode(this, nodeColor);
+	public TintedNode bind(PreciseColor tint) {
+		return new TintedNode(this, tint);
 	}
 
 	/*

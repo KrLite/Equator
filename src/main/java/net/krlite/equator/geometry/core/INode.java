@@ -93,7 +93,7 @@ public interface INode<N extends INode<N>> extends ShortStringable {
 	 * @param y	The ordinate to shift the node by.
 	 * @return	The shifted node.
 	 */
-	default N add(double x, double y) {
+	default N append(double x, double y) {
 		return createNode(x() + x, y() + y);
 	}
 
@@ -102,8 +102,8 @@ public interface INode<N extends INode<N>> extends ShortStringable {
 	 * @param another	The node to shift the node by.
 	 * @return			The shifted node.
 	 */
-	default <AN extends INode<AN>> N add(AN another) {
-		return add(another.x(), another.y());
+	default <AN extends INode<AN>> N append(AN another) {
+		return append(another.x(), another.y());
 	}
 
 	/**
@@ -134,7 +134,7 @@ public interface INode<N extends INode<N>> extends ShortStringable {
 	 * @return					The shifted node.
 	 */
 	default N shift(double distance, double clockwiseDegree) {
-		return add(
+		return append(
 				Math.cos(Math.toRadians(clockwiseDegree)) * distance,
 				Math.sin(Math.toRadians(clockwiseDegree)) * distance
 		);

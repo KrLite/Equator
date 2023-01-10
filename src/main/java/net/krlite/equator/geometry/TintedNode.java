@@ -19,23 +19,23 @@ public class TintedNode extends HashCodeComparable
 	@NotNull
 	private final Node node;
 	@NotNull
-	private final PreciseColor nodeColor;
+	private final PreciseColor tint;
 
 	/*
 	 * CONSTRUCTORS
 	 */
 
-	public TintedNode(@NotNull Node node, @NotNull PreciseColor nodeColor) {
+	public TintedNode(@NotNull Node node, @NotNull PreciseColor tint) {
 		this.node = node;
-		this.nodeColor = nodeColor;
+		this.tint = tint;
 	}
 
-	public TintedNode(double x, double y, @NotNull PreciseColor nodeColor) {
-		this(new Node(x, y), nodeColor);
+	public TintedNode(double x, double y, @NotNull PreciseColor tint) {
+		this(new Node(x, y), tint);
 	}
 
-	public TintedNode(double x, double y, @NotNull Color nodeColor) {
-		this(x, y, PreciseColor.of(nodeColor));
+	public TintedNode(double x, double y, @NotNull Color tint) {
+		this(x, y, PreciseColor.from(tint));
 	}
 
 	/*
@@ -60,28 +60,28 @@ public class TintedNode extends HashCodeComparable
 		return node.y();
 	}
 
+	public PreciseColor tint() {
+		return tint;
+	}
+
 	@Override
 	public double red() {
-		return nodeColor.red();
+		return tint.red();
 	}
 
 	@Override
 	public double green() {
-		return nodeColor.green();
+		return tint.green();
 	}
 
 	@Override
 	public double blue() {
-		return nodeColor.blue();
+		return tint.blue();
 	}
 
 	@Override
 	public double alpha() {
-		return nodeColor.alpha();
-	}
-
-	public PreciseColor nodeColor() {
-		return nodeColor;
+		return tint.alpha();
 	}
 
 	/*
@@ -89,7 +89,7 @@ public class TintedNode extends HashCodeComparable
 	 */
 
 	protected TintedNode swap(@NotNull Node another) {
-		return new TintedNode(another, nodeColor);
+		return new TintedNode(another, tint);
 	}
 
 	protected TintedNode swap(@NotNull PreciseColor another) {
@@ -98,7 +98,7 @@ public class TintedNode extends HashCodeComparable
 
 	@Override
 	public TintedNode createNode(double x, double y) {
-		return new TintedNode(x, y, nodeColor);
+		return new TintedNode(x, y, tint);
 	}
 
 	@Override
@@ -108,52 +108,52 @@ public class TintedNode extends HashCodeComparable
 
 	@Override
 	public TintedNode withAlpha(@Range(from = 0, to = 255) int alpha) {
-		return swap(nodeColor.withAlpha(alpha));
+		return swap(tint.withAlpha(alpha));
 	}
 
 	@Override
 	public TintedNode withOpacity(double opacity) {
-		return swap(nodeColor.withOpacity(opacity));
+		return swap(tint.withOpacity(opacity));
 	}
 
 	@Override
 	public TintedNode brighter() {
-		return swap(nodeColor.brighter());
+		return swap(tint.brighter());
 	}
 
 	@Override
 	public TintedNode dimmer() {
-		return swap(nodeColor.dimmer());
+		return swap(tint.dimmer());
 	}
 
 	@Override
 	public TintedNode moreTranslucent() {
-		return swap(nodeColor.moreTranslucent());
+		return swap(tint.moreTranslucent());
 	}
 
 	@Override
 	public TintedNode lessTranslucent() {
-		return swap(nodeColor.lessTranslucent());
+		return swap(tint.lessTranslucent());
 	}
 
 	@Override
 	public TintedNode transparent() {
-		return swap(nodeColor.transparent());
+		return swap(tint.transparent());
 	}
 
 	@Override
 	public TintedNode opaque() {
-		return swap(nodeColor.opaque());
+		return swap(tint.opaque());
 	}
 
 	@Override
 	public TintedNode halfTransparent() {
-		return swap(nodeColor.halfTransparent());
+		return swap(tint.halfTransparent());
 	}
 
 	@Override
 	public TintedNode halfOpaque() {
-		return swap(nodeColor.halfOpaque());
+		return swap(tint.halfOpaque());
 	}
 
 	/*

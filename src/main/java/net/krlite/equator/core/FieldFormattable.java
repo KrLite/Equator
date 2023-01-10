@@ -10,9 +10,7 @@ public interface FieldFormattable {
 					   .filter(field -> Arrays.stream(excluded).noneMatch(e -> e.equals(field.getName())))
 					   .map(field -> {
 						   try {
-							   return fieldNames
-											  ? field.getName() + "="
-											  : "" + field.get(this);
+							   return (fieldNames ? field.getName() + "=" : "") + field.get(this);
 						   } catch (IllegalAccessException illegalAccessException) {
 							   illegalAccessException.printStackTrace();
 						   }

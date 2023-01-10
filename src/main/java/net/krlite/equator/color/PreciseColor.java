@@ -53,17 +53,17 @@ public class PreciseColor extends HashCodeComparable implements FieldFormattable
 	 * STATIC CONSTRUCTORS
 	 */
 
-	public static PreciseColor of(@Nullable Color color) {
+	public static PreciseColor from(@Nullable Color color) {
 		if (color == null) return TRANSPARENT;
 		return new PreciseColor(color.getRed() / 255.0, color.getGreen() / 255.0, color.getBlue() / 255.0, color.getAlpha() / 255.0);
 	}
 
-	public static PreciseColor of(@Nullable String hexColor) {
+	public static PreciseColor from(@Nullable String hexColor) {
 		if (hexColor == null || hexColor.isEmpty()) return TRANSPARENT;
-		return PreciseColor.of(Color.decode(hexColor));
+		return PreciseColor.from(Color.decode(hexColor));
 	}
 
-	public static PreciseColor of(@Range(from = 0x0, to = 0xFFFFFFFFL) long integerColor) {
+	public static PreciseColor from(@Range(from = 0x0, to = 0xFFFFFFFFL) long integerColor) {
 		return new PreciseColor(
 				((integerColor >> 16) & 0xFF) / 255.0,
 				((integerColor >> 8) & 0xFF) / 255.0,
@@ -72,21 +72,21 @@ public class PreciseColor extends HashCodeComparable implements FieldFormattable
 		);
 	}
 
-	public static PreciseColor of(
+	public static PreciseColor from(
 			@Range(from = 0, to = 255) int red, @Range(from = 0, to = 255) int green,
 			@Range(from = 0, to = 255) int blue, @Range(from = 0, to = 255) int alpha
 	) {
 		return new PreciseColor(red / 255.0, green / 255.0, blue / 255.0, alpha / 255.0);
 	}
 
-	public static PreciseColor of(
+	public static PreciseColor from(
 			@Range(from = 0, to = 255) int red, @Range(from = 0, to = 255) int green,
 			@Range(from = 0, to = 255) int blue
 	) {
 		return new PreciseColor(red / 255.0, green / 255.0, blue / 255.0);
 	}
 
-	public static PreciseColor ofGrayscale(@Range(from = 0, to = 255) int grayscale) {
+	public static PreciseColor grayscale(@Range(from = 0, to = 255) int grayscale) {
 		return new PreciseColor(grayscale / 255.0);
 	}
 
@@ -119,11 +119,11 @@ public class PreciseColor extends HashCodeComparable implements FieldFormattable
 	 */
 
 	public TintedNode bind(Node node) {
-		return new TintedNode(node, this);
+		return node.bind(this);
 	}
 
 	public TintedRect bind(Rect rect) {
-		return new TintedRect(rect, this);
+		return rect.bind(this);
 	}
 
 	/*

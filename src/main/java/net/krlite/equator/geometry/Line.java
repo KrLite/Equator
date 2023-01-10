@@ -10,20 +10,27 @@ public class Line extends HashCodeComparable implements ILine<Line, Node>, Field
 	 * FIELDS
 	 */
 
-	private final double fA, fB, fC;
+	/**
+	 * ax + by + c = 0
+	 */
+	private final double a, b, c;
 
 	/*
 	 * CONSTRUCTORS
 	 */
 
-	public Line(double fA, double fB, double fC) {
-		this.fA = fA;
-		this.fB = fB;
-		this.fC = fC;
+	public Line(double a, double b, double c) {
+		this.a = a;
+		this.b = b;
+		this.c = c;
 	}
 
 	public Line(Node n1, Node n2) {
 		this(n1.y() - n2.y(), n2.x() - n1.x(), n1.x() * n2.y() - n2.x() * n1.y());
+	}
+
+	public Line(double k, double b) {
+		this(k, -1, b);
 	}
 
 	/*
@@ -31,18 +38,18 @@ public class Line extends HashCodeComparable implements ILine<Line, Node>, Field
 	 */
 
 	@Override
-	public double fA() {
-		return fA;
+	public double a() {
+		return a;
 	}
 
 	@Override
-	public double fB() {
-		return fB;
+	public double b() {
+		return b;
 	}
 
 	@Override
-	public double fC() {
-		return fC;
+	public double c() {
+		return c;
 	}
 
 	/*

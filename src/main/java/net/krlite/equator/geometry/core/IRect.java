@@ -15,9 +15,9 @@ public interface IRect<R extends IRect<R, N>, N extends INode<N>> extends ShortS
 
 	N upperRight();
 
-	default <AN extends INode<AN>> boolean inRect(INode<AN> another) {
-		return another.cross(lowerLeft(), upperLeft()) * another.cross(upperRight(), lowerRight()) >= 0 &&
-				another.cross(upperLeft(), upperRight()) * another.cross(lowerRight(), lowerLeft()) >= 0;
+	default <AN extends INode<AN>> boolean inRect(AN node) {
+		return node.cross(lowerLeft(), upperLeft()) * node.cross(upperRight(), lowerRight()) >= 0 &&
+				node.cross(upperLeft(), upperRight()) * node.cross(lowerRight(), lowerLeft()) >= 0;
 	}
 
 	/*
@@ -37,13 +37,13 @@ public interface IRect<R extends IRect<R, N>, N extends INode<N>> extends ShortS
 				((upperLeft().y() + lowerLeft().y()) / 2 + (upperRight().y()) + lowerRight().y()) / 2);
 	}
 
-	default R add(double x, double y) {
+	default R append(double x, double y) {
 		return createRect(upperLeft().shift(x, y), lowerLeft().shift(x, y), lowerRight().shift(x, y), upperRight().shift(x, y));
 	}
 
-	default <AR extends IRect<AR, AN>, AN extends INode<AN>> R add(AR another) {
-		return createRect(upperLeft().add(another.upperLeft()), lowerLeft().add(another.lowerLeft()),
-				lowerRight().add(another.lowerRight()), upperRight().add(another.upperRight()));
+	default <AR extends IRect<AR, AN>, AN extends INode<AN>> R append(AR another) {
+		return createRect(upperLeft().append(another.upperLeft()), lowerLeft().append(another.lowerLeft()),
+				lowerRight().append(another.lowerRight()), upperRight().append(another.upperRight()));
 	}
 
 	default R shift(double distance, double clockwiseDegree) {
@@ -52,7 +52,7 @@ public interface IRect<R extends IRect<R, N>, N extends INode<N>> extends ShortS
 	}
 
 	default <AN extends INode<AN>> R shiftCenter(AN center) {
-		return add(center.x() - center().x(), center.y() - center().y());
+		return append(center.x() - center().x(), center.y() - center().y());
 	}
 
 	default <AN extends INode<AN>> R scale(AN origin, double abscissa, double ordinate) {

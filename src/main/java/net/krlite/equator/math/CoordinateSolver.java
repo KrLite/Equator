@@ -1,5 +1,6 @@
 package net.krlite.equator.math;
 
+import net.krlite.equator.function.AngleFunctions;
 import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.Optional;
@@ -28,7 +29,7 @@ public class CoordinateSolver {
     public static Optional<Double> angleBehindCamera(PlayerEntity player, DimensionalVec3d destination, boolean ignoreDimension) {
         Optional<Double> optional = angleInFrontOfCamera(player, destination, ignoreDimension);
 
-        return optional.map(AngleSolver::revert);
+        return optional.map(AngleFunctions::revert);
     }
 
     /**
@@ -51,15 +52,15 @@ public class CoordinateSolver {
     public static Optional<Double> angleInFrontOfCamera(PlayerEntity player, DimensionalVec3d destination, boolean ignoreDimension) {
         if ( ignoreDimension || destination.dimension().equals(player.getWorld().getRegistryKey()) ) {
             double
-                    dstAngle = AngleSolver.clockwiseToPositive(
+                    dstAngle = AngleFunctions.clockwiseToPositive(
                             Math.atan2(
                                     (destination.vec3d().getZ() + 0.5) - player.getZ(),
                                     (destination.vec3d().getX() + 0.5) - player.getX()
                             ) * 180 / Math.PI + 180
                     ),
-                    cameraAngle = AngleSolver.clockwiseToPositive((player.getYaw() % 360 + 360 + 270) % 360);
+                    cameraAngle = AngleFunctions.clockwiseToPositive((player.getYaw() % 360 + 360 + 270) % 360);
 
-            return Optional.of(AngleSolver.positiveIncludePositive(cameraAngle, dstAngle));
+            return Optional.of(AngleFunctions.positiveIncludePositive(cameraAngle, dstAngle));
         }
 
         return Optional.empty();
