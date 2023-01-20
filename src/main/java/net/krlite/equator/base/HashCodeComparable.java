@@ -1,4 +1,4 @@
-package net.krlite.equator.core;
+package net.krlite.equator.base;
 
 import java.util.Objects;
 

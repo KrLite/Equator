@@ -1,137 +1,42 @@
 package net.krlite.equator.geometry;
 
-import net.krlite.equator.color.PreciseColor;
-import net.krlite.equator.core.FieldFormattable;
-import net.krlite.equator.core.HashCodeComparable;
-import net.krlite.equator.geometry.core.INode;
-import net.minecraft.client.MinecraftClient;
+import net.krlite.equator.color.base.AbstractPreciseColor;
+import net.krlite.equator.geometry.base.AbstractNode;
 
-import java.awt.*;
-
-/**
- * <h2>Node</h2>
- * A class that represents a point which is constrained
- * with abscissa and ordinate.
- */
-public class Node extends HashCodeComparable implements INode<Node>, FieldFormattable {
-	/*
-	 * BASICS
-	 */
-
-	/**
-	 * The origin, or the point where the abscissa and ordinate are 0.
-	 * @return The origin.
-	 */
-	public static Node ORIGIN() {
-		return new Node(0, 0);
-	}
-
-	/**
-	 * The center of the screen.
-	 * @return The center of the screen.
-	 */
-	public static Node CENTER() {
-		return new Node(MinecraftClient.getInstance().getWindow().getScaledWidth() / 2.0, MinecraftClient.getInstance().getWindow().getScaledHeight() / 2.0);
-	}
-
-	/**
-	 * The top vertex of the screen.
-	 * @return	The top vertex of the screen.
-	 */
-	public static Node FULL() {
-		return new Node(MinecraftClient.getInstance().getWindow().getScaledWidth(), MinecraftClient.getInstance().getWindow().getScaledHeight());
-	}
-
-	/*
-	 * FIELDS
-	 */
-
-	private final double x, y;
-
-	/*
-	 * CONSTRUCTORS
-	 */
-
-	/**
-	 * Creates a {@link Node} with the given abscissa and ordinate.
-	 *
-	 * @param x The node's abscissa.
-	 * @param y The node's ordinate.
-	 */
-	public Node(double x, double y) {
-		this.x = x;
-		this.y = y;
-	}
-
-	/*
-	 * CONVERSIONS
-	 */
-
-	/**
-	 * Binds the node with a {@link PreciseColor}.
-	 * @param tint	The {@link PreciseColor} to bind the node with.
-	 * @return		The {@link TintedNode} that represents the
-	 * 				bound node.
-	 */
-	public TintedNode bind(PreciseColor tint) {
-		return new TintedNode(this, tint);
-	}
-
-	/*
-	 * ATTRIBUTES
-	 */
-
+public class Node extends AbstractNode<Node> {
 	@Override
-	public double x() {
-		return x;
+	protected Node child(double abscissa, double ordinate) {
+		return new Node(abscissa, ordinate);
 	}
 
-	@Override
-	public double y() {
-		return y;
+	public Node(double abscissa, double ordinate) {
+		super(abscissa, ordinate);
 	}
 
-	/**
-	 * Calculates the <strong>clockwise</strong> angle between this
-	 * node and the screen center.
-	 * @return	The <strong>clockwise</strong> angle between this
-	 * 			node and the screen center.
-	 */
-	public double clockwiseDegree() {
-		return clockwiseDegree(Rect.SCREEN().center());
+	public Tinted bind(AbstractPreciseColor<?> tint) {
+		return new Tinted(tint);
 	}
 
-	/**
-	 * Calculates the <strong>clockwise</strong> angle including
-	 * <strong>negative ordinate axis</strong> between this node and
-	 * the screen center.
-	 * @return	The <strong>clockwise</strong> angle including
-	 * 			<strong>negative ordinate axis</strong>.
-	 */
-	public double clockwiseDegreeIncludeNegativeOrdinate() {
-		return clockwiseDegreeIncludeNegativeOrdinate(Rect.SCREEN().center());
-	}
+	public class Tinted extends AbstractTinted {
+		public static Tinted of(Node node, AbstractPreciseColor<?> tint) {
+			return node.new Tinted(tint);
+		}
 
-	/*
-	 * OBJECT METHODS
-	 */
+		public static Tinted of(double abscissa, double ordinate, AbstractPreciseColor<?> tint) {
+			return new Node(abscissa, ordinate).new Tinted(tint);
+		}
 
-	@Override
-	public Node createNode(double x, double y) {
-		return new Node(x, y);
-	}
+		@Override
+		protected AbstractNode<Node>.AbstractTinted child(double red, double green, double blue, double alpha) {
+			return new Tinted(red, green, blue, alpha);
+		}
 
-	/*
-	 * PROPERTIES
-	 */
+		public Tinted(double red, double green, double blue, double alpha) {
+			super(red, green, blue, alpha);
+		}
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "{" + formatFields() + "}";
-	}
-
-	@Override
-	public String toShortString() {
-		return "(" + formatFields(false) + ")";
+		public Tinted(AbstractPreciseColor<?> tint) {
+			super(tint);
+		}
 	}
 }
