@@ -12,11 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-/**
- * A class that represents a 3D vector with a dimension.
- * @param dimension The dimension of the vector.
- * @param vec3d     The 3D vector.
- */
 public class DimensionalVec3d extends HashCodeComparable implements Cloneable, ShortStringable {
     protected final @Nullable RegistryKey<World> dimension;
 

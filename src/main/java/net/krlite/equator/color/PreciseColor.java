@@ -1,14 +1,13 @@
 package net.krlite.equator.color;
 
-import net.krlite.equator.color.base.AbstractPreciseColor;
-import net.krlite.equator.geometry.Node;
-import net.krlite.equator.geometry.base.AbstractNode;
+import net.krlite.equator.base.HashCodeComparable;
+import net.krlite.equator.color.core.BasicRGBA;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
 import java.awt.*;
 
-public class PreciseColor extends AbstractPreciseColor<PreciseColor> {
+public class PreciseColor extends HashCodeComparable implements BasicRGBA<PreciseColor> {
 	public static final PreciseColor WHITE = new PreciseColor(1, 1, 1);
 	public static final PreciseColor BLACK = new PreciseColor(0, 0, 0);
 	public static final PreciseColor RED = new PreciseColor(1, 0, 0);
@@ -62,13 +61,33 @@ public class PreciseColor extends AbstractPreciseColor<PreciseColor> {
 		return new PreciseColor(grayscale / 255.0);
 	}
 
+	protected final double red, green, blue, alpha;
+
 	@Override
-	protected PreciseColor child(double red, double green, double blue, double alpha) {
-		return new PreciseColor(red, green, blue, alpha);
+	public double getRed() {
+		return red;
+	}
+
+	@Override
+	public double getGreen() {
+		return green;
+	}
+
+	@Override
+	public double getBlue() {
+		return blue;
+	}
+
+	@Override
+	public double getAlpha() {
+		return alpha;
 	}
 
 	public PreciseColor(double red, double green, double blue, double alpha, boolean transparent) {
-		super(red, green, blue, alpha);
+		this.red = red;
+		this.green = green;
+		this.blue = blue;
+		this.alpha = alpha;
 		this.transparent = transparent;
 	}
 
@@ -84,7 +103,43 @@ public class PreciseColor extends AbstractPreciseColor<PreciseColor> {
 		this(grayscale, grayscale, grayscale);
 	}
 
-	public Node.Tinted bind(AbstractNode<?> node) {
-		return new Node(node.getAbscissa(), node.getOrdinate()).new Tinted(this);
+	@Override
+	public boolean hasColor() {
+		return !transparent;
+	}
+
+	@Override
+	public PreciseColor withRed(double red) {
+		return new PreciseColor(red, getGreen(), getBlue(), getAlpha());
+	}
+
+	@Override
+	public PreciseColor withGreen(double green) {
+		return new PreciseColor(getRed(), green, getBlue(), getAlpha());
+	}
+
+	@Override
+	public PreciseColor withBlue(double blue) {
+		return new PreciseColor(getRed(), getGreen(), blue, getAlpha());
+	}
+
+	@Override
+	public PreciseColor withAlpha(@Range(from = 0, to = 255) int alpha) {
+		return new PreciseColor(getRed(), getGreen(), getBlue(), clampValue(alpha) / 255.0);
+	}
+
+	@Override
+	public PreciseColor withOpacity(double opacity) {
+		return new PreciseColor(getRed(), getGreen(), getBlue(), clampValue(opacity));
+	}
+
+	@Override
+	public String toShortString() {
+		return "<" + (hasColor() ? formatFields(false, "transparent") : "transparent") + ">";
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "<" + (hasColor() ? formatFields("transparent") : "transparent") + ">";
 	}
 }
