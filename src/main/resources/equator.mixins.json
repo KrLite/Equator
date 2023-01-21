@@ -2,6 +2,7 @@
   "required": true,
   "minVersion": "0.8",
   "package": "net.krlite.equator.mixin",
+  "plugin": "net.krlite.equator.plugin.EquatorMixinConfigPlugin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
   ],
@@ -9,6 +10,6 @@
     "defaultRequire": 0
   },
   "client": [
-    "EquatorDebugger"
+    "debug.EquatorDebugger"
   ]
 }
