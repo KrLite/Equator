@@ -1,9 +1,6 @@
 package net.krlite.equator.render.sprite;
 
-import net.krlite.equator.geometry.Rect;
-import net.krlite.equator.color.PreciseColor;
-import net.krlite.equator.render.Equator;
-import net.minecraft.client.util.math.MatrixStack;
+import net.krlite.equator.core.ShortStringable;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +15,8 @@ import java.util.Objects;
  * @param uEnd          The u end.
  * @param vEnd          The v end.
  */
-public record IdentifierSprite(@NotNull Identifier identifier, float uBegin, float vBegin, float uEnd, float vEnd) {
+public record IdentifierSprite(@NotNull Identifier identifier, float uBegin, float vBegin, float uEnd, float vEnd)
+        implements ShortStringable {
     /**
      * Creates a full sized {@link IdentifierSprite} from an {@link Identifier}.
      * @param identifier    The dedicated {@link Identifier}.
@@ -96,17 +94,6 @@ public record IdentifierSprite(@NotNull Identifier identifier, float uBegin, flo
 
     @Override
     public String toString() {
-        return "IdentifierSprite" + "{" +
-                "identifier=" + identifier +
-                ", uBegin=" + uBegin +
-                ", vBegin=" + vBegin +
-                ", uEnd=" + uEnd +
-                ", vEnd=" + vEnd +
-                "}";
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(identifier, uBegin, vBegin, uEnd, vEnd);
+        return getClass().getSimpleName() + "{" + formatFields() + "}";
     }
 }

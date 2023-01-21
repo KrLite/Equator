@@ -172,4 +172,9 @@ public interface BasicRGBA<C extends BasicRGBA<C>> extends ShortStringable, Simp
 									 .average()
 									 .orElse(0));
 	}
+
+	default C orElse(@NotNull BasicRGBA<?> another) {
+		return hasColor() ? withOpacity(getAlpha()) :
+					   withRed(another.getRed()).withGreen(another.getGreen()).withBlue(another.getBlue()).withOpacity(another.getAlpha());
+	}
 }

@@ -1,5 +1,6 @@
 package net.krlite.equator.render.sprite;
 
+import net.krlite.equator.core.ShortStringable;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
@@ -8,7 +9,7 @@ import java.util.Objects;
 /**
  * A sprite that defines a horizontal set of {@link IdentifierSprite}s.
  */
-public record HorizontalSprite(Identifier identifier, int step) {
+public record HorizontalSprite(Identifier identifier, int step) implements ShortStringable {
     /**
      * Creates a {@link HorizontalSprite} by splitting an {@link Identifier} horizontally into slices.
      * @param identifier    The dedicated {@link Identifier}.
@@ -44,14 +45,6 @@ public record HorizontalSprite(Identifier identifier, int step) {
 
     @Override
     public String toString() {
-        return "HorizontalSprite" + "{" +
-                "identifier=" + identifier +
-                ", step=" + step +
-                "}";
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(identifier, step);
+        return getClass().getSimpleName() + "{" + formatFields() + "}";
     }
 }

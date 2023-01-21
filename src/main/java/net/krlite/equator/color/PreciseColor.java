@@ -24,6 +24,10 @@ public class PreciseColor extends HashCodeComparable implements BasicRGBA<Precis
 
 	protected final boolean transparent;
 
+	public static PreciseColor of (BasicRGBA<?> color) {
+		return new PreciseColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+	}
+
 	public static PreciseColor of(@Nullable Color color) {
 		if (color == null) return TRANSPARENT;
 		return new PreciseColor(color.getRed() / 255.0, color.getGreen() / 255.0, color.getBlue() / 255.0, color.getAlpha() / 255.0);

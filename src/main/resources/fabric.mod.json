@@ -23,6 +23,7 @@
     ]
   },
   "mixins": [
+    "equator.mixins.json"
   ],
 
   "depends": {

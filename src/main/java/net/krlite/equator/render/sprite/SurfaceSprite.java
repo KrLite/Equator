@@ -1,5 +1,6 @@
 package net.krlite.equator.render.sprite;
 
+import net.krlite.equator.core.ShortStringable;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
@@ -8,7 +9,7 @@ import java.util.Objects;
 /**
  * A sprite that defines a 2D array set of {@link IdentifierSprite}s.
  */
-public record SurfaceSprite(Identifier identifier, int stepX, int stepY) {
+public record SurfaceSprite(Identifier identifier, int stepX, int stepY) implements ShortStringable {
     /**
      * Creates a {@link SurfaceSprite} by splitting an {@link Identifier} into pieces.
      * @param identifier    The dedicated {@link Identifier}.
@@ -56,11 +57,7 @@ public record SurfaceSprite(Identifier identifier, int stepX, int stepY) {
 
     @Override
     public String toString() {
-        return "SurfaceSprite" + "{" +
-                "identifier=" + identifier +
-                ", stepX=" + stepX +
-                ", stepY=" + stepY +
-                "}";
+        return getClass().getSimpleName() + "{" + formatFields() + "}";
     }
 
     @Override

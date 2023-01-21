@@ -15,20 +15,33 @@ import java.util.stream.Collectors;
  * A utility class for building identifiers and sprites.
  */
 public class IdentifierBuilder {
+	public static boolean checkContains(@NotNull String namespace, @Nullable Identifier identifier) {
+		return identifier != null && identifier.getNamespace().equals(namespace);
+	}
+
+	public static boolean checkContains(@NotNull Identifier namespace, @Nullable Identifier identifier) {
+		return checkContains(namespace.getNamespace(), identifier);
+	}
+
+	private static String joinAll(@Nullable CharSequence delimiter, @Nullable String... strings) {
+		return Arrays.stream(strings).filter(Objects::nonNull).filter(s -> !s.isEmpty())
+					   .collect(Collectors.joining(delimiter != null ? delimiter : ""));
+	}
+
+	public static String joinAsPath(@Nullable String... paths) {
+		return joinAll("/", paths);
+	}
+
+	public static String joinAsId(@Nullable String... paths) {
+		return joinAll("_", paths);
+	}
+
 	public static Identifier id(@NotNull String namespace, @Nullable String... paths) {
-		return new Identifier(namespace,
-				Arrays.stream(paths)
-						.filter(Objects::nonNull)
-						.filter(p -> !p.isEmpty())
-						.collect(Collectors.joining("/")));
+		return new Identifier(namespace, joinAsPath(paths));
 	}
 
 	public static Identifier png(@NotNull String namespace, @Nullable String... paths) {
-		return new Identifier(namespace,
-				"textures/" + Arrays.stream(paths)
-									  .filter(Objects::nonNull)
-									  .filter(p -> !p.isEmpty())
-									  .collect(Collectors.joining("/")) + ".png");
+		return new Identifier(namespace, "textures/" + joinAsPath(paths) + ".png");
 	}
 
 	public static IdentifierSprite sprite(@NotNull String namespace, @Nullable String... paths) {
@@ -52,6 +65,10 @@ public class IdentifierBuilder {
 	 * @param namespace	The default namespace.
 	 */
 	public record Specified(@NotNull String namespace) implements ShortStringable {
+		public boolean checkContains(@Nullable Identifier identifier) {
+			return IdentifierBuilder.checkContains(namespace, identifier);
+		}
+
 		public Identifier id(@Nullable String... paths) {
 			return IdentifierBuilder.id(namespace, paths);
 		}
