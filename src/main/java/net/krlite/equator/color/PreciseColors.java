@@ -120,6 +120,7 @@ public class PreciseColors {
 	public static final PreciseColor PEACH = new PreciseColor(1, 0.85, 0.73);
 	public static final PreciseColor COBALT = new PreciseColor(0, 0.28, 0.67);
 	public static final PreciseColor PLUM = new PreciseColor(0.5, 0, 0.5);
+	public static final PreciseColor SCARLET = new PreciseColor(1, 0.14, 0);
 	public static final PreciseColor MUSTARD = new PreciseColor(1, 0.87, 0.37);
 	public static final PreciseColor CHOCOLATE = new PreciseColor(0.48, 0.25, 0);
 	public static final PreciseColor TAN = new PreciseColor(0.82, 0.71, 0.55);

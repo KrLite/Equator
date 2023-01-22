@@ -39,11 +39,11 @@ public class PreciseColor extends HashCodeComparable implements BasicRGBA<Precis
 	}
 
 	public static PreciseColor of(@Range(from = 0x0, to = 0xFFFFFFFFL) long colorCode) {
-		return new PreciseColor(
-				((colorCode >> 16) & 0xFF) / 255.0,
-				((colorCode >> 8) & 0xFF) / 255.0,
-				(colorCode & 0xFF) / 255.0,
-				colorCode > 0xFFFFFF ? ((colorCode >> 24) & 0xFF) / 255.0 : 0xFF
+		return PreciseColor.of(
+				(int) ((colorCode >> 16) & 0xFF),
+				(int) ((colorCode >> 8) & 0xFF),
+				(int) (colorCode & 0xFF),
+				colorCode > 0xFFFFFF ? (int) ((colorCode >> 24) & 0xFF) : 0xFF
 		);
 	}
 

@@ -1,6 +1,5 @@
 package net.krlite.equator.color.core;
 
-import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.core.ShortStringable;
 import net.krlite.equator.core.SimpleOperations;
 import org.jetbrains.annotations.NotNull;
@@ -137,9 +136,11 @@ public interface BasicRGBA<C extends BasicRGBA<C>> extends ShortStringable, Simp
 					   .withBlue(Math.min(Math.pow(getBlue(), 2), 0.73));
 	}
 
-	default C blend(@NotNull BasicRGBA<?> another, double ratio) {
-		if (!another.hasColor())
+	default BasicRGBA<?> blend(@NotNull BasicRGBA<?> another, double ratio) {
+		if (!another.hasColor()) {
+			if (!hasColor()) return this;
 			return withOpacity(blendValue(another.getAlpha(), getAlpha(), ratio));
+		}
 		if (!hasColor())
 			return withOpacity(blendValue(getAlpha(), another.getAlpha(), ratio));
 		return withRed(blendValue(getRed(), another.getRed(), ratio))
@@ -148,33 +149,35 @@ public interface BasicRGBA<C extends BasicRGBA<C>> extends ShortStringable, Simp
 					   .withOpacity(blendValue(getAlpha(), another.getAlpha(), ratio));
 	}
 
-	default C blend(@NotNull BasicRGBA<?> another) {
+	default BasicRGBA<?> blend(@NotNull BasicRGBA<?> another) {
 		return blend(another, 0.5);
 	}
 
-	default C average(@NotNull BasicRGBA<?>... others) {
+	default BasicRGBA<?> average(@NotNull BasicRGBA<?>... others) {
 		if (others.length == 0)
-			return withOpacity(getAlpha());
+			return this;
 		return withRed(Stream.concat(Stream.of(this), Arrays.stream(others))
-									 .mapToDouble(BasicRGBA::getRed)
-									 .average()
-									 .orElse(0))
+							   .filter(BasicRGBA::hasColor)
+							   .mapToDouble(BasicRGBA::getRed)
+							   .average()
+							   .orElse(0))
 					   .withGreen(Stream.concat(Stream.of(this), Arrays.stream(others))
-									 .mapToDouble(BasicRGBA::getGreen)
-									 .average()
-									 .orElse(0))
+										  .filter(BasicRGBA::hasColor)
+										  .mapToDouble(BasicRGBA::getGreen)
+										  .average()
+										  .orElse(0))
 					   .withBlue(Stream.concat(Stream.of(this), Arrays.stream(others))
-									 .mapToDouble(BasicRGBA::getBlue)
-									 .average()
-									 .orElse(0))
-					   .withOpacity(Stream.concat(Stream.of(this), Arrays.stream(others))
-									 .mapToDouble(BasicRGBA::getAlpha)
-									 .average()
-									 .orElse(0));
+										 .filter(BasicRGBA::hasColor)
+										 .mapToDouble(BasicRGBA::getBlue)
+										 .average()
+										 .orElse(0))
+					   .withOpacity(hasColor() ? Stream.concat(Stream.of(this), Arrays.stream(others))
+														 .mapToDouble(BasicRGBA::getAlpha)
+														 .average()
+														 .orElse(0) : 0);
 	}
 
-	default C orElse(@NotNull BasicRGBA<?> another) {
-		return hasColor() ? withOpacity(getAlpha()) :
-					   withRed(another.getRed()).withGreen(another.getGreen()).withBlue(another.getBlue()).withOpacity(another.getAlpha());
+	default BasicRGBA<?> orElse(@NotNull BasicRGBA<?> another) {
+		return hasColor() ? this : another;
 	}
 }

@@ -3,11 +3,13 @@ package net.krlite.equator.geometry;
 import net.krlite.equator.base.HashCodeComparable;
 import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.color.core.BasicRGBA;
+import net.krlite.equator.core.Operatable;
 import net.krlite.equator.core.ShortStringable;
 import net.krlite.equator.core.SimpleOperations;
 import net.minecraft.client.MinecraftClient;
 import org.jetbrains.annotations.Range;
 
+import java.awt.*;
 import java.util.function.Function;
 
 public class Rect extends HashCodeComparable implements ShortStringable, SimpleOperations {
@@ -35,16 +37,32 @@ public class Rect extends HashCodeComparable implements ShortStringable, SimpleO
 
 	protected final Node leftTop, leftBottom, rightBottom, rightTop;
 
+	public Node getTop() {
+		return getLeftTop().interpolate(getRightTop(), 0.5);
+	}
+
 	public Node getLeftTop() {
 		return leftTop;
+	}
+
+	public Node getLeft() {
+		return getLeftTop().interpolate(getLeftBottom(), 0.5);
 	}
 
 	public Node getLeftBottom() {
 		return leftBottom;
 	}
 
+	public Node getBottom() {
+		return getLeftBottom().interpolate(getRightBottom(), 0.5);
+	}
+
 	public Node getRightBottom() {
 		return rightBottom;
+	}
+
+	public Node getRight() {
+		return getRightBottom().interpolate(getRightTop(), 0.5);
 	}
 
 	public Node getRightTop() {
@@ -81,9 +99,9 @@ public class Rect extends HashCodeComparable implements ShortStringable, SimpleO
 
 	public double getArea() {
 		return getWidth() * getHeight();
-	}
+	} // Except in the gradiant painters, the rect will always be a 'Rectangle' instead of a 'Quadrangle'
 
-	public Rect(Node leftTop, Node leftBottom, Node rightBottom, Node rightTop) {
+	protected Rect(Node leftTop, Node leftBottom, Node rightBottom, Node rightTop) {
 		this.leftTop = leftTop;
 		this.leftBottom = leftBottom;
 		this.rightBottom = rightBottom;
@@ -103,6 +121,14 @@ public class Rect extends HashCodeComparable implements ShortStringable, SimpleO
 	}
 
 	public Tinted tint(BasicRGBA<?> tint) {
+		return tint(tint, tint, tint, tint);
+	}
+
+	public Tinted tint(PreciseColor leftTop, PreciseColor leftBottom, PreciseColor rightBottom, PreciseColor rightTop) {
+		return new Tinted(leftTop, leftBottom, rightBottom, rightTop);
+	}
+
+	public Tinted tint(PreciseColor tint) {
 		return tint(tint, tint, tint, tint);
 	}
 
@@ -158,16 +184,32 @@ public class Rect extends HashCodeComparable implements ShortStringable, SimpleO
 				origin.rotate(getRightBottom(), angle), origin.rotate(getRightTop(), angle));
 	}
 
+	public Rect rotateByTop(double angle) {
+		return rotateBy(getTop(), angle);
+	}
+
 	public Rect rotateByLeftTop(double angle) {
 		return rotateBy(getLeftTop(), angle);
+	}
+
+	public Rect rotateByLeft(double angle) {
+		return rotateBy(getLeft(), angle);
 	}
 
 	public Rect rotateByLeftBottom(double angle) {
 		return rotateBy(getLeftBottom(), angle);
 	}
 
+	public Rect rotateByBottom(double angle) {
+		return rotateBy(getBottom(), angle);
+	}
+
 	public Rect rotateByRightBottom(double angle) {
 		return rotateBy(getRightBottom(), angle);
+	}
+
+	public Rect rotateByRight(double angle) {
+		return rotateBy(getRight(), angle);
 	}
 
 	public Rect rotateByRightTop(double angle) {
@@ -243,7 +285,7 @@ public class Rect extends HashCodeComparable implements ShortStringable, SimpleO
 		return meshByGrid(grid, grid, step, step);
 	}
 
-	public class Tinted implements BasicRGBA<Tinted> {
+	public class Tinted implements BasicRGBA<Tinted>, Operatable<Rect, Tinted> {
 		public static Tinted of(Node.Tinted leftTop, Node.Tinted leftBottom, Node.Tinted rightBottom, Node.Tinted rightTop) {
 			return new Rect(leftTop.getNode(), leftBottom.getNode(), rightBottom.getNode(), rightTop.getNode())
 						   .new Tinted(leftTop, leftBottom, rightBottom, rightTop);
@@ -259,39 +301,75 @@ public class Rect extends HashCodeComparable implements ShortStringable, SimpleO
 
 		protected final PreciseColor leftTop, leftBottom, rightBottom, rightTop;
 
+		public PreciseColor getTop() {
+			return PreciseColor.of(leftTop.blend(rightTop, 0.5));
+		}
+
 		public PreciseColor getLeftTop() {
 			return leftTop;
+		}
+
+		public PreciseColor getLeft() {
+			return PreciseColor.of(leftTop.blend(leftBottom, 0.5));
 		}
 
 		public PreciseColor getLeftBottom() {
 			return leftBottom;
 		}
 
+		public PreciseColor getBottom() {
+			return PreciseColor.of(leftBottom.blend(rightBottom, 0.5));
+		}
+
 		public PreciseColor getRightBottom() {
 			return rightBottom;
+		}
+
+		public PreciseColor getRight() {
+			return PreciseColor.of(rightTop.blend(rightBottom, 0.5));
 		}
 
 		public PreciseColor getRightTop() {
 			return rightTop;
 		}
 
+		public PreciseColor getCenter() {
+			return PreciseColor.of(leftTop.average(leftBottom, rightBottom, rightTop));
+		}
+
+		public PreciseColor getTopNode() {
+			return getLeftTopNode().interpolate(getRightTopNode(), 0.5);
+		}
+
 		public Node.Tinted getLeftTopNode() {
 			return getRect().getLeftTop().tint(getLeftTop());
+		}
+
+		public PreciseColor getLeftNode() {
+			return getLeftTopNode().interpolate(getLeftBottomNode(), 0.5);
 		}
 
 		public Node.Tinted getLeftBottomNode() {
 			return getRect().getLeftBottom().tint(getLeftBottom());
 		}
 
+		public PreciseColor getBottomNode() {
+			return getLeftBottomNode().interpolate(getRightBottomNode(), 0.5);
+		}
+
 		public Node.Tinted getRightBottomNode() {
 			return getRect().getRightBottom().tint(getRightBottom());
+		}
+
+		public PreciseColor getRightNode() {
+			return getRightTopNode().interpolate(getRightBottomNode(), 0.5);
 		}
 
 		public Node.Tinted getRightTopNode() {
 			return getRect().getRightTop().tint(getRightTop());
 		}
 
-		public Node.Tinted getCenter() {
+		public Node.Tinted getCenterNode() {
 			return getRect().getCenter().new Tinted(leftTop.average(leftBottom, rightBottom, rightTop));
 		}
 
@@ -325,22 +403,22 @@ public class Rect extends HashCodeComparable implements ShortStringable, SimpleO
 
 		@Override
 		public double getRed() {
-			return getCenter().getRed();
+			return getCenterNode().getRed();
 		}
 
 		@Override
 		public double getGreen() {
-			return getCenter().getGreen();
+			return getCenterNode().getGreen();
 		}
 
 		@Override
 		public double getBlue() {
-			return getCenter().getBlue();
+			return getCenterNode().getBlue();
 		}
 
 		@Override
 		public double getAlpha() {
-			return getCenter().getAlpha();
+			return getCenterNode().getAlpha();
 		}
 
 		public Rect getRect() {
@@ -356,6 +434,25 @@ public class Rect extends HashCodeComparable implements ShortStringable, SimpleO
 
 		public Tinted(BasicRGBA<?> tint) {
 			this(tint, tint, tint, tint);
+		}
+
+		public Tinted(PreciseColor leftTop, PreciseColor leftBottom, PreciseColor rightBottom, PreciseColor rightTop) {
+			this.leftTop = leftTop;
+			this.leftBottom = leftBottom;
+			this.rightBottom = rightBottom;
+			this.rightTop = rightTop;
+		}
+
+		public Tinted(PreciseColor tint) {
+			this(tint, tint, tint, tint);
+		}
+
+		public Tinted(Color leftTop, Color leftBottom, Color rightBottom, Color rightTop) {
+			this(PreciseColor.of(leftTop), PreciseColor.of(leftBottom), PreciseColor.of(rightBottom), PreciseColor.of(rightTop));
+		}
+
+		public Tinted(Color tint) {
+			this(PreciseColor.of(tint));
 		}
 
 		public double distanceTo(Node node) {
@@ -411,10 +508,10 @@ public class Rect extends HashCodeComparable implements ShortStringable, SimpleO
 
 		public Tinted cut() {
 			return new Tinted(
-					getLeftTop().orElse(getLeftBottom().average(getRightTop()).transparent()),
-					getLeftBottom().orElse(getLeftTop().average(getRightBottom()).transparent()),
-					getRightBottom().orElse(getRightTop().average(getLeftBottom()).transparent()),
-					getRightTop().orElse(getRightBottom().average(getLeftTop()).transparent())
+					getLeftTop().orElse(getLeftTop().average(getLeftBottom(), getRightBottom(), getRightTop())),
+					getLeftBottom().orElse(getLeftBottom().average(getRightBottom(), getRightTop(), getLeftTop())),
+					getRightBottom().orElse(getRightBottom().average(getRightTop(), getLeftTop(), getLeftBottom())),
+					getRightTop().orElse(getRightTop().average(getLeftTop(), getLeftBottom(), getRightBottom()))
 			);
 		}
 
@@ -470,6 +567,7 @@ public class Rect extends HashCodeComparable implements ShortStringable, SimpleO
 			return rect.tint(getLeftTop(), getLeftBottom(), getRightBottom(), getRightTop());
 		}
 
+		@Override
 		public Tinted operate(Function<Rect, Rect> operation) {
 			return swap(operation.apply(getRect()));
 		}

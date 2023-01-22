@@ -3,6 +3,7 @@ package net.krlite.equator.geometry;
 import net.krlite.equator.base.HashCodeComparable;
 import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.color.core.BasicRGBA;
+import net.krlite.equator.core.Operatable;
 import net.krlite.equator.core.ShortStringable;
 import net.krlite.equator.core.SimpleOperations;
 import net.krlite.equator.function.AngleFunctions;
@@ -70,6 +71,10 @@ public class Node extends HashCodeComparable implements ShortStringable, SimpleO
 		return new Tinted(tint);
 	}
 
+	public Tinted tint(PreciseColor tint) {
+		return new Tinted(tint);
+	}
+
 	public double distanceTo(Node another) {
 		return Math.sqrt(Math.pow(getX() - another.getX(), 2) + Math.pow(getY() - another.getY(), 2));
 	}
@@ -127,7 +132,7 @@ public class Node extends HashCodeComparable implements ShortStringable, SimpleO
 		return origin.rotate(this, angle);
 	}
 
-	public class Tinted extends PreciseColor {
+	public class Tinted extends PreciseColor implements Operatable<Node, Tinted> {
 		public static Tinted of(double x, double y, double red, double green, double blue, double alpha) {
 			return new Node(x, y).new Tinted(red, green, blue, alpha);
 		}
@@ -172,6 +177,10 @@ public class Node extends HashCodeComparable implements ShortStringable, SimpleO
 			this(tint.getRed(), tint.getGreen(), tint.getBlue(), tint.getAlpha());
 		}
 
+		public Tinted(PreciseColor tint) {
+			super(tint.getRed(), tint.getGreen(), tint.getBlue(), tint.getAlpha(), tint.isTransparent());
+		}
+
 		public Tinted(Color tint) {
 			this(PreciseColor.of(tint));
 		}
@@ -192,10 +201,15 @@ public class Node extends HashCodeComparable implements ShortStringable, SimpleO
 			return getNode().isIn(rect);
 		}
 
+		public Tinted interpolate(Tinted another, double ratio) {
+			return getNode().interpolate(another.getNode(), ratio).tint(blend(another, ratio));
+		}
+
 		public Tinted swap(Node another) {
 			return another.tint(this);
 		}
 
+		@Override
 		public Tinted operate(Function<Node, Node> operation) {
 			return swap(operation.apply(getNode()));
 		}

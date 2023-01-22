@@ -33,7 +33,7 @@ public class Equator extends HashCodeComparable {
 		}
 
 		public Renderer renderRect(@NotNull Rect.Tinted tinted) {
-			Tessellator tessellator = prepare(tinted.getCenter());
+			Tessellator tessellator = prepare(tinted.getCenterNode());
 			BufferBuilder builder = tessellator.getBuffer();
 			builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 
@@ -322,8 +322,8 @@ public class Equator extends HashCodeComparable {
 			return paintRect(new Rect(tinted.getX() - size / 2, tinted.getY() - size / 2, size, size).tint(tinted));
 		}
 
-		public Painter paintPoint(@NotNull Node.Tinted tintedNode) {
-			return paintPoint(tintedNode, 1);
+		public Painter paintPoint(@NotNull Node.Tinted tinted) {
+			return paintPoint(tinted, 1);
 		}
 
 		public Painter paintLine(@NotNull Node.Tinted start, @NotNull Node.Tinted end, double width) {
@@ -363,29 +363,27 @@ public class Equator extends HashCodeComparable {
 			return horizontalGradiant(Rect.fullScreen(), left, right);
 		}
 
+		public static final double MIN_GRADIANT_AREA = 50;
+
 		@Contract("_, _ -> this")
 		public Painter verticalGradiant(@NotNull Rect.Tinted tinted, double upperToLowerAttenuation) {
-			upperToLowerAttenuation = nonLinearProjection(upperToLowerAttenuation);
-			tinted = tinted.cut();
-
-			if (tinted.getArea() <= 20) return paintRect(tinted);
+			//upperToLowerAttenuation = nonLinearProjection(upperToLowerAttenuation);
+			if (tinted.getArea() <= MIN_GRADIANT_AREA) return paintRect(tinted);
 
 			return verticalGradiant(tinted.getRect().topHalf().tint(
 					tinted.getLeftTop(), tinted.getLeftBottom().blend(tinted.getLeftTop(), upperToLowerAttenuation),
-					tinted.getRightBottom().blend(tinted.getRightTop(), upperToLowerAttenuation), tinted.getRightBottom()
+					tinted.getRightBottom().blend(tinted.getRightTop(), upperToLowerAttenuation), tinted.getRightTop()
 			), upperToLowerAttenuation)
 						   .verticalGradiant(tinted.getRect().bottomHalf().tint(
 					tinted.getLeftTop().blend(tinted.getLeftBottom(), 1 - upperToLowerAttenuation), tinted.getLeftBottom(),
 					tinted.getRightBottom(), tinted.getRightTop().blend(tinted.getRightBottom(), 1 - upperToLowerAttenuation)
-			), upperToLowerAttenuation);
+						   ), upperToLowerAttenuation);
 		}
 
 		@Contract("_, _ -> this")
 		public Painter horizontalGradiant(@NotNull Rect.Tinted tinted, double leftToRightAttenuation) {
-			leftToRightAttenuation = nonLinearProjection(leftToRightAttenuation);
-			tinted = tinted.cut();
-
-			if (tinted.getArea() <= 20) return paintRect(tinted);
+			//leftToRightAttenuation = nonLinearProjection(leftToRightAttenuation);
+			if (tinted.getArea() <= MIN_GRADIANT_AREA) return paintRect(tinted);
 
 			return horizontalGradiant(tinted.getRect().leftHalf().tint(
 					tinted.getLeftTop(), tinted.getLeftBottom(),
@@ -396,37 +394,37 @@ public class Equator extends HashCodeComparable {
 					tinted.getLeftTop().blend(tinted.getRightTop(), 1 - leftToRightAttenuation),
 					tinted.getLeftBottom().blend(tinted.getRightBottom(), 1 - leftToRightAttenuation),
 					tinted.getRightBottom(), tinted.getRightTop()
-			), leftToRightAttenuation);
+						   ), leftToRightAttenuation);
 		}
 
 		public Painter rectShadowWithScissor(@NotNull Rect.Tinted tinted, @NotNull Rect.Tinted scissor) {
 			// Upper
-			return paintRect(tinted.getRect().tint(tinted.getLeftTop(), scissor.getLeftTop(), scissor.getRightTop(), tinted.getRightTop()).cut())
+			return paintRect(Rect.Tinted.of(tinted.getLeftTopNode(), scissor.getLeftTopNode(), scissor.getRightTopNode(), tinted.getRightTopNode()))
 						   // Lower
-						   .paintRect(tinted.getRect().tint(scissor.getLeftBottom(), tinted.getLeftBottom(), tinted.getRightBottom(), scissor.getLeftBottom()).cut())
+						   .paintRect(Rect.Tinted.of(scissor.getLeftBottomNode(), tinted.getLeftBottomNode(), tinted.getRightBottomNode(), scissor.getRightBottomNode()))
 						   // Left
-						   .paintRect(tinted.getRect().tint(tinted.getLeftTop(), tinted.getLeftBottom(), scissor.getLeftBottom(), scissor.getLeftTop()).cut())
+						   .paintRect(Rect.Tinted.of(tinted.getLeftTopNode(), tinted.getLeftBottomNode(), scissor.getLeftBottomNode(), scissor.getLeftTopNode()))
 						   // Right
-						   .paintRect(tinted.getRect().tint(scissor.getRightTop(), scissor.getRightBottom(), tinted.getRightBottom(), tinted.getRightTop()).cut());
-		}
-
-		public Painter rectShadowWithScissor(@NotNull Rect.Tinted scissor) {
-			return rectShadowWithScissor(Rect.fullScreen().tint(PreciseColor.TRANSPARENT), scissor);
+						   .paintRect(Rect.Tinted.of(scissor.getRightTopNode(), scissor.getRightBottomNode(), tinted.getRightBottomNode(), tinted.getRightTopNode()));
 		}
 
 		public Painter rectShadowWithScissor(@NotNull Rect.Tinted tinted, @NotNull Rect.Tinted scissor, double attenuation) {
 			// Upper
-			return verticalGradiant(tinted.getRect().tint(tinted.getLeftTop(), scissor.getLeftTop(), scissor.getRightTop(), tinted.getRightTop()).cut(), 1 - attenuation)
+			return verticalGradiant(Rect.Tinted.of(tinted.getLeftTopNode(), scissor.getLeftTopNode(), scissor.getRightTopNode(), tinted.getRightTopNode()).cut(), 1 - attenuation)
 						   // Lower
-						   .verticalGradiant(tinted.getRect().tint(scissor.getLeftBottom(), tinted.getLeftBottom(), tinted.getRightBottom(), scissor.getRightBottom()).cut(),attenuation)
+						   .verticalGradiant(Rect.Tinted.of(scissor.getLeftBottomNode(), tinted.getLeftBottomNode(), tinted.getRightBottomNode(), scissor.getRightBottomNode()).cut(), attenuation)
 						   // Left
-						   .horizontalGradiant(tinted.getRect().tint(tinted.getLeftTop(), tinted.getLeftBottom(), scissor.getLeftBottom(), scissor.getLeftTop()).cut(), 1 - attenuation)
+						   .horizontalGradiant(Rect.Tinted.of(tinted.getLeftTopNode(), tinted.getLeftBottomNode(), scissor.getLeftBottomNode(), scissor.getLeftTopNode()).cut(), 1 - attenuation)
 						   // Right
-						   .horizontalGradiant(tinted.getRect().tint(scissor.getRightTop(), scissor.getRightBottom(), tinted.getRightBottom(), tinted.getRightTop()).cut(), attenuation);
+						   .horizontalGradiant(Rect.Tinted.of(scissor.getRightTopNode(), scissor.getRightBottomNode(), tinted.getRightBottomNode(), tinted.getRightTopNode()).cut(), attenuation);
 		}
 
 		public Painter rectShadowWithScissor(@NotNull Rect.Tinted scissor, double attenuation) {
 			return rectShadowWithScissor(Rect.fullScreen().tint(PreciseColor.TRANSPARENT), scissor, attenuation);
+		}
+
+		public Painter rectShadowWithScissor(@NotNull Rect.Tinted scissor) {
+			return rectShadowWithScissor(Rect.fullScreen().tint(PreciseColor.TRANSPARENT), scissor);
 		}
 
 		public Painter rectShadow(@NotNull Rect.Tinted outer, @NotNull Rect.Tinted inner, double attenuation) {
@@ -471,7 +469,7 @@ public class Equator extends HashCodeComparable {
 		}
 
 		private void paintRect(@NotNull BufferBuilder builder, @NotNull Rect.Tinted tinted) {
-			if (tinted.noneHasColor()) return;
+			if (!tinted.allHasColor()) throw new IllegalArgumentException("All vertices must have a color");
 			paintVertex(builder, tinted.getRightTopNode());
 			paintVertex(builder, tinted.getLeftTopNode());
 			paintVertex(builder, tinted.getLeftBottomNode());
