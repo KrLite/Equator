@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaterniond;
+import org.joml.Quaterniondc;
 
 /**
  * <h2>Equator</h2>
@@ -497,24 +498,24 @@ public class Equator extends HashCodeComparable {
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 
-	private static void applyModelView(MatrixStack matrixStack, Quaterniond quaterniond) {
+	private static void applyModelView(MatrixStack matrixStack, Quaterniondc quaternion) {
 		matrixStack.scale(1, -1, 1);
-		matrixStack.scale((float) (16 * quaterniond.w), (float) (16 * quaterniond.w), (float) (16 * quaterniond.w));
-		matrixStack.multiply(QuaternionAdapter.toFloat(quaterniond));
+		matrixStack.scale((float) (16 * quaternion.w()), (float) (16 * quaternion.w()), (float) (16 * quaternion.w()));
+		matrixStack.multiply(QuaternionAdapter.toFloat(quaternion));
 
 		RenderSystem.applyModelViewMatrix();
 	}
 
 	public record Item(ItemStack itemStack) {
-		public Item render(Vec3d pos, boolean leftHanded, Quaterniond quaterniond) {
+		public Item render(Vec3d pos, boolean leftHanded, Quaterniondc quaternion) {
 			BakedModel bakedModel = MinecraftClient.getInstance().getItemRenderer().getModel(itemStack, null, null, 0);
 			prepareModel();
 			MatrixStack matrixStack = RenderSystem.getModelViewStack();
 
 			matrixStack.push();
 			matrixStack.translate(pos.x, pos.y, 100 + pos.z);
-			matrixStack.translate(8 * quaterniond.w, 8 * quaterniond.w, 0);
-			applyModelView(matrixStack, quaterniond);
+			matrixStack.translate(8 * quaternion.w(), 8 * quaternion.w(), 0);
+			applyModelView(matrixStack, quaternion);
 
 			MatrixStack itemMatrixStack = new MatrixStack();
 			VertexConsumerProvider.Immediate immediate = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
@@ -536,8 +537,8 @@ public class Equator extends HashCodeComparable {
 			return this;
 		}
 
-		public Item render(Vec3d pos, Quaterniond quaterniond) {
-			return render(pos, false, quaterniond);
+		public Item render(Vec3d pos, Quaterniondc quaternion) {
+			return render(pos, false, quaternion);
 		}
 
 		public Item render(Vec3d pos, int size) {
@@ -548,8 +549,8 @@ public class Equator extends HashCodeComparable {
 			return render(pos, false, new Quaterniond(0, 0, 0, 1));
 		}
 
-		public Item render(double x, double y, Quaterniond quaterniond) {
-			return render(new Vec3d(x, y, 0), false, quaterniond);
+		public Item render(double x, double y, Quaterniondc quaternion) {
+			return render(new Vec3d(x, y, 0), false, quaternion);
 		}
 
 		public Item render(double x, double y, int size) {
@@ -560,12 +561,12 @@ public class Equator extends HashCodeComparable {
 			return render(x, y, 16);
 		}
 
-		public Item render(Node leftTopVertex, boolean leftHanded, Quaterniond quaterniond) {
-			return render(leftTopVertex.toVec3d(), leftHanded, quaterniond);
+		public Item render(Node leftTopVertex, boolean leftHanded, Quaterniondc quaternion) {
+			return render(leftTopVertex.toVec3d(), leftHanded, quaternion);
 		}
 
-		public Item render(Node leftTopVertex, Quaterniond quaterniond) {
-			return render(leftTopVertex.toVec3d(), quaterniond);
+		public Item render(Node leftTopVertex, Quaterniondc quaternion) {
+			return render(leftTopVertex.toVec3d(), quaternion);
 		}
 
 		public Item render(Node leftTopVertex, int size) {
@@ -576,12 +577,12 @@ public class Equator extends HashCodeComparable {
 			return render(leftTopVertex.getX(), leftTopVertex.getY());
 		}
 
-		public Item renderCentered(Vec3d pos, boolean leftHanded, Quaterniond quaterniond) {
-			return render(pos.add(-8 * quaterniond.w, -8 * quaterniond.w, 0), leftHanded, quaterniond);
+		public Item renderCentered(Vec3d pos, boolean leftHanded, Quaterniondc quaternion) {
+			return render(pos.add(-8 * quaternion.w(), -8 * quaternion.w(), 0), leftHanded, quaternion);
 		}
 
-		public Item renderCentered(Vec3d pos, Quaterniond quaterniond) {
-			return renderCentered(pos, false, quaterniond);
+		public Item renderCentered(Vec3d pos, Quaterniondc quaternion) {
+			return renderCentered(pos, false, quaternion);
 		}
 
 		public Item renderCentered(Vec3d pos, int size) {
@@ -592,8 +593,8 @@ public class Equator extends HashCodeComparable {
 			return renderCentered(pos, new Quaterniond(0, 0, 0, 1));
 		}
 
-		public Item renderCentered(double x, double y, Quaterniond quaterniond) {
-			return renderCentered(new Vec3d(x, y, 0), quaterniond);
+		public Item renderCentered(double x, double y, Quaterniondc quaternion) {
+			return renderCentered(new Vec3d(x, y, 0), quaternion);
 		}
 
 		public Item renderCentered(double x, double y, int size) {
@@ -604,12 +605,12 @@ public class Equator extends HashCodeComparable {
 			return renderCentered(x, y, 16);
 		}
 
-		public Item renderCentered(Node centerVertex, boolean leftHanded, Quaterniond quaterniond) {
-			return renderCentered(centerVertex.toVec3d(), leftHanded, quaterniond);
+		public Item renderCentered(Node centerVertex, boolean leftHanded, Quaterniondc quaternion) {
+			return renderCentered(centerVertex.toVec3d(), leftHanded, quaternion);
 		}
 
-		public Item renderCentered(Node centerVertex, Quaterniond quaterniond) {
-			return renderCentered(centerVertex.toVec3d(), quaterniond);
+		public Item renderCentered(Node centerVertex, Quaterniondc quaternion) {
+			return renderCentered(centerVertex.toVec3d(), quaternion);
 		}
 
 		public Item renderCentered(Node centerVertex, int size) {
@@ -622,14 +623,14 @@ public class Equator extends HashCodeComparable {
 	}
 
 	public record Block(BlockState blockState) {
-		public Block render(Vec3d pos, Quaterniond quaterniond) {
+		public Block render(Vec3d pos, Quaterniondc quaternion) {
 			prepareModel();
 			MatrixStack matrixStack = RenderSystem.getModelViewStack();
 
 			matrixStack.push();
 			matrixStack.translate(pos.x, pos.y, 100 + pos.z);
-			matrixStack.translate(8 * quaterniond.w, 8 * quaterniond.w, 8 * quaterniond.w);
-			applyModelView(matrixStack, quaterniond);
+			matrixStack.translate(8 * quaternion.w(), 8 * quaternion.w(), 8 * quaternion.w());
+			applyModelView(matrixStack, quaternion);
 
 			MatrixStack blockMatrixStack = new MatrixStack();
 			blockMatrixStack.translate(-0.5, -0.5, -0.5);
@@ -654,8 +655,8 @@ public class Equator extends HashCodeComparable {
 			return render(pos, new Quaterniond(0, 0, 0, 1));
 		}
 
-		public Block render(double x, double y, Quaterniond quaterniond) {
-			return render(new Vec3d(x, y, 0), quaterniond);
+		public Block render(double x, double y, Quaterniondc quaternion) {
+			return render(new Vec3d(x, y, 0), quaternion);
 		}
 
 		public Block render(double x, double y, int size) {
@@ -666,8 +667,8 @@ public class Equator extends HashCodeComparable {
 			return render(x, y, 16);
 		}
 
-		public Block render(Node leftTopVertex, Quaterniond quaterniond) {
-			return render(leftTopVertex.toVec3d(), quaterniond);
+		public Block render(Node leftTopVertex, Quaterniondc quaternion) {
+			return render(leftTopVertex.toVec3d(), quaternion);
 		}
 
 		public Block render(Node leftTopVertex, int size) {
@@ -678,8 +679,8 @@ public class Equator extends HashCodeComparable {
 			return render(leftTopVertex.getX(), leftTopVertex.getY());
 		}
 
-		public Block renderCentered(Vec3d pos, Quaterniond quaterniond) {
-			return render(pos.add(-8 * quaterniond.w, -8 * quaterniond.w, 0), quaterniond);
+		public Block renderCentered(Vec3d pos, Quaterniondc quaternion) {
+			return render(pos.add(-8 * quaternion.w(), -8 * quaternion.w(), 0), quaternion);
 		}
 
 		public Block renderCentered(Vec3d pos, int size) {
@@ -690,8 +691,8 @@ public class Equator extends HashCodeComparable {
 			return renderCentered(pos, new Quaterniond(0, 0, 0, 1));
 		}
 
-		public Block renderCentered(double x, double y, Quaterniond quaterniond) {
-			return renderCentered(new Vec3d(x, y, 0), quaterniond);
+		public Block renderCentered(double x, double y, Quaterniondc quaternion) {
+			return renderCentered(new Vec3d(x, y, 0), quaternion);
 		}
 
 		public Block renderCentered(double x, double y, int size) {
@@ -702,8 +703,8 @@ public class Equator extends HashCodeComparable {
 			return renderCentered(x, y, 16);
 		}
 
-		public Block renderCentered(Node centerVertex, Quaterniond quaterniond) {
-			return renderCentered(centerVertex.toVec3d(), quaterniond);
+		public Block renderCentered(Node centerVertex, Quaterniondc quaternion) {
+			return renderCentered(centerVertex.toVec3d(), quaternion);
 		}
 
 		public Block renderCentered(Node centerVertex, int size) {

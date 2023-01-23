@@ -1,10 +1,7 @@
 package net.krlite.equator.debug;
 
 import net.krlite.equator.EquatorLib;
-import net.krlite.equator.animator.ColorAnimator;
 import net.krlite.equator.color.PreciseColor;
-import net.krlite.equator.color.PreciseColors;
-import net.krlite.equator.geometry.Node;
 import net.krlite.equator.geometry.Rect;
 import net.krlite.equator.math.EasingFunctions;
 import net.krlite.equator.render.Equator;
@@ -15,9 +12,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
 import org.joml.Quaterniond;
-import org.joml.Quaternionf;
 
 public class CanvasScreen extends Screen {
 	public static final IdentifierSprite FLASH = IdentifierBuilder.sprite(EquatorLib.MOD_ID, "debug", "flash");
@@ -25,8 +20,7 @@ public class CanvasScreen extends Screen {
 	public static final IdentifierSprite BUBBLE = IdentifierBuilder.sprite(EquatorLib.MOD_ID, "debug", "bubble");
 
 	private final Screen parent;
-	private final Timer bounce = new Timer(1500), swing = new Timer(1905), jump = new Timer(500);
-	private final Pusher b = new Pusher(), s = new Pusher(), j = new Pusher();
+	private final Timer bounce = new Timer(2000), swing = new Timer(1900);
 
 	public CanvasScreen(Screen parent) {
 		super(Text.literal("Canvas"));
@@ -39,9 +33,8 @@ public class CanvasScreen extends Screen {
 	}
 
 	public void renderCanvas(MatrixStack matrixStack, int mouseX, int mouseY, float delta) {
-		// Not working
 		new Equator.Renderer(matrixStack, BUBBLE).tiledBackground(PreciseColor.WHITE, 0.5F,
-				3, SystemClock.queue() / 1000F % 100 / 100, SystemClock.queue() / 1000F % 175 / 175);
+				3, SystemClock.queueElapsed() * 0.01F % 100 / 100, SystemClock.queueElapsed() * 0.01F % 175 / 175);
 
 		/*
 		new Equator.Renderer(matrixStack, FLASH).renderRect(Rect.centerScreen(50).rotateByCenter(Math.toDegrees(EasingFunctions.cos())));
@@ -54,35 +47,21 @@ public class CanvasScreen extends Screen {
 
 		 */
 
-		jump.run(() -> j.push(() -> b.pull(bounce::reset)));
-		swing.run(s::push);
-		bounce.run(() -> s.pull(swing::reset));
-		bounce.run(() -> b.push(() -> j.pull(jump::reset)));
+		bounce.run(() -> {
+			bounce.reset();
+			swing.reset();
+		});
 
-		/*
-		Rect square = Rect.centerScreen(35).rotateByBottom(EasingFunctions.Back.easeOut(swing, 34) + EasingFunctions.Linear.ease(swing, -34));
+		EasingFunctions.Combined bouncing = new EasingFunctions.Combined()
+												  .append(5, EasingFunctions.Quadratic::easeOut).appendNegate(15, EasingFunctions.Bounce::easeOut);
 
-		if (jump.isPresent()) {
-			square = square.shift(0, EasingFunctions.Quadratic.easeOut(jump, -50));
-		} else if (bounce.isPresent()) {
-			square = square.shift(0, EasingFunctions.Bounce.easeOut(bounce, 50) - 50);
-		}
-
-		new Equator.Painter(matrixStack).paintRect(square.tint(PreciseColor.MAGENTA));
-
-		 */
+		EasingFunctions.Concurred swinging = new EasingFunctions.Concurred(EasingFunctions.Linear::ease,
+				(p, o, s, d) -> EasingFunctions.Back.easeOut(p, o, -s, d));
 
 		Equator.Block block = new Equator.Block(Registries.BLOCK.get(IdentifierBuilder.id("minecraft", "diamond_block")).getDefaultState());
-		Quaterniond quaternion = QuaternionAdapter.fromEularDeg(
-				0, Math.toRadians(EasingFunctions.Back.easeOut(swing, 17) + EasingFunctions.Linear.ease(swing, -17)),
-				Math.toRadians(EasingFunctions.Back.easeOut(swing, 34) + EasingFunctions.Linear.ease(swing, -34)), 1
-		);
+		Quaterniond quaternion = QuaternionAdapter.fromEularDeg(swinging.apply(swing, -6), swinging.apply(swing, 17), swinging.apply(swing, 34));
 
-		if (jump.isPresent()) {
-			block.renderCentered(MinecraftClient.getInstance().getWindow().getScaledWidth() / 2.0, 150 + EasingFunctions.Quadratic.easeOut(jump, -50), quaternion);
-		} else if (bounce.isPresent()) {
-			block.renderCentered(MinecraftClient.getInstance().getWindow().getScaledWidth() / 2.0, 100 + EasingFunctions.Bounce.easeOut(bounce, 50), quaternion);
-		}
+		block.renderCentered(MinecraftClient.getInstance().getWindow().getScaledWidth() / 2.0, MinecraftClient.getInstance().getWindow().getScaledHeight() / 2.0 - bouncing.apply(bounce, 50), quaternion);
 	}
 
 	@Override
