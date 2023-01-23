@@ -8,6 +8,7 @@ import net.krlite.equator.core.ShortStringable;
 import net.krlite.equator.core.SimpleOperations;
 import net.krlite.equator.function.AngleFunctions;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
 import java.util.function.Function;
@@ -73,6 +74,14 @@ public class Node extends HashCodeComparable implements ShortStringable, SimpleO
 
 	public Tinted tint(PreciseColor tint) {
 		return new Tinted(tint);
+	}
+
+	public Vec3d toVec3d(double z) {
+		return new Vec3d(x, y, z);
+	}
+
+	public Vec3d toVec3d() {
+		return toVec3d(0);
 	}
 
 	public double distanceTo(Node another) {

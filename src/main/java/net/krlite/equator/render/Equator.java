@@ -1,5 +1,6 @@
 package net.krlite.equator.render;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.krlite.equator.base.HashCodeComparable;
 import net.krlite.equator.color.PreciseColor;
@@ -9,13 +10,22 @@ import net.krlite.equator.core.ShortStringable;
 import net.krlite.equator.geometry.Node;
 import net.krlite.equator.geometry.Rect;
 import net.krlite.equator.render.sprite.IdentifierSprite;
+import net.krlite.equator.util.QuaternionAdapter;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaterniond;
 
 /**
  * <h2>Equator</h2>
@@ -474,6 +484,234 @@ public class Equator extends HashCodeComparable {
 			paintVertex(builder, tinted.getLeftTopNode());
 			paintVertex(builder, tinted.getLeftBottomNode());
 			paintVertex(builder, tinted.getRightBottomNode());
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	private static void prepareModel() {
+		MinecraftClient.getInstance().getTextureManager().getTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE).setFilter(false, false);
+		RenderSystem.setShaderTexture(0, SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
+
+		RenderSystem.enableBlend();
+		RenderSystem.blendFunc(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+	}
+
+	private static void applyModelView(MatrixStack matrixStack, Quaterniond quaterniond) {
+		matrixStack.scale(1, -1, 1);
+		matrixStack.scale((float) (16 * quaterniond.w), (float) (16 * quaterniond.w), (float) (16 * quaterniond.w));
+		matrixStack.multiply(QuaternionAdapter.toFloat(quaterniond));
+
+		RenderSystem.applyModelViewMatrix();
+	}
+
+	public record Item(ItemStack itemStack) {
+		public Item render(Vec3d pos, boolean leftHanded, Quaterniond quaterniond) {
+			BakedModel bakedModel = MinecraftClient.getInstance().getItemRenderer().getModel(itemStack, null, null, 0);
+			prepareModel();
+			MatrixStack matrixStack = RenderSystem.getModelViewStack();
+
+			matrixStack.push();
+			matrixStack.translate(pos.x, pos.y, 100 + pos.z);
+			matrixStack.translate(8 * quaterniond.w, 8 * quaterniond.w, 0);
+			applyModelView(matrixStack, quaterniond);
+
+			MatrixStack itemMatrixStack = new MatrixStack();
+			VertexConsumerProvider.Immediate immediate = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
+
+			if (!bakedModel.isSideLit())
+				DiffuseLighting.disableGuiDepthLighting();
+
+			MinecraftClient.getInstance().getItemRenderer().renderItem(itemStack, ModelTransformation.Mode.GUI,
+					leftHanded, itemMatrixStack, immediate, 0xF000F0, OverlayTexture.DEFAULT_UV, bakedModel);
+			immediate.draw();
+			RenderSystem.enableDepthTest();
+
+			if (!bakedModel.isSideLit())
+				DiffuseLighting.enableGuiDepthLighting();
+
+			matrixStack.pop();
+			RenderSystem.applyModelViewMatrix();
+
+			return this;
+		}
+
+		public Item render(Vec3d pos, Quaterniond quaterniond) {
+			return render(pos, false, quaterniond);
+		}
+
+		public Item render(Vec3d pos, int size) {
+			return render(pos, false, new Quaterniond(0, 0, 0, size / 16.0));
+		}
+
+		public Item render(Vec3d pos) {
+			return render(pos, false, new Quaterniond(0, 0, 0, 1));
+		}
+
+		public Item render(double x, double y, Quaterniond quaterniond) {
+			return render(new Vec3d(x, y, 0), false, quaterniond);
+		}
+
+		public Item render(double x, double y, int size) {
+			return render(x, y, new Quaterniond(0, 0, 0, size / 16.0));
+		}
+
+		public Item render(double x, double y) {
+			return render(x, y, 16);
+		}
+
+		public Item render(Node leftTopVertex, boolean leftHanded, Quaterniond quaterniond) {
+			return render(leftTopVertex.toVec3d(), leftHanded, quaterniond);
+		}
+
+		public Item render(Node leftTopVertex, Quaterniond quaterniond) {
+			return render(leftTopVertex.toVec3d(), quaterniond);
+		}
+
+		public Item render(Node leftTopVertex, int size) {
+			return render(leftTopVertex.getX(), leftTopVertex.getY(), size);
+		}
+
+		public Item render(Node leftTopVertex) {
+			return render(leftTopVertex.getX(), leftTopVertex.getY());
+		}
+
+		public Item renderCentered(Vec3d pos, boolean leftHanded, Quaterniond quaterniond) {
+			return render(pos.add(-8 * quaterniond.w, -8 * quaterniond.w, 0), leftHanded, quaterniond);
+		}
+
+		public Item renderCentered(Vec3d pos, Quaterniond quaterniond) {
+			return renderCentered(pos, false, quaterniond);
+		}
+
+		public Item renderCentered(Vec3d pos, int size) {
+			return renderCentered(pos, new Quaterniond(0, 0, 0, size / 16.0));
+		}
+
+		public Item renderCentered(Vec3d pos) {
+			return renderCentered(pos, new Quaterniond(0, 0, 0, 1));
+		}
+
+		public Item renderCentered(double x, double y, Quaterniond quaterniond) {
+			return renderCentered(new Vec3d(x, y, 0), quaterniond);
+		}
+
+		public Item renderCentered(double x, double y, int size) {
+			return renderCentered(x, y, new Quaterniond(0, 0, 0, size / 16.0));
+		}
+
+		public Item renderCentered(double x, double y) {
+			return renderCentered(x, y, 16);
+		}
+
+		public Item renderCentered(Node centerVertex, boolean leftHanded, Quaterniond quaterniond) {
+			return renderCentered(centerVertex.toVec3d(), leftHanded, quaterniond);
+		}
+
+		public Item renderCentered(Node centerVertex, Quaterniond quaterniond) {
+			return renderCentered(centerVertex.toVec3d(), quaterniond);
+		}
+
+		public Item renderCentered(Node centerVertex, int size) {
+			return renderCentered(centerVertex.getX(), centerVertex.getY(), size);
+		}
+
+		public Item renderCentered(Node centerVertex) {
+			return renderCentered(centerVertex.getX(), centerVertex.getY());
+		}
+	}
+
+	public record Block(BlockState blockState) {
+		public Block render(Vec3d pos, Quaterniond quaterniond) {
+			prepareModel();
+			MatrixStack matrixStack = RenderSystem.getModelViewStack();
+
+			matrixStack.push();
+			matrixStack.translate(pos.x, pos.y, 100 + pos.z);
+			matrixStack.translate(8 * quaterniond.w, 8 * quaterniond.w, 8 * quaterniond.w);
+			applyModelView(matrixStack, quaterniond);
+
+			MatrixStack blockMatrixStack = new MatrixStack();
+			blockMatrixStack.translate(-0.5, -0.5, -0.5);
+			VertexConsumerProvider.Immediate immediate = MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
+
+			MinecraftClient.getInstance().getBlockRenderManager().renderBlockAsEntity(blockState, blockMatrixStack,
+					immediate, 0xF000F0, OverlayTexture.DEFAULT_UV);
+			immediate.draw();
+			RenderSystem.enableDepthTest();
+
+			matrixStack.pop();
+			RenderSystem.applyModelViewMatrix();
+
+			return this;
+		}
+
+		public Block render(Vec3d pos, int size) {
+			return render(pos, new Quaterniond(0, 0, 0, size / 16.0));
+		}
+
+		public Block render(Vec3d pos) {
+			return render(pos, new Quaterniond(0, 0, 0, 1));
+		}
+
+		public Block render(double x, double y, Quaterniond quaterniond) {
+			return render(new Vec3d(x, y, 0), quaterniond);
+		}
+
+		public Block render(double x, double y, int size) {
+			return render(x, y, new Quaterniond(0, 0, 0, size / 16.0));
+		}
+
+		public Block render(double x, double y) {
+			return render(x, y, 16);
+		}
+
+		public Block render(Node leftTopVertex, Quaterniond quaterniond) {
+			return render(leftTopVertex.toVec3d(), quaterniond);
+		}
+
+		public Block render(Node leftTopVertex, int size) {
+			return render(leftTopVertex.getX(), leftTopVertex.getY(), size);
+		}
+
+		public Block render(Node leftTopVertex) {
+			return render(leftTopVertex.getX(), leftTopVertex.getY());
+		}
+
+		public Block renderCentered(Vec3d pos, Quaterniond quaterniond) {
+			return render(pos.add(-8 * quaterniond.w, -8 * quaterniond.w, 0), quaterniond);
+		}
+
+		public Block renderCentered(Vec3d pos, int size) {
+			return renderCentered(pos, new Quaterniond(0, 0, 0, size / 16.0));
+		}
+
+		public Block renderCentered(Vec3d pos) {
+			return renderCentered(pos, new Quaterniond(0, 0, 0, 1));
+		}
+
+		public Block renderCentered(double x, double y, Quaterniond quaterniond) {
+			return renderCentered(new Vec3d(x, y, 0), quaterniond);
+		}
+
+		public Block renderCentered(double x, double y, int size) {
+			return renderCentered(x, y, new Quaterniond(0, 0, 0, size / 16.0));
+		}
+
+		public Block renderCentered(double x, double y) {
+			return renderCentered(x, y, 16);
+		}
+
+		public Block renderCentered(Node centerVertex, Quaterniond quaterniond) {
+			return renderCentered(centerVertex.toVec3d(), quaterniond);
+		}
+
+		public Block renderCentered(Node centerVertex, int size) {
+			return renderCentered(centerVertex.getX(), centerVertex.getY(), size);
+		}
+
+		public Block renderCentered(Node centerVertex) {
+			return renderCentered(centerVertex.getX(), centerVertex.getY());
 		}
 	}
 }

@@ -62,16 +62,16 @@ public interface BasicRGBA<C extends BasicRGBA<C>> extends ShortStringable, Simp
 		return getAlpha() == 1;
 	}
 
-	default Color getColor() {
+	default Color toColor() {
 		return new Color(getRedInt(), getGreenInt(), getBlueInt(), getAlphaInt());
 	}
 
-	default int getColorInt() {
-		return getColor().getRGB();
+	default int toColorInt() {
+		return toColor().getRGB();
 	}
 
-	default String getColorHex() {
-		return Integer.toHexString(getColorInt());
+	default String toColorHex() {
+		return Integer.toHexString(toColorInt());
 	}
 
 	default boolean hasColor() {
