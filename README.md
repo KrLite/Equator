@@ -26,22 +26,15 @@ Add the content below to your `build.gradle` file:
 repositories {
     // Modrinth Maven
     maven { url = "https://api.modrinth.com/maven" }
-    
-    /* JITPACK ISN'T WORKING NOW, DON'T USE
-    maven { url 'https://jitpack.io' }
-     */
 }
 
 dependencies {
     // Modrinth Maven
     modImplementation "maven.modrinth:equator:{x}"
-    
-    // JitPack
-    modImplementation "com.github.KrLite:Equator:v{a.b.c}+{x}"
 }
 ```
 
-Remember to replace the `{a.b.c}` above with the target `Minecraft version`, and the `{x}` above with the latest [`version id`](https://modrinth.com/mod/equator/versions) of **Equator,** or the [`tag name`](https://github.com/KrLite/Equator/tags) if you are using JitPack.
+Remember to replace the `{a.b.c}` above with the target `Minecraft version`, and the `{x}` above with the latest [`version id`](https://modrinth.com/mod/equator/versions) of **Equator.**
 
 And finally, don't forget to add Equator as a mod dependent in your `fabric.mod.json:`
 
