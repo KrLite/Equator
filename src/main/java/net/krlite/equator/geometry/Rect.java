@@ -1,6 +1,5 @@
 package net.krlite.equator.geometry;
 
-import net.krlite.equator.annotation.Active;
 import net.krlite.equator.base.HashCodeComparable;
 import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.color.core.BasicRGBA;
@@ -13,7 +12,6 @@ import org.jetbrains.annotations.Range;
 import java.awt.*;
 import java.util.function.Function;
 
-@Active
 public class Rect extends HashCodeComparable implements ShortStringable, SimpleOperations {
 	public static Rect fullScreen() {
 		return new Rect(0, 0, MinecraftClient.getInstance().getWindow().getScaledWidth(), MinecraftClient.getInstance().getWindow().getScaledHeight());
@@ -288,6 +286,7 @@ public class Rect extends HashCodeComparable implements ShortStringable, SimpleO
 	}
 
 	public class Tinted implements BasicRGBA<Tinted>, Operatable<Rect, Tinted> {
+		@Deprecated
 		public static Tinted of(Node.Tinted leftTop, Node.Tinted leftBottom, Node.Tinted rightBottom, Node.Tinted rightTop) {
 			return new Rect(leftTop.getNode(), leftBottom.getNode(), rightBottom.getNode(), rightTop.getNode())
 						   .new Tinted(leftTop, leftBottom, rightBottom, rightTop);
@@ -532,6 +531,15 @@ public class Rect extends HashCodeComparable implements ShortStringable, SimpleO
 					getLeftBottom().orElse(fallback),
 					getRightBottom().orElse(fallback),
 					getRightTop().orElse(fallback)
+			);
+		}
+
+		public Tinted interpolate(Tinted another, double ratio) {
+			return Tinted.of(
+					getLeftTopNode().interpolate(another.getLeftTopNode(), ratio),
+					getLeftBottomNode().interpolate(another.getLeftBottomNode(), ratio),
+					getRightBottomNode().interpolate(another.getRightBottomNode(), ratio),
+					getRightTopNode().interpolate(another.getRightTopNode(), ratio)
 			);
 		}
 

@@ -1,6 +1,5 @@
 package net.krlite.equator.geometry;
 
-import net.krlite.equator.annotation.Active;
 import net.krlite.equator.base.HashCodeComparable;
 import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.color.core.BasicRGBA;
@@ -14,7 +13,6 @@ import net.minecraft.util.math.Vec3d;
 import java.awt.*;
 import java.util.function.Function;
 
-@Active
 public class Node extends HashCodeComparable implements ShortStringable, SimpleOperations {
 	public static Node topScreen() {
 		return new Node(MinecraftClient.getInstance().getWindow().getScaledWidth() / 2.0, 0);
