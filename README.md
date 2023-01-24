@@ -51,10 +51,10 @@ dependencies {
 }
 ```
 
-In above:
-
-- `{x}` in `maven.modrinth:equator:{x}` should be the latest [`version id`](https://modrinth.com/mod/equator/versions) of **Equator.**
-- `v{x}` in `com.github.KrLite:Equator-Utils:v{x}` should be the latest [`tag name`](https://github.com/KrLite/Equator-Utils/tags) of Equator Utils.
+> In above:
+> 
+> - `{x}` in `maven.modrinth:equator:{x}` should be the latest [`version id`](https://modrinth.com/mod/equator/versions) of **Equator.**
+> - `v{x}` in `com.github.KrLite:Equator-Utils:v{x}` should be the latest [`tag name`](https://github.com/KrLite/Equator-Utils/tags) of Equator Utils.
 
 If you do not implement **Equator Utils,** **Equator** can still function fully, but you may not be able to access many convenient methods that **Equator** uses. To only implement **Equator,** refer to the content below:
 
