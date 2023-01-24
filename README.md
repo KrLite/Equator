@@ -24,11 +24,12 @@ Add the content below to your `build.gradle` file:
 
 ```groovy
 repositories {
-    // If you are using Modrinth Maven
+    // Modrinth Maven
     maven { url = "https://api.modrinth.com/maven" }
     
-    // If you are using JitPack
+    /* JITPACK ISN'T WORKING NOW, DON'T USE
     maven { url 'https://jitpack.io' }
+     */
 }
 
 dependencies {
