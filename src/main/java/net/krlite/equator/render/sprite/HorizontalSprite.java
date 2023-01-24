@@ -1,14 +1,15 @@
 package net.krlite.equator.render.sprite;
 
+import net.krlite.equator.annotation.See;
+import net.krlite.equator.core.ShortStringable;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-
-import java.util.Objects;
 
 /**
  * A sprite that defines a horizontal set of {@link IdentifierSprite}s.
  */
-public record HorizontalSprite(Identifier identifier, int step) {
+@See(IdentifierSprite.class)
+public record HorizontalSprite(Identifier identifier, int step) implements ShortStringable, Cloneable {
     /**
      * Creates a {@link HorizontalSprite} by splitting an {@link Identifier} horizontally into slices.
      * @param identifier    The dedicated {@link Identifier}.
@@ -44,14 +45,15 @@ public record HorizontalSprite(Identifier identifier, int step) {
 
     @Override
     public String toString() {
-        return "HorizontalSprite" + "{" +
-                "identifier=" + identifier +
-                ", step=" + step +
-                "}";
+        return getClass().getSimpleName() + "{" + formatFields() + "}";
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(identifier, step);
+    public HorizontalSprite clone() {
+        try {
+            return (HorizontalSprite) super.clone();
+        } catch (CloneNotSupportedException cloneNotSupportedException) {
+            throw new RuntimeException(cloneNotSupportedException);
+        }
     }
 }

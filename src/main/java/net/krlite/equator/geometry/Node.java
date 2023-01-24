@@ -1,137 +1,248 @@
 package net.krlite.equator.geometry;
 
+import net.krlite.equator.annotation.Active;
+import net.krlite.equator.base.HashCodeComparable;
 import net.krlite.equator.color.PreciseColor;
-import net.krlite.equator.core.FieldFormattable;
-import net.krlite.equator.core.HashCodeComparable;
-import net.krlite.equator.geometry.core.INode;
+import net.krlite.equator.color.core.BasicRGBA;
+import net.krlite.equator.core.Operatable;
+import net.krlite.equator.core.ShortStringable;
+import net.krlite.equator.core.SimpleOperations;
+import net.krlite.equator.function.AngleFunctions;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.math.Vec3d;
 
 import java.awt.*;
+import java.util.function.Function;
 
-/**
- * <h2>Node</h2>
- * A class that represents a point which is constrained
- * with abscissa and ordinate.
- */
-public class Node extends HashCodeComparable implements INode<Node>, FieldFormattable {
-	/*
-	 * BASICS
-	 */
+@Active
+public class Node extends HashCodeComparable implements ShortStringable, SimpleOperations {
+	public static Node topScreen() {
+		return new Node(MinecraftClient.getInstance().getWindow().getScaledWidth() / 2.0, 0);
+	}
 
-	/**
-	 * The origin, or the point where the abscissa and ordinate are 0.
-	 * @return The origin.
-	 */
-	public static Node ORIGIN() {
+	public static Node leftTopScreen() {
 		return new Node(0, 0);
 	}
 
-	/**
-	 * The center of the screen.
-	 * @return The center of the screen.
-	 */
-	public static Node CENTER() {
-		return new Node(MinecraftClient.getInstance().getWindow().getScaledWidth() / 2.0, MinecraftClient.getInstance().getWindow().getScaledHeight() / 2.0);
+	public static Node leftScreen() {
+		return new Node(0, MinecraftClient.getInstance().getWindow().getScaledHeight() / 2.0);
 	}
 
-	/**
-	 * The top vertex of the screen.
-	 * @return	The top vertex of the screen.
-	 */
-	public static Node FULL() {
-		return new Node(MinecraftClient.getInstance().getWindow().getScaledWidth(), MinecraftClient.getInstance().getWindow().getScaledHeight());
+	public static Node leftBottomScreen() {
+		return new Node(0, MinecraftClient.getInstance().getWindow().getScaledHeight());
 	}
 
-	/*
-	 * FIELDS
-	 */
+	public static Node bottomScreen() {
+		return new Node(MinecraftClient.getInstance().getWindow().getScaledWidth() / 2.0, MinecraftClient.getInstance().getWindow().getScaledHeight());
+	}
 
-	private final double x, y;
+	public static Node rightBottomScreen() {
+		return new Node(MinecraftClient.getInstance().getWindow().getScaledWidth(),
+				MinecraftClient.getInstance().getWindow().getScaledHeight());
+	}
 
-	/*
-	 * CONSTRUCTORS
-	 */
+	public static Node rightScreen() {
+		return new Node(MinecraftClient.getInstance().getWindow().getScaledWidth(),
+				MinecraftClient.getInstance().getWindow().getScaledHeight() / 2.0);
+	}
 
-	/**
-	 * Creates a {@link Node} with the given abscissa and ordinate.
-	 *
-	 * @param x The node's abscissa.
-	 * @param y The node's ordinate.
-	 */
+	public static Node rightTopScreen() {
+		return new Node(MinecraftClient.getInstance().getWindow().getScaledWidth(), 0);
+	}
+
+	public static Node centerScreen() {
+		return new Node(MinecraftClient.getInstance().getWindow().getScaledWidth() / 2.0,
+				MinecraftClient.getInstance().getWindow().getScaledHeight() / 2.0);
+	}
+
+	protected final double x, y;
+
+	public double getX() {
+		return x;
+	}
+
+	public double getY() {
+		return y;
+	}
+
 	public Node(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
 
-	/*
-	 * CONVERSIONS
-	 */
-
-	/**
-	 * Binds the node with a {@link PreciseColor}.
-	 * @param tint	The {@link PreciseColor} to bind the node with.
-	 * @return		The {@link TintedNode} that represents the
-	 * 				bound node.
-	 */
-	public TintedNode bind(PreciseColor tint) {
-		return new TintedNode(this, tint);
+	public Tinted tint(BasicRGBA<?> tint) {
+		return new Tinted(tint);
 	}
 
-	/*
-	 * ATTRIBUTES
-	 */
-
-	@Override
-	public double x() {
-		return x;
+	public Tinted tint(PreciseColor tint) {
+		return new Tinted(tint);
 	}
 
-	@Override
-	public double y() {
-		return y;
+	public Vec3d toVec3d(double z) {
+		return new Vec3d(x, y, z);
 	}
 
-	/**
-	 * Calculates the <strong>clockwise</strong> angle between this
-	 * node and the screen center.
-	 * @return	The <strong>clockwise</strong> angle between this
-	 * 			node and the screen center.
-	 */
-	public double clockwiseDegree() {
-		return clockwiseDegree(Rect.SCREEN().center());
+	public Vec3d toVec3d() {
+		return toVec3d(0);
 	}
 
-	/**
-	 * Calculates the <strong>clockwise</strong> angle including
-	 * <strong>negative ordinate axis</strong> between this node and
-	 * the screen center.
-	 * @return	The <strong>clockwise</strong> angle including
-	 * 			<strong>negative ordinate axis</strong>.
-	 */
-	public double clockwiseDegreeIncludeNegativeOrdinate() {
-		return clockwiseDegreeIncludeNegativeOrdinate(Rect.SCREEN().center());
+	public double distanceTo(Node another) {
+		return Math.sqrt(Math.pow(getX() - another.getX(), 2) + Math.pow(getY() - another.getY(), 2));
 	}
 
-	/*
-	 * OBJECT METHODS
-	 */
-
-	@Override
-	public Node createNode(double x, double y) {
-		return new Node(x, y);
+	public double angleTo(Node another) {
+		return AngleFunctions.negativeToClockwise(Math.toDegrees(Math.atan2(another.getY() - getY(), another.getX() - getX())));
 	}
 
-	/*
-	 * PROPERTIES
-	 */
+	public double crossWith(Node n1, Node n2) {
+		return (n2.getX() - n1.getX()) * (getY() - n1.getY()) - (n2.getY() - n1.getY()) * (getX() - n1.getX());
+	}
 
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "{" + formatFields() + "}";
+	public boolean isIn(Rect rect) {
+		return rect.contains(this);
+	}
+
+	public Node min(Node another) {
+		return new Node(Math.min(getX(), another.getX()), Math.min(getY(), another.getY()));
+	}
+
+	public Node max(Node another) {
+		return new Node(Math.max(getX(), another.getX()), Math.max(getY(), another.getY()));
+	}
+
+	public Node shift(double x, double y) {
+		return new Node(getX() + x, getY() + y);
+	}
+
+	public Node shift(Node another) {
+		return shift(another.getX(), another.getY());
+	}
+
+	public Node scale(Node another, double scale) {
+		return new Node(getX() + (another.getX() - getX()) * scale, getY() + (another.getY() - getY()) * scale);
+	}
+
+	public Node scaleBy(Node origin, double scale) {
+		return origin.scale(this, scale);
+	}
+
+	public Node interpolate(Node another, double ratio) {
+		return new Node(blendValue(getX(), another.getX(), ratio), blendValue(getY(), another.getY(), ratio));
+	}
+
+	public Node rotate(Node another, double angle) {
+		angle = Math.toRadians(angle);
+		double cos = Math.cos(angle);
+		double sin = Math.sin(angle);
+		double x = another.getX() - getX();
+		double y = another.getY() - getY();
+		return new Node(x * cos - y * sin + getX(), x * sin + y * cos + getY());
+	}
+
+	public Node rotateBy(Node origin, double angle) {
+		return origin.rotate(this, angle);
+	}
+
+	public class Tinted extends PreciseColor implements Operatable<Node, Tinted> {
+		public static Tinted of(double x, double y, double red, double green, double blue, double alpha) {
+			return new Node(x, y).new Tinted(red, green, blue, alpha);
+		}
+
+		public static Tinted of(double x, double y, double red, double green, double blue) {
+			return new Node(x, y).new Tinted(red, green, blue);
+		}
+
+		public static Tinted of(Node node, BasicRGBA<?> tint) {
+			return node.new Tinted(tint);
+		}
+
+		public static Tinted of(Node node, Color tint) {
+			return node.new Tinted(tint);
+		}
+
+		public double getX() {
+			return getNode().getX();
+		}
+
+		public double getY() {
+			return getNode().getY();
+		}
+
+		public Node getNode() {
+			return Node.this;
+		}
+
+		public PreciseColor getTint() {
+			return this;
+		}
+
+		public Tinted(double red, double green, double blue, double alpha) {
+			super(red, green, blue, alpha);
+		}
+
+		public Tinted(double red, double green, double blue) {
+			this(red, green, blue, 1);
+		}
+
+		public Tinted(BasicRGBA<?> tint) {
+			this(tint.getRed(), tint.getGreen(), tint.getBlue(), tint.getAlpha());
+		}
+
+		public Tinted(PreciseColor tint) {
+			super(tint.getRed(), tint.getGreen(), tint.getBlue(), tint.getAlpha(), tint.isTransparent());
+		}
+
+		public Tinted(Color tint) {
+			this(PreciseColor.of(tint));
+		}
+
+		public double distanceTo(Tinted another) {
+			return getNode().distanceTo(another.getNode());
+		}
+
+		public double angleTo(Tinted another) {
+			return getNode().angleTo(another.getNode());
+		}
+
+		public double crossWith(Node n1, Node n2) {
+			return getNode().crossWith(n1, n2);
+		}
+
+		public boolean isIn(Rect rect) {
+			return getNode().isIn(rect);
+		}
+
+		public Tinted interpolate(Tinted another, double ratio) {
+			return getNode().interpolate(another.getNode(), ratio).tint(blend(another, ratio));
+		}
+
+		public Tinted swap(Node another) {
+			return another.tint(this);
+		}
+
+		@Override
+		public Tinted operate(Function<Node, Node> operation) {
+			return swap(operation.apply(getNode()));
+		}
+
+		@Override
+		public String toShortString() {
+			return super.toShortString() + "-" + getNode().toShortString();
+		}
+
+		@Override
+		public String toString() {
+			return getClass().getSimpleName() + "{" + super.toString() + ", " + getNode().toString() + "}";
+		}
 	}
 
 	@Override
 	public String toShortString() {
 		return "(" + formatFields(false) + ")";
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "(" + formatFields() + ")";
 	}
 }

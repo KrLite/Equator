@@ -1,48 +1,83 @@
 package net.krlite.equator.util;
 
+import net.krlite.equator.core.ShortStringable;
 import net.krlite.equator.render.sprite.IdentifierSprite;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * A utility class for building identifiers and sprites.
  */
 public class IdentifierBuilder {
-	public static Identifier id(@NotNull String namespace, @NotNull String... paths) {
-		return new Identifier(namespace, String.join("/", paths));
+	public static boolean checkContains(@NotNull String namespace, @Nullable Identifier identifier) {
+		return identifier != null && identifier.getNamespace().equals(namespace);
 	}
 
-	public static Identifier png(@NotNull String namespace, @NotNull String... paths) {
-		return new Identifier(namespace, "textures/" + String.join("/", paths) + ".png");
+	public static boolean checkContains(@NotNull Identifier namespace, @Nullable Identifier identifier) {
+		return checkContains(namespace.getNamespace(), identifier);
 	}
 
-	public static IdentifierSprite sprite(@NotNull String namespace, @NotNull String... paths) {
+	private static String joinAll(@Nullable CharSequence delimiter, @Nullable String... strings) {
+		return Arrays.stream(strings).filter(Objects::nonNull).filter(s -> !s.isEmpty())
+					   .collect(Collectors.joining(delimiter != null ? delimiter : ""));
+	}
+
+	public static String joinAsPath(@Nullable String... paths) {
+		return joinAll("/", paths);
+	}
+
+	public static String joinAsId(@Nullable String... paths) {
+		return joinAll("_", paths);
+	}
+
+	public static Identifier id(@NotNull String namespace, @Nullable String... paths) {
+		return new Identifier(namespace, joinAsPath(paths));
+	}
+
+	public static Identifier png(@NotNull String namespace, @Nullable String... paths) {
+		return new Identifier(namespace, "textures/" + joinAsPath(paths) + ".png");
+	}
+
+	public static IdentifierSprite sprite(@NotNull String namespace, @Nullable String... paths) {
 		return IdentifierSprite.of(png(namespace, paths));
 	}
 
-	public static Text localization(@NotNull String prefix, @NotNull String namespace, @NotNull String... paths) {
+	public static Text localization(@NotNull String prefix, @NotNull String namespace, @Nullable String... paths) {
 		return Text.translatable(translationKey(prefix, namespace, paths));
 	}
 
-	public static String translationKey(@NotNull String prefix, @NotNull String namespace, @NotNull String... paths) {
-		return String.join(".", prefix, namespace, String.join(".", paths));
+	public static String translationKey(@NotNull String prefix, @NotNull String namespace, @Nullable String... paths) {
+		return String.join(".", prefix, namespace,
+				Arrays.stream(paths)
+						.filter(Objects::nonNull)
+						.filter(p -> !p.isEmpty())
+						.collect(Collectors.joining(".")));
 	}
 
 	/**
 	 * A utility class for building identifiers and sprites, with a default namespace.
 	 * @param namespace	The default namespace.
 	 */
-	public record Specified(@NotNull String namespace) {
-		public Identifier id(@NotNull String... paths) {
+	public record Specified(@NotNull String namespace) implements ShortStringable {
+		public boolean checkContains(@Nullable Identifier identifier) {
+			return IdentifierBuilder.checkContains(namespace, identifier);
+		}
+
+		public Identifier id(@Nullable String... paths) {
 			return IdentifierBuilder.id(namespace, paths);
 		}
 
-		public Identifier png(@NotNull String... paths) {
+		public Identifier png(@Nullable String... paths) {
 			return IdentifierBuilder.png(namespace, paths);
 		}
 
-		public IdentifierSprite sprite(@NotNull String... paths) {
+		public IdentifierSprite sprite(@Nullable String... paths) {
 			return IdentifierSprite.of(png(paths));
 		}
 
@@ -56,7 +91,7 @@ public class IdentifierBuilder {
 
 		@Override
 		public String toString() {
-			return "IdentifierBuilder" + "{namespace='" + namespace + "'}";
+			return getClass().getSimpleName() + "{" + formatFields() + "}";
 		}
 	}
 }

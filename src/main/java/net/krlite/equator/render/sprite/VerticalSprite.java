@@ -1,5 +1,7 @@
 package net.krlite.equator.render.sprite;
 
+import net.krlite.equator.annotation.See;
+import net.krlite.equator.core.ShortStringable;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
@@ -8,7 +10,8 @@ import java.util.Objects;
 /**
  * A sprite that defines a vertical set of {@link IdentifierSprite}s.
  */
-public record VerticalSprite(Identifier identifier, int step) {
+@See(IdentifierSprite.class)
+public record VerticalSprite(Identifier identifier, int step) implements ShortStringable, Cloneable {
     /**
      * Creates a {@link VerticalSprite} by splitting an {@link Identifier} vertically into slices.
      * @param identifier    The dedicated {@link Identifier}.
@@ -44,14 +47,20 @@ public record VerticalSprite(Identifier identifier, int step) {
 
     @Override
     public String toString() {
-        return "VerticalSprite" + "{" +
-                "identifier=" + identifier +
-                ", step=" + step +
-                "}";
+        return getClass().getSimpleName() + "{" + formatFields() + "}";
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(identifier, step);
+    }
+
+    @Override
+    public VerticalSprite clone() {
+        try {
+            return (VerticalSprite) super.clone();
+        } catch (CloneNotSupportedException cloneNotSupportedException) {
+            throw new RuntimeException(cloneNotSupportedException);
+        }
     }
 }

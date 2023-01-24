@@ -1,5 +1,7 @@
 package net.krlite.equator.math;
 
+import net.krlite.equator.base.HashCodeComparable;
+import net.krlite.equator.core.ShortStringable;
 import net.minecraft.entity.Entity;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.GlobalPos;
@@ -8,66 +10,51 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.Optional;
 
-/**
- * A class that represents a 3D vector with a dimension.
- * @param dimension The dimension of the vector.
- * @param vec3d     The 3D vector.
- */
-public record DimensionalVec3d(@NotNull RegistryKey<World> dimension, @NotNull Vec3d vec3d) {
-    /**
-     * Creates a {@link DimensionalVec3d} from a {@link RegistryKey RegistryKey(Dimension)}
-     * and a {@link Vec3d}.
-     * @param dimension The dimension of the vector.
-     *                  If <code>null</code>, the dimension will be set to the overworld.
-     * @param vec3d     The 3D vector.
-     */
-    public DimensionalVec3d(@Nullable RegistryKey<World> dimension, @NotNull Vec3d vec3d) {
-        this.dimension = dimension == null ? World.OVERWORLD : dimension;
-        this.vec3d = vec3d;
+public class DimensionalVec3d extends HashCodeComparable implements ShortStringable, Cloneable {
+    protected final @Nullable RegistryKey<World> dimension;
+
+    protected final @NotNull Vec3d pos;
+
+    public @Nullable RegistryKey<World> getDimension() {
+        return dimension;
     }
 
-    /**
-     * Creates a {@link DimensionalVec3d} from a {@link Entity}.
-     * @param entity The {@link Entity} to get the dimension and the 3D vector from.
-     */
+    public @NotNull Vec3d getPos() {
+        return pos;
+    }
+
+    public DimensionalVec3d(@Nullable RegistryKey<World> dimension, @NotNull Vec3d pos) {
+        this.dimension = dimension;
+        this.pos = pos;
+    }
+
     public DimensionalVec3d(@NotNull Entity entity) {
         this(entity.world.getRegistryKey(), entity.getPos());
     }
 
-    /**
-     * Creates a {@link DimensionalVec3d} from a {@link GlobalPos}.
-     * @param globalPos The {@link GlobalPos} to get the dimension and the 3D vector from.
-     */
     public DimensionalVec3d(@NotNull GlobalPos globalPos) {
         this(globalPos.getDimension(), Vec3d.of(globalPos.getPos()));
     }
 
     public Optional<Double> distance(DimensionalVec3d destination) {
-        return CoordinateSolver.distance(this, destination);
-    }
-
-    public boolean equals(@Nullable DimensionalVec3d other) {
-        if (other == null) return false;
-        return hashCode() == other.hashCode();
-    }
-
-    @Override
-    public boolean equals(@Nullable Object other) {
-        if (this == other) return true;
-        if (other instanceof DimensionalVec3d) return equals((DimensionalVec3d) other);
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(dimension, vec3d);
+        return getDimension() == null || getDimension().equals(destination.getDimension()) ?
+                       Optional.of(getPos().distanceTo(destination.getPos())) :
+                       Optional.empty();
     }
 
     @Override
     public String toString() {
-        return getClass().getName() + "{" + "dimension=" + dimension.toString() + ", vec3d=" + vec3d.toString() + "}";
+        return getClass().getName() + "{" + formatFields() + "}";
+    }
+
+    @Override
+    public DimensionalVec3d clone() {
+        try {
+            return (DimensionalVec3d) super.clone();
+        } catch (CloneNotSupportedException cloneNotSupportedException) {
+            throw new RuntimeException(cloneNotSupportedException);
+        }
     }
 }
