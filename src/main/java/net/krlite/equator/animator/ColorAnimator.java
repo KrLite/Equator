@@ -1,8 +1,10 @@
 package net.krlite.equator.animator;
 
 import net.krlite.equator.animation.base.ValueAnimator;
+import net.krlite.equator.annotation.See;
 import net.krlite.equator.color.core.BasicRGBA;
 
+@See(ValueAnimator.class)
 public class ColorAnimator extends ValueAnimator<BasicRGBA<?>> {
 	public ColorAnimator(BasicRGBA<?> start, BasicRGBA<?> end, double delta) {
 		super(start, end, delta);

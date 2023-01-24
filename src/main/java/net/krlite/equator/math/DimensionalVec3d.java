@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-public class DimensionalVec3d extends HashCodeComparable implements Cloneable, ShortStringable {
+public class DimensionalVec3d extends HashCodeComparable implements ShortStringable, Cloneable {
     protected final @Nullable RegistryKey<World> dimension;
 
     protected final @NotNull Vec3d pos;
@@ -47,5 +47,14 @@ public class DimensionalVec3d extends HashCodeComparable implements Cloneable, S
     @Override
     public String toString() {
         return getClass().getName() + "{" + formatFields() + "}";
+    }
+
+    @Override
+    public DimensionalVec3d clone() {
+        try {
+            return (DimensionalVec3d) super.clone();
+        } catch (CloneNotSupportedException cloneNotSupportedException) {
+            throw new RuntimeException(cloneNotSupportedException);
+        }
     }
 }

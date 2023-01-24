@@ -1,5 +1,6 @@
 package net.krlite.equator.color;
 
+@Deprecated
 public class ColorConvertor {
 	public PreciseColor fromHSB(double hue, double saturation, double brightness) {
 		if (saturation == 0.0F) {

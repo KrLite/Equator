@@ -1,5 +1,6 @@
 package net.krlite.equator.color.core;
 
+import net.krlite.equator.annotation.Active;
 import net.krlite.equator.core.ShortStringable;
 import net.krlite.equator.core.SimpleOperations;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +10,7 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+@Active
 public interface BasicRGBA<C extends BasicRGBA<C>> extends ShortStringable, SimpleOperations {
 	double getRed();
 

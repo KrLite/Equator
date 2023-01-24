@@ -2,11 +2,13 @@ package net.krlite.equator.debug;
 
 import net.krlite.equator.EquatorLib;
 import net.krlite.equator.color.PreciseColor;
-import net.krlite.equator.geometry.Rect;
 import net.krlite.equator.math.EasingFunctions;
 import net.krlite.equator.render.Equator;
 import net.krlite.equator.render.sprite.IdentifierSprite;
-import net.krlite.equator.util.*;
+import net.krlite.equator.util.IdentifierBuilder;
+import net.krlite.equator.util.QuaternionAdapter;
+import net.krlite.equator.util.SystemClock;
+import net.krlite.equator.util.Timer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
@@ -53,15 +55,15 @@ public class CanvasScreen extends Screen {
 		});
 
 		EasingFunctions.Combined bouncing = new EasingFunctions.Combined()
-												  .append(5, EasingFunctions.Quadratic::easeOut).appendNegate(15, EasingFunctions.Bounce::easeOut);
+												  .append(EasingFunctions.Quadratic::easeOut, 5).appendNegate(EasingFunctions.Bounce::easeOut, 15);
 
 		EasingFunctions.Concurred swinging = new EasingFunctions.Concurred(EasingFunctions.Linear::ease,
 				(p, o, s, d) -> EasingFunctions.Back.easeOut(p, o, -s, d));
 
-		Equator.Block block = new Equator.Block(Registries.BLOCK.get(IdentifierBuilder.id("minecraft", "diamond_block")).getDefaultState());
+		Equator.BlockModel blockModel = new Equator.BlockModel(Registries.BLOCK.get(IdentifierBuilder.id("minecraft", "diamond_block")).getDefaultState());
 		Quaterniond quaternion = QuaternionAdapter.fromEularDeg(swinging.apply(swing, -6), swinging.apply(swing, 17), swinging.apply(swing, 34));
 
-		block.renderCentered(MinecraftClient.getInstance().getWindow().getScaledWidth() / 2.0, MinecraftClient.getInstance().getWindow().getScaledHeight() / 2.0 - bouncing.apply(bounce, 50), quaternion);
+		blockModel.renderCentered(MinecraftClient.getInstance().getWindow().getScaledWidth() / 2.0, MinecraftClient.getInstance().getWindow().getScaledHeight() / 2.0 - bouncing.apply(bounce, 50), quaternion);
 	}
 
 	@Override

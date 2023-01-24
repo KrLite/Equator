@@ -1,5 +1,6 @@
 package net.krlite.equator.color;
 
+import net.krlite.equator.annotation.See;
 import net.krlite.equator.base.HashCodeComparable;
 import net.krlite.equator.color.core.BasicRGBA;
 import org.jetbrains.annotations.Nullable;
@@ -7,6 +8,7 @@ import org.jetbrains.annotations.Range;
 
 import java.awt.*;
 
+@See(BasicRGBA.class)
 public class PreciseColor extends HashCodeComparable implements BasicRGBA<PreciseColor> {
 	public static final PreciseColor WHITE = new PreciseColor(1, 1, 1);
 	public static final PreciseColor BLACK = new PreciseColor(0, 0, 0);

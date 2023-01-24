@@ -1,5 +1,11 @@
 package net.krlite.equator.color;
 
+import net.krlite.equator.annotation.See;
+import net.krlite.equator.annotation.Sees;
+import net.krlite.equator.color.core.BasicRGBA;
+
+@See(BasicRGBA.class)
+@See(PreciseColor.class)
 @SuppressWarnings("unused")
 public class PreciseColors {
 	// === Translucent basic ===

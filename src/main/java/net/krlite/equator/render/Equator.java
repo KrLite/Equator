@@ -2,7 +2,7 @@ package net.krlite.equator.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.krlite.equator.base.HashCodeComparable;
+import net.krlite.equator.annotation.See;
 import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.color.PreciseColors;
 import net.krlite.equator.color.core.BasicRGBA;
@@ -14,13 +14,14 @@ import net.krlite.equator.util.QuaternionAdapter;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.block.BlockRenderManager;
+import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -32,9 +33,9 @@ import org.joml.Quaterniondc;
  * <h2>Equator</h2>
  * A class that provides a set of methods to draw colors, shapes and sprites on the screen.
  */
-public class Equator extends HashCodeComparable {
+public class Equator {
 	public record Renderer(@NotNull MatrixStack matrixStack, @NotNull IdentifierSprite identifierSprite)
-			implements ShortStringable {
+			implements ShortStringable, Cloneable {
 		public Renderer swap(@NotNull MatrixStack matrixStack) {
 			return new Renderer(matrixStack, identifierSprite);
 		}
@@ -306,9 +307,18 @@ public class Equator extends HashCodeComparable {
 			renderVertex(builder, tinted.getLeftBottomNode(), uBegin, vEnd);
 			renderVertex(builder, tinted.getRightBottomNode(), uEnd, vEnd);
 		}
+
+		@Override
+		public Renderer clone() {
+			try {
+				return (Renderer) super.clone();
+			} catch (CloneNotSupportedException cloneNotSupportedException) {
+				throw new RuntimeException(cloneNotSupportedException);
+			}
+		}
 	}
 
-	public record Painter(@NotNull MatrixStack matrixStack) {
+	public record Painter(@NotNull MatrixStack matrixStack) implements ShortStringable, Cloneable {
 		public Painter swap(@NotNull MatrixStack matrixStack) {
 			return new Painter(matrixStack);
 		}
@@ -486,6 +496,15 @@ public class Equator extends HashCodeComparable {
 			paintVertex(builder, tinted.getLeftBottomNode());
 			paintVertex(builder, tinted.getRightBottomNode());
 		}
+
+		@Override
+		public Painter clone() {
+			try {
+				return (Painter) super.clone();
+			} catch (CloneNotSupportedException cloneNotSupportedException) {
+				throw new RuntimeException(cloneNotSupportedException);
+			}
+		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -506,8 +525,9 @@ public class Equator extends HashCodeComparable {
 		RenderSystem.applyModelViewMatrix();
 	}
 
-	public record Item(ItemStack itemStack) {
-		public Item render(Vec3d pos, boolean leftHanded, Quaterniondc quaternion) {
+	@See(ItemRenderer.class)
+	public record ItemModel(ItemStack itemStack) implements ShortStringable, Cloneable {
+		public ItemModel render(Vec3d pos, boolean leftHanded, @See(QuaternionAdapter.class) Quaterniondc quaternion) {
 			BakedModel bakedModel = MinecraftClient.getInstance().getItemRenderer().getModel(itemStack, null, null, 0);
 			prepareModel();
 			MatrixStack matrixStack = RenderSystem.getModelViewStack();
@@ -537,93 +557,103 @@ public class Equator extends HashCodeComparable {
 			return this;
 		}
 
-		public Item render(Vec3d pos, Quaterniondc quaternion) {
+		public ItemModel render(Vec3d pos, Quaterniondc quaternion) {
 			return render(pos, false, quaternion);
 		}
 
-		public Item render(Vec3d pos, int size) {
+		public ItemModel render(Vec3d pos, int size) {
 			return render(pos, false, new Quaterniond(0, 0, 0, size / 16.0));
 		}
 
-		public Item render(Vec3d pos) {
+		public ItemModel render(Vec3d pos) {
 			return render(pos, false, new Quaterniond(0, 0, 0, 1));
 		}
 
-		public Item render(double x, double y, Quaterniondc quaternion) {
+		public ItemModel render(double x, double y, Quaterniondc quaternion) {
 			return render(new Vec3d(x, y, 0), false, quaternion);
 		}
 
-		public Item render(double x, double y, int size) {
+		public ItemModel render(double x, double y, int size) {
 			return render(x, y, new Quaterniond(0, 0, 0, size / 16.0));
 		}
 
-		public Item render(double x, double y) {
+		public ItemModel render(double x, double y) {
 			return render(x, y, 16);
 		}
 
-		public Item render(Node leftTopVertex, boolean leftHanded, Quaterniondc quaternion) {
+		public ItemModel render(Node leftTopVertex, boolean leftHanded, Quaterniondc quaternion) {
 			return render(leftTopVertex.toVec3d(), leftHanded, quaternion);
 		}
 
-		public Item render(Node leftTopVertex, Quaterniondc quaternion) {
+		public ItemModel render(Node leftTopVertex, Quaterniondc quaternion) {
 			return render(leftTopVertex.toVec3d(), quaternion);
 		}
 
-		public Item render(Node leftTopVertex, int size) {
+		public ItemModel render(Node leftTopVertex, int size) {
 			return render(leftTopVertex.getX(), leftTopVertex.getY(), size);
 		}
 
-		public Item render(Node leftTopVertex) {
+		public ItemModel render(Node leftTopVertex) {
 			return render(leftTopVertex.getX(), leftTopVertex.getY());
 		}
 
-		public Item renderCentered(Vec3d pos, boolean leftHanded, Quaterniondc quaternion) {
+		public ItemModel renderCentered(Vec3d pos, boolean leftHanded, Quaterniondc quaternion) {
 			return render(pos.add(-8 * quaternion.w(), -8 * quaternion.w(), 0), leftHanded, quaternion);
 		}
 
-		public Item renderCentered(Vec3d pos, Quaterniondc quaternion) {
+		public ItemModel renderCentered(Vec3d pos, Quaterniondc quaternion) {
 			return renderCentered(pos, false, quaternion);
 		}
 
-		public Item renderCentered(Vec3d pos, int size) {
+		public ItemModel renderCentered(Vec3d pos, int size) {
 			return renderCentered(pos, new Quaterniond(0, 0, 0, size / 16.0));
 		}
 
-		public Item renderCentered(Vec3d pos) {
+		public ItemModel renderCentered(Vec3d pos) {
 			return renderCentered(pos, new Quaterniond(0, 0, 0, 1));
 		}
 
-		public Item renderCentered(double x, double y, Quaterniondc quaternion) {
+		public ItemModel renderCentered(double x, double y, Quaterniondc quaternion) {
 			return renderCentered(new Vec3d(x, y, 0), quaternion);
 		}
 
-		public Item renderCentered(double x, double y, int size) {
+		public ItemModel renderCentered(double x, double y, int size) {
 			return renderCentered(x, y, new Quaterniond(0, 0, 0, size / 16.0));
 		}
 
-		public Item renderCentered(double x, double y) {
+		public ItemModel renderCentered(double x, double y) {
 			return renderCentered(x, y, 16);
 		}
 
-		public Item renderCentered(Node centerVertex, boolean leftHanded, Quaterniondc quaternion) {
+		public ItemModel renderCentered(Node centerVertex, boolean leftHanded, Quaterniondc quaternion) {
 			return renderCentered(centerVertex.toVec3d(), leftHanded, quaternion);
 		}
 
-		public Item renderCentered(Node centerVertex, Quaterniondc quaternion) {
+		public ItemModel renderCentered(Node centerVertex, Quaterniondc quaternion) {
 			return renderCentered(centerVertex.toVec3d(), quaternion);
 		}
 
-		public Item renderCentered(Node centerVertex, int size) {
+		public ItemModel renderCentered(Node centerVertex, int size) {
 			return renderCentered(centerVertex.getX(), centerVertex.getY(), size);
 		}
 
-		public Item renderCentered(Node centerVertex) {
+		public ItemModel renderCentered(Node centerVertex) {
 			return renderCentered(centerVertex.getX(), centerVertex.getY());
+		}
+
+		@Override
+		public ItemModel clone() {
+			try {
+				return (ItemModel) super.clone();
+			} catch (CloneNotSupportedException cloneNotSupportedException) {
+				throw new RuntimeException(cloneNotSupportedException);
+			}
 		}
 	}
 
-	public record Block(BlockState blockState) {
-		public Block render(Vec3d pos, Quaterniondc quaternion) {
+	@See(BlockRenderManager.class)
+	public record BlockModel(BlockState blockState) implements ShortStringable, Cloneable {
+		public BlockModel render(Vec3d pos, @See(QuaternionAdapter.class) Quaterniondc quaternion) {
 			prepareModel();
 			MatrixStack matrixStack = RenderSystem.getModelViewStack();
 
@@ -647,72 +677,81 @@ public class Equator extends HashCodeComparable {
 			return this;
 		}
 
-		public Block render(Vec3d pos, int size) {
+		public BlockModel render(Vec3d pos, int size) {
 			return render(pos, new Quaterniond(0, 0, 0, size / 16.0));
 		}
 
-		public Block render(Vec3d pos) {
+		public BlockModel render(Vec3d pos) {
 			return render(pos, new Quaterniond(0, 0, 0, 1));
 		}
 
-		public Block render(double x, double y, Quaterniondc quaternion) {
+		public BlockModel render(double x, double y, Quaterniondc quaternion) {
 			return render(new Vec3d(x, y, 0), quaternion);
 		}
 
-		public Block render(double x, double y, int size) {
+		public BlockModel render(double x, double y, int size) {
 			return render(x, y, new Quaterniond(0, 0, 0, size / 16.0));
 		}
 
-		public Block render(double x, double y) {
+		public BlockModel render(double x, double y) {
 			return render(x, y, 16);
 		}
 
-		public Block render(Node leftTopVertex, Quaterniondc quaternion) {
+		public BlockModel render(Node leftTopVertex, Quaterniondc quaternion) {
 			return render(leftTopVertex.toVec3d(), quaternion);
 		}
 
-		public Block render(Node leftTopVertex, int size) {
+		public BlockModel render(Node leftTopVertex, int size) {
 			return render(leftTopVertex.getX(), leftTopVertex.getY(), size);
 		}
 
-		public Block render(Node leftTopVertex) {
+		public BlockModel render(Node leftTopVertex) {
 			return render(leftTopVertex.getX(), leftTopVertex.getY());
 		}
 
-		public Block renderCentered(Vec3d pos, Quaterniondc quaternion) {
+		public BlockModel renderCentered(Vec3d pos, Quaterniondc quaternion) {
 			return render(pos.add(-8 * quaternion.w(), -8 * quaternion.w(), 0), quaternion);
 		}
 
-		public Block renderCentered(Vec3d pos, int size) {
+		public BlockModel renderCentered(Vec3d pos, int size) {
 			return renderCentered(pos, new Quaterniond(0, 0, 0, size / 16.0));
 		}
 
-		public Block renderCentered(Vec3d pos) {
+		public BlockModel renderCentered(Vec3d pos) {
 			return renderCentered(pos, new Quaterniond(0, 0, 0, 1));
 		}
 
-		public Block renderCentered(double x, double y, Quaterniondc quaternion) {
+		public BlockModel renderCentered(double x, double y, Quaterniondc quaternion) {
 			return renderCentered(new Vec3d(x, y, 0), quaternion);
 		}
 
-		public Block renderCentered(double x, double y, int size) {
+		public BlockModel renderCentered(double x, double y, int size) {
 			return renderCentered(x, y, new Quaterniond(0, 0, 0, size / 16.0));
 		}
 
-		public Block renderCentered(double x, double y) {
+		public BlockModel renderCentered(double x, double y) {
 			return renderCentered(x, y, 16);
 		}
 
-		public Block renderCentered(Node centerVertex, Quaterniondc quaternion) {
+		public BlockModel renderCentered(Node centerVertex, Quaterniondc quaternion) {
 			return renderCentered(centerVertex.toVec3d(), quaternion);
 		}
 
-		public Block renderCentered(Node centerVertex, int size) {
+		public BlockModel renderCentered(Node centerVertex, int size) {
 			return renderCentered(centerVertex.getX(), centerVertex.getY(), size);
 		}
 
-		public Block renderCentered(Node centerVertex) {
+		public BlockModel renderCentered(Node centerVertex) {
 			return renderCentered(centerVertex.getX(), centerVertex.getY());
+		}
+
+		@Override
+		public BlockModel clone() {
+			try {
+				return (BlockModel) super.clone();
+			} catch (CloneNotSupportedException cloneNotSupportedException) {
+				throw new RuntimeException(cloneNotSupportedException);
+			}
 		}
 	}
 }
