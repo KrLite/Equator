@@ -12,7 +12,7 @@ With **Equator,** you can render and manage texture resources with ease, and get
 
 ```groovy
 repositories {
-    maven { url = "https://api.modrinth.com/maven" }
+    maven { url "https://api.modrinth.com/maven" }
     maven { url "https://jitpack.io" }
 }
 
