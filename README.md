@@ -8,6 +8,20 @@
 
 With **Equator,** you can render and manage texture resources with ease, and get access to many useful rendering utilities.
 
+## TL;DR
+
+```groovy
+repositories {
+    maven { url = "https://api.modrinth.com/maven" }
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    modImplementation "maven.modrinth:equator:{x}"
+    implementation include("com.github.KrLite:Equator-Utils:v{x}")
+}
+```
+
 ## Features
 
 - **Equator** - The main class for rendering, including **Renderer** for sprites, **Painter** for colors and shapes, and **ItemModel** and **BlockModel** to render models in ease.
@@ -18,25 +32,45 @@ With **Equator,** you can render and manage texture resources with ease, and get
 
 ## Implementation
 
-You can use **[Modrinth Maven](https://docs.modrinth.com/docs/tutorials/maven/)** or **[JitPack](https://jitpack.io/#KrLite/Equator)** to implement Equator.
+You can use **[Modrinth Maven](https://docs.modrinth.com/docs/tutorials/maven/)** to implement **Equator** and **[JitPack](https://jitpack.io/#KrLite/Equator)** to implement **[Equator Utils.](https://github.com/KrLite/Equator-Utils)**
 
 Add the content below to your `build.gradle` file:
 
 ```groovy
 repositories {
-    // Modrinth Maven
+    // Modrinth Maven, for the mod Equator
+    maven { url = "https://api.modrinth.com/maven" }
+    
+    // JitPack, for Equator Utils(you probably want this too)
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    modImplementation "maven.modrinth:equator:{x}"
+    implementation include("com.github.KrLite:Equator-Utils:v{x}")
+}
+```
+
+In above:
+
+- `{x}` in `maven.modrinth:equator:{x}` should be the latest [`version id`](https://modrinth.com/mod/equator/versions) of **Equator.**
+- `v{x}` in `com.github.KrLite:Equator-Utils:v{x}` should be the latest [`tag name`](https://github.com/KrLite/Equator-Utils/tags) of Equator Utils.
+
+If you do not implement **Equator Utils,** **Equator** can still function fully, but you may not be able to access many convenient methods that **Equator** uses. To only implement **Equator,** refer to the content below:
+
+```groovy
+repositories {
     maven { url = "https://api.modrinth.com/maven" }
 }
 
 dependencies {
-    // Modrinth Maven
     modImplementation "maven.modrinth:equator:{x}"
 }
 ```
 
-Remember to replace the `{a.b.c}` above with the target `Minecraft version`, and the `{x}` above with the latest [`version id`](https://modrinth.com/mod/equator/versions) of **Equator.**
+## Dependency
 
-And finally, don't forget to add Equator as a mod dependent in your `fabric.mod.json:`
+Finally, don't forget to add **Equator** as a mod dependent in your `fabric.mod.json:`
 
 ```json
 "depends": {
@@ -44,7 +78,7 @@ And finally, don't forget to add Equator as a mod dependent in your `fabric.mod.
 }
 ```
 
-Or if on Quilt, `quilt.mod.json:`
+And Quilt, in your `quilt.mod.json:`
 
 ```json
 "depends": [
