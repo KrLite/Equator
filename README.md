@@ -34,7 +34,7 @@ dependencies {
 
 You can use **[Modrinth Maven](https://docs.modrinth.com/docs/tutorials/maven/)** to implement **Equator** and **[JitPack](https://jitpack.io/#KrLite/Equator)** to implement **[Equator Utils.](https://github.com/KrLite/Equator-Utils)**
 
-Add the content below to your `build.gradle` file:
+Add the content below to your `build.gradle:`
 
 ```groovy
 repositories {
