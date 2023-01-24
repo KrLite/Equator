@@ -10,15 +10,15 @@ With **Equator,** you can render and manage texture resources with ease, and get
 
 ## Features
 
-- **Equator** - The main class for rendering, including **Renderer** for sprites, and **Drawer** for colors and shapes.
-- **Math** - Access easing functions and analyse angles with ease.
+- **Equator** - The main class for rendering, including **Renderer** for sprites, **Painter** for colors and shapes, and **ItemModel** and **BlockModel** to render models in ease.
+- **Math** - Access easing functions and analyse angles, coordinates, etc.
 - **Utilities** - Use **Pusher** and **Timer** to handle animations and rendering rules in a simpler way.
 - **Management** - Manage your textures as **IdentifierSprites** and render them with **Rect**s and **TintedRect**s.
 - **More** - Equator Lib is in active development! More features will be added soon.
 
 ## Implementation
 
-You can use **[Modrinth Maven](https://docs.modrinth.com/docs/tutorials/maven/)** or **[JitPack](https://jitpack.io)** to implement Equator.
+You can use **[Modrinth Maven](https://docs.modrinth.com/docs/tutorials/maven/)** or **[JitPack](https://jitpack.io/#KrLite/Equator)** to implement Equator.
 
 Add the content below to your `build.gradle` file:
 
