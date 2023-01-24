@@ -36,11 +36,11 @@ dependencies {
     modImplementation "maven.modrinth:equator:xxx"
     
     // JitPack
-    modImplementation "com.github.KrLite:Equator:xxx"
+    modImplementation "com.github.KrLite:Equator:a.b.c+vxxx"
 }
 ```
 
-Remember to replace `xxx` above with the latest [`version id,`](https://modrinth.com/mod/equator/versions) or the [`tag name`](https://github.com/KrLite/Equator/tags) if you are using JitPack, of Equator.
+Remember to replace the `a.b.c` above with the target `Minecraft version`, and the `xxx` above with the latest [`version id`](https://modrinth.com/mod/equator/versions) of **Equator,** or the [`tag name`](https://github.com/KrLite/Equator/tags) if you are using JitPack.
 
 And finally, don't forget to add Equator as a mod dependent in your `fabric.mod.json:`
 
