@@ -27,8 +27,6 @@ import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Quaterniond;
-import org.joml.Quaternion;
 
 /**
  * <h2>Equator</h2>
@@ -267,7 +265,7 @@ public class Equator {
 			RenderSystem.enableBlend();
 
 			RenderSystem.defaultBlendFunc();
-			RenderSystem.setShader(GameRenderer::getPositionTexColorProgram);
+			RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 			RenderSystem.setShaderColor(shaderColor.getRedFloat(), shaderColor.getGreenFloat(),
 					shaderColor.getBlueFloat(), shaderColor.getAlphaFloat());
 			RenderSystem.setShaderTexture(0, identifierSprite.identifier());
