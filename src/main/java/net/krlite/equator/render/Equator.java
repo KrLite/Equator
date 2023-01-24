@@ -22,12 +22,13 @@ import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaterniond;
-import org.joml.Quaterniondc;
+import org.joml.Quaternion;
 
 /**
  * <h2>Equator</h2>
@@ -469,7 +470,7 @@ public class Equator {
 			RenderSystem.enableBlend();
 
 			RenderSystem.defaultBlendFunc();
-			RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+			RenderSystem.setShader(GameRenderer::getPositionColorShader);
 			
 			return Tessellator.getInstance();
 		}
@@ -517,24 +518,24 @@ public class Equator {
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 
-	private static void applyModelView(MatrixStack matrixStack, Quaterniondc quaternion) {
+	private static void applyModelView(MatrixStack matrixStack, Quaternion quaternion) {
 		matrixStack.scale(1, -1, 1);
-		matrixStack.scale((float) (16 * quaternion.w()), (float) (16 * quaternion.w()), (float) (16 * quaternion.w()));
-		matrixStack.multiply(QuaternionAdapter.toFloat(quaternion));
+		matrixStack.scale((16 * quaternion.getW()), (16 * quaternion.getW()), (16 * quaternion.getW()));
+		matrixStack.multiply(quaternion);
 
 		RenderSystem.applyModelViewMatrix();
 	}
 
 	@See(ItemRenderer.class)
 	public record ItemModel(ItemStack itemStack) implements ShortStringable, Cloneable {
-		public ItemModel render(Vec3d pos, boolean leftHanded, @See(QuaternionAdapter.class) Quaterniondc quaternion) {
+		public ItemModel render(Vec3d pos, boolean leftHanded, @See(QuaternionAdapter.class) Quaternion quaternion) {
 			BakedModel bakedModel = MinecraftClient.getInstance().getItemRenderer().getModel(itemStack, null, null, 0);
 			prepareModel();
 			MatrixStack matrixStack = RenderSystem.getModelViewStack();
 
 			matrixStack.push();
 			matrixStack.translate(pos.x, pos.y, 100 + pos.z);
-			matrixStack.translate(8 * quaternion.w(), 8 * quaternion.w(), 0);
+			matrixStack.translate(8 * quaternion.getW(), 8 * quaternion.getW(), 0);
 			applyModelView(matrixStack, quaternion);
 
 			MatrixStack itemMatrixStack = new MatrixStack();
@@ -557,35 +558,35 @@ public class Equator {
 			return this;
 		}
 
-		public ItemModel render(Vec3d pos, Quaterniondc quaternion) {
+		public ItemModel render(Vec3d pos, Quaternion quaternion) {
 			return render(pos, false, quaternion);
 		}
 
 		public ItemModel render(Vec3d pos, int size) {
-			return render(pos, false, new Quaterniond(0, 0, 0, size / 16.0));
+			return render(pos, false, new Quaternion(0, 0, 0, size / 16F));
 		}
 
 		public ItemModel render(Vec3d pos) {
-			return render(pos, false, new Quaterniond(0, 0, 0, 1));
+			return render(pos, false, new Quaternion(0, 0, 0, 1));
 		}
 
-		public ItemModel render(double x, double y, Quaterniondc quaternion) {
+		public ItemModel render(double x, double y, Quaternion quaternion) {
 			return render(new Vec3d(x, y, 0), false, quaternion);
 		}
 
 		public ItemModel render(double x, double y, int size) {
-			return render(x, y, new Quaterniond(0, 0, 0, size / 16.0));
+			return render(x, y, new Quaternion(0, 0, 0, size / 16F));
 		}
 
 		public ItemModel render(double x, double y) {
 			return render(x, y, 16);
 		}
 
-		public ItemModel render(Node leftTopVertex, boolean leftHanded, Quaterniondc quaternion) {
+		public ItemModel render(Node leftTopVertex, boolean leftHanded, Quaternion quaternion) {
 			return render(leftTopVertex.toVec3d(), leftHanded, quaternion);
 		}
 
-		public ItemModel render(Node leftTopVertex, Quaterniondc quaternion) {
+		public ItemModel render(Node leftTopVertex, Quaternion quaternion) {
 			return render(leftTopVertex.toVec3d(), quaternion);
 		}
 
@@ -597,39 +598,39 @@ public class Equator {
 			return render(leftTopVertex.getX(), leftTopVertex.getY());
 		}
 
-		public ItemModel renderCentered(Vec3d pos, boolean leftHanded, Quaterniondc quaternion) {
-			return render(pos.add(-8 * quaternion.w(), -8 * quaternion.w(), 0), leftHanded, quaternion);
+		public ItemModel renderCentered(Vec3d pos, boolean leftHanded, Quaternion quaternion) {
+			return render(pos.add(-8 * quaternion.getW(), -8 * quaternion.getW(), 0), leftHanded, quaternion);
 		}
 
-		public ItemModel renderCentered(Vec3d pos, Quaterniondc quaternion) {
+		public ItemModel renderCentered(Vec3d pos, Quaternion quaternion) {
 			return renderCentered(pos, false, quaternion);
 		}
 
 		public ItemModel renderCentered(Vec3d pos, int size) {
-			return renderCentered(pos, new Quaterniond(0, 0, 0, size / 16.0));
+			return renderCentered(pos, new Quaternion(0, 0, 0, size / 16F));
 		}
 
 		public ItemModel renderCentered(Vec3d pos) {
-			return renderCentered(pos, new Quaterniond(0, 0, 0, 1));
+			return renderCentered(pos, new Quaternion(0, 0, 0, 1));
 		}
 
-		public ItemModel renderCentered(double x, double y, Quaterniondc quaternion) {
+		public ItemModel renderCentered(double x, double y, Quaternion quaternion) {
 			return renderCentered(new Vec3d(x, y, 0), quaternion);
 		}
 
 		public ItemModel renderCentered(double x, double y, int size) {
-			return renderCentered(x, y, new Quaterniond(0, 0, 0, size / 16.0));
+			return renderCentered(x, y, new Quaternion(0, 0, 0, size / 16F));
 		}
 
 		public ItemModel renderCentered(double x, double y) {
 			return renderCentered(x, y, 16);
 		}
 
-		public ItemModel renderCentered(Node centerVertex, boolean leftHanded, Quaterniondc quaternion) {
+		public ItemModel renderCentered(Node centerVertex, boolean leftHanded, Quaternion quaternion) {
 			return renderCentered(centerVertex.toVec3d(), leftHanded, quaternion);
 		}
 
-		public ItemModel renderCentered(Node centerVertex, Quaterniondc quaternion) {
+		public ItemModel renderCentered(Node centerVertex, Quaternion quaternion) {
 			return renderCentered(centerVertex.toVec3d(), quaternion);
 		}
 
@@ -653,13 +654,13 @@ public class Equator {
 
 	@See(BlockRenderManager.class)
 	public record BlockModel(BlockState blockState) implements ShortStringable, Cloneable {
-		public BlockModel render(Vec3d pos, @See(QuaternionAdapter.class) Quaterniondc quaternion) {
+		public BlockModel render(Vec3d pos, @See(QuaternionAdapter.class) Quaternion quaternion) {
 			prepareModel();
 			MatrixStack matrixStack = RenderSystem.getModelViewStack();
 
 			matrixStack.push();
 			matrixStack.translate(pos.x, pos.y, 100 + pos.z);
-			matrixStack.translate(8 * quaternion.w(), 8 * quaternion.w(), 8 * quaternion.w());
+			matrixStack.translate(8 * quaternion.getW(), 8 * quaternion.getW(), 8 * quaternion.getW());
 			applyModelView(matrixStack, quaternion);
 
 			MatrixStack blockMatrixStack = new MatrixStack();
@@ -678,26 +679,26 @@ public class Equator {
 		}
 
 		public BlockModel render(Vec3d pos, int size) {
-			return render(pos, new Quaterniond(0, 0, 0, size / 16.0));
+			return render(pos, new Quaternion(0, 0, 0, size / 16F));
 		}
 
 		public BlockModel render(Vec3d pos) {
-			return render(pos, new Quaterniond(0, 0, 0, 1));
+			return render(pos, new Quaternion(0, 0, 0, 1));
 		}
 
-		public BlockModel render(double x, double y, Quaterniondc quaternion) {
+		public BlockModel render(double x, double y, Quaternion quaternion) {
 			return render(new Vec3d(x, y, 0), quaternion);
 		}
 
 		public BlockModel render(double x, double y, int size) {
-			return render(x, y, new Quaterniond(0, 0, 0, size / 16.0));
+			return render(x, y, new Quaternion(0, 0, 0, size / 16F));
 		}
 
 		public BlockModel render(double x, double y) {
 			return render(x, y, 16);
 		}
 
-		public BlockModel render(Node leftTopVertex, Quaterniondc quaternion) {
+		public BlockModel render(Node leftTopVertex, Quaternion quaternion) {
 			return render(leftTopVertex.toVec3d(), quaternion);
 		}
 
@@ -709,31 +710,31 @@ public class Equator {
 			return render(leftTopVertex.getX(), leftTopVertex.getY());
 		}
 
-		public BlockModel renderCentered(Vec3d pos, Quaterniondc quaternion) {
-			return render(pos.add(-8 * quaternion.w(), -8 * quaternion.w(), 0), quaternion);
+		public BlockModel renderCentered(Vec3d pos, Quaternion quaternion) {
+			return render(pos.add(-8 * quaternion.getW(), -8 * quaternion.getW(), 0), quaternion);
 		}
 
 		public BlockModel renderCentered(Vec3d pos, int size) {
-			return renderCentered(pos, new Quaterniond(0, 0, 0, size / 16.0));
+			return renderCentered(pos, new Quaternion(0, 0, 0, size / 16F));
 		}
 
 		public BlockModel renderCentered(Vec3d pos) {
-			return renderCentered(pos, new Quaterniond(0, 0, 0, 1));
+			return renderCentered(pos, new Quaternion(0, 0, 0, 1));
 		}
 
-		public BlockModel renderCentered(double x, double y, Quaterniondc quaternion) {
+		public BlockModel renderCentered(double x, double y, Quaternion quaternion) {
 			return renderCentered(new Vec3d(x, y, 0), quaternion);
 		}
 
 		public BlockModel renderCentered(double x, double y, int size) {
-			return renderCentered(x, y, new Quaterniond(0, 0, 0, size / 16.0));
+			return renderCentered(x, y, new Quaternion(0, 0, 0, size / 16F));
 		}
 
 		public BlockModel renderCentered(double x, double y) {
 			return renderCentered(x, y, 16);
 		}
 
-		public BlockModel renderCentered(Node centerVertex, Quaterniondc quaternion) {
+		public BlockModel renderCentered(Node centerVertex, Quaternion quaternion) {
 			return renderCentered(centerVertex.toVec3d(), quaternion);
 		}
 

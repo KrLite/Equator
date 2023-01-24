@@ -12,9 +12,9 @@ import net.krlite.equator.util.Timer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.text.Text;
-import org.joml.Quaterniond;
+import net.minecraft.text.LiteralText;
+import net.minecraft.util.math.Quaternion;
+import net.minecraft.util.registry.Registry;
 
 public class CanvasScreen extends Screen {
 	public static final IdentifierSprite FLASH = IdentifierBuilder.sprite(EquatorLib.MOD_ID, "debug", "flash");
@@ -25,7 +25,7 @@ public class CanvasScreen extends Screen {
 	private final Timer bounce = new Timer(2000), swing = new Timer(1900);
 
 	public CanvasScreen(Screen parent) {
-		super(Text.literal("Canvas"));
+		super(new LiteralText("Canvas"));
 		this.parent = parent;
 	}
 
@@ -60,8 +60,8 @@ public class CanvasScreen extends Screen {
 		EasingFunctions.Concurred swinging = new EasingFunctions.Concurred(EasingFunctions.Linear::ease,
 				(p, o, s, d) -> EasingFunctions.Back.easeOut(p, o, -s, d));
 
-		Equator.BlockModel blockModel = new Equator.BlockModel(Registries.BLOCK.get(IdentifierBuilder.id("minecraft", "diamond_block")).getDefaultState());
-		Quaterniond quaternion = QuaternionAdapter.fromEularDeg(swinging.apply(swing, -6), swinging.apply(swing, 17), swinging.apply(swing, 34));
+		Equator.BlockModel blockModel = new Equator.BlockModel(Registry.BLOCK.get(IdentifierBuilder.id("minecraft", "diamond_block")).getDefaultState());
+		Quaternion quaternion = QuaternionAdapter.fromEulerDeg(swinging.apply(swing, -6), swinging.apply(swing, 17), swinging.apply(swing, 34));
 
 		blockModel.renderCentered(MinecraftClient.getInstance().getWindow().getScaledWidth() / 2.0, MinecraftClient.getInstance().getWindow().getScaledHeight() / 2.0 - bouncing.apply(bounce, 50), quaternion);
 	}

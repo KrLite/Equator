@@ -2,7 +2,7 @@ package net.krlite.equator.util;
 
 import net.krlite.equator.core.ShortStringable;
 import net.krlite.equator.render.sprite.IdentifierSprite;
-import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -48,8 +48,8 @@ public class IdentifierBuilder {
 		return IdentifierSprite.of(png(namespace, paths));
 	}
 
-	public static Text localization(@NotNull String prefix, @NotNull String namespace, @Nullable String... paths) {
-		return Text.translatable(translationKey(prefix, namespace, paths));
+	public static TranslatableText localization(@NotNull String prefix, @NotNull String namespace, @Nullable String... paths) {
+		return new TranslatableText(translationKey(prefix, namespace, paths));
 	}
 
 	public static String translationKey(@NotNull String prefix, @NotNull String namespace, @Nullable String... paths) {
@@ -81,7 +81,7 @@ public class IdentifierBuilder {
 			return IdentifierSprite.of(png(paths));
 		}
 
-		public Text localization(@NotNull String prefix, @NotNull String... paths) {
+		public TranslatableText localization(@NotNull String prefix, @NotNull String... paths) {
 			return IdentifierBuilder.localization(prefix, namespace, paths);
 		}
 
