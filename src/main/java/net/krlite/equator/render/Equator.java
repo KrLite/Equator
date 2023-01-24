@@ -14,6 +14,7 @@ import net.krlite.equator.util.QuaternionAdapter;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.block.BlockModelRenderer;
 import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
@@ -50,7 +51,7 @@ public class Equator {
 
 			renderRect(builder, tinted);
 
-			cleanup(tessellator);
+			cleanup(builder);
 			return this;
 		}
 
@@ -273,8 +274,9 @@ public class Equator {
 			return Tessellator.getInstance();
 		}
 
-		private void cleanup(@NotNull Tessellator tessellator) {
-			tessellator.draw();
+		private void cleanup(@NotNull BufferBuilder builder) {
+			builder.end();
+			BufferRenderer.draw(builder);
         	RenderSystem.depthMask(true);
 			RenderSystem.enableDepthTest();
 
@@ -284,10 +286,8 @@ public class Equator {
 		private void renderVertex(@NotNull BufferBuilder builder, @NotNull Node.Tinted vertex, float u, float v) {
 			builder.vertex(matrixStack.peek().getPositionMatrix(), (float) vertex.getX(), (float) vertex.getY(), 0)
 					.texture(u, v)
-					.color(
-							vertex.getRedFloat(), vertex.getGreenFloat(),
-							vertex.getBlueFloat(), vertex.getAlphaFloat()
-					).next();
+					.color(vertex.getRedFloat(), vertex.getGreenFloat(),
+							vertex.getBlueFloat(), vertex.getAlphaFloat()).next();
 		}
 
 		private void renderRect(@NotNull BufferBuilder builder, @NotNull Rect.Tinted tinted) {
@@ -330,7 +330,7 @@ public class Equator {
 
 			paintRect(builder, tinted.cut());
 
-			cleanup(tessellator);
+			cleanup(builder);
 			return this;
 		}
 
@@ -473,8 +473,9 @@ public class Equator {
 			return Tessellator.getInstance();
 		}
 
-		private void cleanup(@NotNull Tessellator tessellator) {
-			tessellator.draw();
+		private void cleanup(@NotNull BufferBuilder builder) {
+			builder.end();
+			BufferRenderer.draw(builder);
 			RenderSystem.enableTexture();
 		}
 
@@ -650,7 +651,7 @@ public class Equator {
 		}
 	}
 
-	@See(BlockRenderManager.class)
+	@See(BlockModelRenderer.class)
 	public record BlockModel(BlockState blockState) implements ShortStringable, Cloneable {
 		public BlockModel render(Vec3d pos, @See(QuaternionAdapter.class) Quaternion quaternion) {
 			prepareModel();
