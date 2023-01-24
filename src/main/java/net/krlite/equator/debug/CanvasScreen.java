@@ -61,7 +61,7 @@ public class CanvasScreen extends Screen {
 				(p, o, s, d) -> EasingFunctions.Back.easeOut(p, o, -s, d));
 
 		Equator.BlockModel blockModel = new Equator.BlockModel(Registries.BLOCK.get(IdentifierBuilder.id("minecraft", "diamond_block")).getDefaultState());
-		Quaterniond quaternion = QuaternionAdapter.fromEularDeg(swinging.apply(swing, -6), swinging.apply(swing, 17), swinging.apply(swing, 34));
+		Quaterniond quaternion = QuaternionAdapter.fromEulerDeg(swinging.apply(swing, -6), swinging.apply(swing, 17), swinging.apply(swing, 34));
 
 		blockModel.renderCentered(MinecraftClient.getInstance().getWindow().getScaledWidth() / 2.0, MinecraftClient.getInstance().getWindow().getScaledHeight() / 2.0 - bouncing.apply(bounce, 50), quaternion);
 	}
