@@ -1,6 +1,5 @@
 package net.krlite.equator.render.sprite;
 
-import net.krlite.equator.annotation.See;
 import net.krlite.equator.core.ShortStringable;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -9,8 +8,9 @@ import java.util.Objects;
 
 /**
  * A sprite that defines a 2D array set of {@link IdentifierSprite}s.
+ *
+ * @see IdentifierSprite
  */
-@See(IdentifierSprite.class)
 public record SurfaceSprite(Identifier identifier, int stepX, int stepY) implements ShortStringable, Cloneable {
     /**
      * Creates a {@link SurfaceSprite} by splitting an {@link Identifier} into pieces.

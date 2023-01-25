@@ -1,6 +1,5 @@
 package net.krlite.equator.math;
 
-import net.krlite.equator.function.AngleFunctions;
 import net.minecraft.entity.player.PlayerEntity;
 
 import java.util.Objects;
