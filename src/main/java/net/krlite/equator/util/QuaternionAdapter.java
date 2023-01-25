@@ -5,6 +5,10 @@ import org.joml.Quaterniondc;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 
+/**
+ * @see Quaternionfc
+ * @see Quaterniondc
+ */
 public class QuaternionAdapter {
 	public static Quaterniond fromEulerDeg(double x, double y, double z, double w) {
 		return new Quaterniond(Math.toRadians(x), Math.toRadians(y), Math.toRadians(z), w);
