@@ -1,4 +1,4 @@
-package net.krlite.equator.animator;
+package net.krlite.equator.animation;
 
 import net.krlite.equator.animation.base.ValueAnimator;
 import net.krlite.equator.color.core.BasicRGBA;

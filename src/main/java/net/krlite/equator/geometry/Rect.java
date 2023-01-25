@@ -1,6 +1,5 @@
 package net.krlite.equator.geometry;
 
-import net.krlite.equator.annotation.Active;
 import net.krlite.equator.base.HashCodeComparable;
 import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.color.core.BasicRGBA;
@@ -13,7 +12,6 @@ import org.jetbrains.annotations.Range;
 import java.awt.*;
 import java.util.function.Function;
 
-@Active
 public class Rect extends HashCodeComparable implements ShortStringable, SimpleOperations {
 	public static Rect fullScreen() {
 		return new Rect(0, 0, MinecraftClient.getInstance().getWindow().getScaledWidth(), MinecraftClient.getInstance().getWindow().getScaledHeight());
