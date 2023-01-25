@@ -1,14 +1,9 @@
 package net.krlite.equator.color;
 
-import net.krlite.equator.annotation.See;
-import net.krlite.equator.annotation.Sees;
-import net.krlite.equator.color.core.BasicRGBA;
-
-@See(BasicRGBA.class)
-@See(PreciseColor.class)
-@SuppressWarnings("unused")
 public class PreciseColors {
-	// === Translucent basic ===
+	/*
+	 * TRANSLUCENT BASIC
+	 */
 	public static final PreciseColor TRANSLUCENT_WHITE = new PreciseColor(1, 1, 1, 0.5);
 	public static final PreciseColor TRANSLUCENT_BLACK = new PreciseColor(0, 0, 0, 0.5);
 	public static final PreciseColor TRANSLUCENT_RED = new PreciseColor(1, 0, 0, 0.5);
@@ -18,14 +13,18 @@ public class PreciseColors {
 	public static final PreciseColor TRANSLUCENT_MAGENTA = new PreciseColor(1, 0, 1, 0.5);
 	public static final PreciseColor TRANSLUCENT_CYAN = new PreciseColor(0, 1, 1, 0.5);
 
-	// === Grayscale ===
+	/*
+	 * GRAYSCALE
+	 */
 	public static final PreciseColor NEAR_WHITE = new PreciseColor(0.95);
 	public static final PreciseColor LIGHT_GRAY = new PreciseColor(0.75);
 	public static final PreciseColor GRAY = new PreciseColor(0.5);
 	public static final PreciseColor DARK_GRAY = new PreciseColor(0.25);
 	public static final PreciseColor NEAR_BLACK = new PreciseColor(0.05);
 
-	// === Normal ===
+	/*
+	 * NORMAL
+	 */
 	public static final PreciseColor GOLD = new PreciseColor(1, 0.85, 0);
 	public static final PreciseColor SILVER = new PreciseColor(0.65, 0.66, 0.67);
 	public static final PreciseColor LIME = new PreciseColor(0.75, 1, 0);
@@ -34,7 +33,9 @@ public class PreciseColors {
 	public static final PreciseColor PURPLE = new PreciseColor(0.5, 0, 0.5);
 	public static final PreciseColor PINK = new PreciseColor(1, 0.75, 0.8);
 
-	// === Dark basic ===
+	/*
+	 * DARK BASIC
+	 */
 	public static final PreciseColor DARK_RED = new PreciseColor(0.5, 0, 0);
 	public static final PreciseColor DARK_GREEN = new PreciseColor(0, 0.5, 0);
 	public static final PreciseColor DARK_BLUE = new PreciseColor(0, 0, 0.5);
@@ -42,7 +43,9 @@ public class PreciseColors {
 	public static final PreciseColor DARK_MAGENTA = new PreciseColor(0.5, 0, 0.5);
 	public static final PreciseColor DARK_CYAN = new PreciseColor(0, 0.5, 0.5);
 
-	// === Light basic ===
+	/*
+	 * LIGHT BASIC
+	 */
 	public static final PreciseColor LIGHT_RED = new PreciseColor(1, 0.5, 0.5);
 	public static final PreciseColor LIGHT_GREEN = new PreciseColor(0.5, 1, 0.5);
 	public static final PreciseColor LIGHT_BLUE = new PreciseColor(0.5, 0.5, 1);
@@ -50,7 +53,9 @@ public class PreciseColors {
 	public static final PreciseColor LIGHT_MAGENTA = new PreciseColor(1, 0.5, 1);
 	public static final PreciseColor LIGHT_CYAN = new PreciseColor(0.5, 1, 1);
 
-	// === Dark normal ===
+	/*
+	 * DARK NORMAL
+	 */
 	public static final PreciseColor DARK_GOLD = new PreciseColor(0.5, 0.425, 0);
 	public static final PreciseColor DARK_SILVER = new PreciseColor(0.325, 0.33, 0.335);
 	public static final PreciseColor DARK_LIME = new PreciseColor(0.375, 0.5, 0);
@@ -59,7 +64,9 @@ public class PreciseColors {
 	public static final PreciseColor DARK_BROWN = new PreciseColor(0.4, 0.25, 0.12);
 	public static final PreciseColor DARK_PINK = new PreciseColor(1, 0.41, 0.71);
 
-	// === Light normal ===
+	/*
+	 * LIGHT NORMAL
+	 */
 	public static final PreciseColor LIGHT_GOLD = new PreciseColor(1, 0.7, 0.2);
 	public static final PreciseColor LIGHT_SILVER = new PreciseColor(0.8, 0.8, 0.8);
 	public static final PreciseColor LIGHT_LIME = new PreciseColor(0.8, 1, 0.2);
@@ -68,9 +75,12 @@ public class PreciseColors {
 	public static final PreciseColor LIGHT_BROWN = new PreciseColor(0.7, 0.6, 0.5);
 	public static final PreciseColor LIGHT_PINK = new PreciseColor(1, 0.71, 0.76);
 
-	// === Minecraft ===
-	// Mojang
+	/*
+	 * MINECRAFT
+	 */
 	public static final PreciseColor MOJANG_RED = new PreciseColor(1, 0, 0.5);
+	public static final PreciseColor MINECRAFT_MISSING_TEXTURE_PURPLE = PreciseColor.of(0xF800F8);
+	public static final PreciseColor MINECRAFT_MISSING_TEXTURE_BLACK = PreciseColor.of(0x000000);
 	// Foreground
 	public static final PreciseColor MINECOIN_GOLD = PreciseColor.of(0xDDD605);
 	public static final PreciseColor MINECRAFT_BLACK = PreciseColor.of(0x000000);
@@ -108,11 +118,10 @@ public class PreciseColors {
 	public static final PreciseColor MINECRAFT_BACKGROUND_LIGHT_PURPLE = PreciseColor.of(0x3F153F);
 	public static final PreciseColor MINECRAFT_BACKGROUND_YELLOW = PreciseColor.of(0x3F3F15);
 	public static final PreciseColor MINECRAFT_BACKGROUND_WHITE = PreciseColor.of(0x3F3F3F);
-	// Miscellaneous
-	public static final PreciseColor MINECRAFT_MISSING_TEXTURE_PURPLE = PreciseColor.of(0xF800F8);
-	public static final PreciseColor MINECRAFT_MISSING_TEXTURE_BLACK = PreciseColor.of(0x000000);
 
-	// === Fashionable ===
+	/*
+	 * FASHIONABLE
+	 */
 	public static final PreciseColor TURQUOISE = new PreciseColor(0.25, 0.88, 0.82);
 	public static final PreciseColor TEAL = new PreciseColor(0, 0.5, 0.5);
 	public static final PreciseColor OLIVE = new PreciseColor(0.5, 0.5, 0);
@@ -165,4 +174,5 @@ public class PreciseColors {
 	public static final PreciseColor SLATE_GRAY = new PreciseColor(0.44, 0.5, 0.56);
 	public static final PreciseColor SLATE_GREEN = new PreciseColor(0.31, 0.5, 0.44);
 	public static final PreciseColor TIN = new PreciseColor(0.8, 0.8, 0.8);
+	public static final PreciseColor TIN_SHINE = new PreciseColor(0.9, 0.9, 0.9);
 }

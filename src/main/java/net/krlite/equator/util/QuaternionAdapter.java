@@ -1,13 +1,10 @@
 package net.krlite.equator.util;
 
-import net.krlite.equator.annotation.See;
 import org.joml.Quaterniond;
 import org.joml.Quaterniondc;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 
-@See(Quaternionfc.class)
-@See(Quaterniondc.class)
 public class QuaternionAdapter {
 	public static Quaterniond fromEulerDeg(double x, double y, double z, double w) {
 		return new Quaterniond(Math.toRadians(x), Math.toRadians(y), Math.toRadians(z), w);

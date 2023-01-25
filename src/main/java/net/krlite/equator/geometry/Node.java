@@ -6,7 +6,7 @@ import net.krlite.equator.color.core.BasicRGBA;
 import net.krlite.equator.core.Operatable;
 import net.krlite.equator.core.ShortStringable;
 import net.krlite.equator.core.SimpleOperations;
-import net.krlite.equator.function.AngleFunctions;
+import net.krlite.equator.math.AngleFunctions;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.Vec3d;
 

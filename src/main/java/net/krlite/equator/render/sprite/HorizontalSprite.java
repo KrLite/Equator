@@ -1,6 +1,5 @@
 package net.krlite.equator.render.sprite;
 
-import net.krlite.equator.annotation.See;
 import net.krlite.equator.core.ShortStringable;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -8,7 +7,6 @@ import net.minecraft.util.math.MathHelper;
 /**
  * A sprite that defines a horizontal set of {@link IdentifierSprite}s.
  */
-@See(IdentifierSprite.class)
 public record HorizontalSprite(Identifier identifier, int step) implements ShortStringable, Cloneable {
     /**
      * Creates a {@link HorizontalSprite} by splitting an {@link Identifier} horizontally into slices.

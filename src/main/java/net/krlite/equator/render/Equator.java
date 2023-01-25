@@ -2,7 +2,6 @@ package net.krlite.equator.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.krlite.equator.annotation.See;
 import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.color.PreciseColors;
 import net.krlite.equator.color.core.BasicRGBA;
@@ -14,8 +13,6 @@ import net.krlite.equator.util.QuaternionAdapter;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
-import net.minecraft.client.render.block.BlockRenderManager;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.texture.SpriteAtlasTexture;
@@ -525,9 +522,8 @@ public class Equator {
 		RenderSystem.applyModelViewMatrix();
 	}
 
-	@See(ItemRenderer.class)
 	public record ItemModel(ItemStack itemStack) implements ShortStringable, Cloneable {
-		public ItemModel render(Vec3d pos, boolean leftHanded, @See(QuaternionAdapter.class) Quaterniondc quaternion) {
+		public ItemModel render(Vec3d pos, boolean leftHanded, Quaterniondc quaternion) {
 			BakedModel bakedModel = MinecraftClient.getInstance().getItemRenderer().getModel(itemStack, null, null, 0);
 			prepareModel();
 			MatrixStack matrixStack = RenderSystem.getModelViewStack();
@@ -651,9 +647,8 @@ public class Equator {
 		}
 	}
 
-	@See(BlockRenderManager.class)
 	public record BlockModel(BlockState blockState) implements ShortStringable, Cloneable {
-		public BlockModel render(Vec3d pos, @See(QuaternionAdapter.class) Quaterniondc quaternion) {
+		public BlockModel render(Vec3d pos, Quaterniondc quaternion) {
 			prepareModel();
 			MatrixStack matrixStack = RenderSystem.getModelViewStack();
 
