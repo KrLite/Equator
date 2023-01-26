@@ -2,4 +2,4 @@
 
 ![Banner](https://github.com/KrLite/Equator/blob/1.19.3/artwork/banner.png)
 
-# This branch is for Equator on Minecraft `1.18.2.`
+# Branch for Equator on Minecraft `1.18.2.`
