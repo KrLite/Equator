@@ -10,15 +10,30 @@ With **Equator,** you can render and manage texture resources with ease, and get
 
 ## TL;DR
 
+### 1. Implement Equator in your `build.gradle`
+
 ```groovy
 repositories {
-    maven { url "https://api.modrinth.com/maven" }
     maven { url "https://jitpack.io" }
 }
 
 dependencies {
-    modImplementation "maven.modrinth:equator:v{x}"
-    implementation include("com.github.KrLite:Equator-Utils:v{x}")
+    modImplementation "com.github.KrLite:Equator:{a.b.c}+{v1}"
+    implementation include("com.github.KrLite:Equator-Utils:{v2}")
+}
+```
+
+> In above:
+>
+> - `{a.b.c}` The target `Minecraft version`
+> - `{v1}` The latest [`JitPack version`](https://jitpack.io/#KrLite/Equator) of **Equator**
+> - `v{x2}` The latest [`JitPack version`](https://jitpack.io/#KrLite/Equator-Utils) of **Equator Utils**
+
+### 2. Add Equator as a mod dependent
+
+```json
+"depends": {
+  "equator": "*"
 }
 ```
 
@@ -32,59 +47,73 @@ dependencies {
 
 ## Implementation
 
-You can use **[Modrinth Maven](https://docs.modrinth.com/docs/tutorials/maven/)** to implement **Equator** and **[JitPack](https://jitpack.io/#KrLite/Equator)** to implement **[Equator Utils.](https://github.com/KrLite/Equator-Utils)**
+You can use **[Modrinth Maven](https://docs.modrinth.com/docs/tutorials/maven/)** to implement **Equator,** or use **[JitPack](https://jitpack.io/#KrLite/Equator)** to implement both **Equator** and **[Equator Utils.](https://github.com/KrLite/Equator-Utils)**
 
 Add the content below to your `build.gradle:`
 
+- **Modrinth Maven**
+
 ```groovy
 repositories {
-    // Modrinth Maven, for the mod Equator
     maven { url = "https://api.modrinth.com/maven" }
-    
-    // JitPack, for Equator Utils(you probably want this too)
     maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-    modImplementation "maven.modrinth:equator:v{x}"
-    implementation include("com.github.KrLite:Equator-Utils:v{x}")
+    modImplementation "maven.modrinth:equator:{v1}"
+    implementation include("com.github.KrLite:Equator-Utils:{v2}")
+}
+```
+
+> In above:
+>
+> - `{v1}` The latest [`Modrinth version id`](https://modrinth.com/mod/equator/versions) of **Equator**
+> - `{v2}` The latest [`JitPack version`](https://jitpack.io/#KrLite/Equator-Utils) of **Equator Utils**
+
+> For example: `{v1} → v1.0` `{v2} → v1.0.0`
+
+- **JitPack**
+
+```groovy
+repositories {
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    modImplementation "com.github.KrLite:Equator:{a.b.c}+{v1}"
+    implementation include("com.github.KrLite:Equator-Utils:{v2}")
 }
 ```
 
 > In above:
 > 
-> - `v{x}` in `maven.modrinth:equator:{x}` should be the latest [`version id`](https://modrinth.com/mod/equator/versions) of **Equator,** equals to the [`tag name.`](https://github.com/KrLite/Equator/tags)
-> - `v{x}` in `com.github.KrLite:Equator-Utils:v{x}` should be the latest [`tag name`](https://github.com/KrLite/Equator-Utils/tags) of Equator Utils.
+> - `{a.b.c}` The target `Minecraft version`
+> - `{v1}` The latest [`JitPack version`](https://jitpack.io/#KrLite/Equator) of **Equator**
+> - `v{x2}` The latest [`JitPack version`](https://jitpack.io/#KrLite/Equator-Utils) of **Equator Utils**
 
-If you do not implement **Equator Utils,** **Equator** can still function fully, but you may not be able to access many convenient methods that **Equator** uses. To only implement **Equator,** refer to the content below:
+> For example: `{a.b.c}+{v1} → 1.19.3+v1.0` `{v2} → v1.0.0`
 
-```groovy
-repositories {
-    maven { url = "https://api.modrinth.com/maven" }
-}
-
-dependencies {
-    modImplementation "maven.modrinth:equator:{x}"
-}
-```
+If you do not implement **Equator Utils,** **Equator** can still function fully, but you may not be able to access many convenient methods that **Equator** uses.
 
 ## Dependency
 
-Finally, don't forget to add **Equator** as a mod dependent in your `fabric.mod.json:`
+Finally, don't forget to add **Equator** as a mod dependent in your `fabric/quilt.mod.json:`
+
+- **Fabric**
 
 ```json
 "depends": {
-    "equator": "*"
+  "equator": "*"
 }
 ```
 
-And Quilt, in your `quilt.mod.json:`
+- **Quilt**
 
 ```json
 "depends": [
-      {
-        "id": "equator",
-        "versions": "*"
-      }
-    ]
+  {
+    "id": "equator",
+    "versions": "*"
+  }
+]
 ```
