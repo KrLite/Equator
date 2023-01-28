@@ -112,6 +112,10 @@ public class Rect extends HashCodeComparable implements ShortStringable, SimpleO
 		this(new Node(x, y), new Node(x, y + height), new Node(x + width, y + height), new Node(x + width, y));
 	}
 
+	public Rect(Node leftTopVertex, Node rightBottomVertex) {
+		this(leftTopVertex.getX(), leftTopVertex.getY(), rightBottomVertex.getX() - leftTopVertex.getX(), rightBottomVertex.getY() - leftTopVertex.getY());
+	}
+
 	public Rect(Node origin, double width, double height) {
 		this(origin.getX(), origin.getY(), width, height);
 	}

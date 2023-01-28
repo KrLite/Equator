@@ -1,5 +1,6 @@
 package net.krlite.equator.color.core;
 
+import com.scrtwpns.Mixbox;
 import net.krlite.equator.core.ShortStringable;
 import net.krlite.equator.core.SimpleOperations;
 import org.jetbrains.annotations.NotNull;
@@ -151,6 +152,27 @@ public interface BasicRGBA<C extends BasicRGBA<C>> extends ShortStringable, Simp
 
 	default BasicRGBA<?> blend(@NotNull BasicRGBA<?> another) {
 		return blend(another, 0.5);
+	}
+
+	default BasicRGBA<?> mix(@NotNull BasicRGBA<?> another, double ratio) {
+		if (!another.hasColor()) {
+			if (!hasColor()) return this;
+			return withOpacity(blendValue(another.getAlpha(), getAlpha(), ratio));
+		}
+		if (!hasColor())
+			return withOpacity(blendValue(getAlpha(), another.getAlpha(), ratio));
+		float[] mixed = Mixbox.lerpFloat(new float[]{getRedFloat(), getGreenFloat(), getBlueFloat(), getAlphaFloat()},
+				new float[]{another.getRedFloat(), another.getGreenFloat(), another.getBlueFloat(), another.getAlphaFloat()},
+				(float) ratio);
+		return withRed(mixed[0]).withGreen(mixed[1]).withBlue(mixed[2]).withOpacity(mixed[3]);
+	}
+
+	default BasicRGBA<?> mix(@NotNull BasicRGBA<?> another) {
+		return mix(another, 0.5F);
+	}
+
+	default BasicRGBA<?> blendOrMix(@NotNull BasicRGBA<?> another, double ratio, boolean pigmentMix) {
+		return pigmentMix ? mix(another, ratio) : blend(another, ratio);
 	}
 
 	default BasicRGBA<?> average(@NotNull BasicRGBA<?>... others) {

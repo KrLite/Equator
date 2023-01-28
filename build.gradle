@@ -19,6 +19,9 @@ dependencies {
 
 	/* Equator Utils */
 	implementation include("com.github.KrLite:Equator-Utils:${project.eu_version}")
+
+	/* Mixbox */
+	implementation include("com.scrtwpns:mixbox:2.0.0")
 }
 
 processResources {

@@ -18,6 +18,7 @@ import net.minecraft.client.render.model.json.ModelTransformation;
 import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Contract;
@@ -33,54 +34,60 @@ import org.joml.Quaterniondc;
 public class Equator {
 	public record Renderer(@NotNull MatrixStack matrixStack, @NotNull IdentifierSprite identifierSprite)
 			implements ShortStringable, Cloneable {
-		public Renderer swap(@NotNull MatrixStack matrixStack) {
+		@Contract("_ -> new")
+		public @NotNull Renderer swap(@NotNull MatrixStack matrixStack) {
 			return new Renderer(matrixStack, identifierSprite);
 		}
 
-		public Renderer swap(@NotNull IdentifierSprite identifierSprite) {
+		@Contract("_ -> new")
+		public @NotNull Renderer swap(@NotNull IdentifierSprite identifierSprite) {
 			return new Renderer(matrixStack, identifierSprite);
 		}
 
-		public Renderer renderRect(@NotNull Rect.Tinted tinted) {
+		public Renderer render(@NotNull Rect.Tinted tinted) {
 			Tessellator tessellator = prepare(tinted.getCenterNode());
 			BufferBuilder builder = tessellator.getBuffer();
 			builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 
-			renderRect(builder, tinted);
+			render(builder, tinted);
 
 			cleanup(tessellator);
 			return this;
 		}
 
-		public Renderer renderRect(@NotNull Rect rect) {
-			return renderRect(rect.tint(PreciseColor.WHITE));
+		public Renderer render(@NotNull Rect rect) {
+			return render(rect.tint(PreciseColor.WHITE));
 		}
 
-		public Renderer renderRect(double x, double y, double width, double height, @NotNull BasicRGBA<?> tint) {
-			return renderRect(new Rect(x, y, width, height).tint(tint));
+		public Renderer render(double x, double y, double width, double height, @NotNull BasicRGBA<?> tint) {
+			return render(new Rect(x, y, width, height).tint(tint));
 		}
 
-		public Renderer renderRect(double x, double y, double width, double height) {
-			return renderRect(x, y, width, height, PreciseColor.WHITE);
+		public Renderer render(Node leftTopVertex, double width, double height, @NotNull BasicRGBA<?> tint) {
+			return render(new Rect(leftTopVertex, width, height).tint(tint));
 		}
 
-		public Renderer centeredRect(double xCentered, double yCentered, double width, double height, @NotNull BasicRGBA<?> tint) {
-			return renderRect(xCentered - width / 2, yCentered - height / 2, width, height, tint);
+		public Renderer render(Node leftTopVertex, double width, double height) {
+			return render(leftTopVertex, width, height, PreciseColor.WHITE);
 		}
 
-		public Renderer centeredRect(double xCentered, double yCentered, double width, double height) {
-			return centeredRect(xCentered, yCentered, width, height, PreciseColor.WHITE);
+		public Renderer renderCentered(Node center, double width, double height, @NotNull BasicRGBA<?> tint) {
+			return render(center.getX() - width / 2, center.getY() - height / 2, width, height, tint);
 		}
 
-		public Renderer overlay(@NotNull BasicRGBA<?> tint) {
-			return renderRect(Rect.fullScreen().tint(tint));
+		public Renderer renderCentered(Node center, double width, double height) {
+			return renderCentered(center, width, height, PreciseColor.WHITE);
 		}
 
-		public Renderer overlay() {
-			return overlay(PreciseColor.WHITE);
+		public Renderer renderOverlay(@NotNull BasicRGBA<?> tint) {
+			return render(Rect.fullScreen().tint(tint));
 		}
 
-		public Renderer fixedOverlay(@NotNull BasicRGBA<?> tint) {
+		public Renderer renderOverlay() {
+			return renderOverlay(PreciseColor.WHITE);
+		}
+
+		public Renderer renderFixedOverlay(@NotNull BasicRGBA<?> tint) {
 			int width = MinecraftClient.getInstance().getWindow().getScaledWidth(),
 					height = MinecraftClient.getInstance().getWindow().getScaledHeight();
 
@@ -89,138 +96,114 @@ public class Equator {
 			// Upper
 			if (width > height)
 				swap(identifierSprite.mask(0.5F, 0, 0.5F, 0.5F))
-						.renderRect(fixedSize, 0, width - fixedSize * 2, fixedSize, tint);
+						.render(fixedSize, 0, width - fixedSize * 2, fixedSize, tint);
 			// Left upper
 			swap(identifierSprite.mask(0, 0, 0.5F, 0.5F))
-					.renderRect(0, 0, fixedSize, fixedSize, tint);
+					.render(0, 0, fixedSize, fixedSize, tint);
 
 			// Left
 			if (height > width)
 				swap(identifierSprite.mask(0, 0.5F, 0.5F, 0.5F))
-						.renderRect(0, fixedSize, fixedSize, height - fixedSize * 2, tint);
+						.render(0, fixedSize, fixedSize, height - fixedSize * 2, tint);
 			// Left lower
 			swap(identifierSprite.mask(0, 0.5F, 0.5F, 1))
-					.renderRect(0, height - fixedSize, fixedSize, fixedSize, tint);
+					.render(0, height - fixedSize, fixedSize, fixedSize, tint);
 
 			// Lower
 			if (width > height)
 				swap(identifierSprite.mask(0.5F, 0.5F, 0.5F, 1))
-						.renderRect(fixedSize, height - fixedSize, width - fixedSize * 2, fixedSize, tint);
+						.render(fixedSize, height - fixedSize, width - fixedSize * 2, fixedSize, tint);
 			// Right lower
 			swap(identifierSprite.mask(0.5F, 0.5F, 1, 1))
-					.renderRect(width - fixedSize, height - fixedSize, fixedSize, fixedSize, tint);
+					.render(width - fixedSize, height - fixedSize, fixedSize, fixedSize, tint);
 
 			// Right
 			if (height > width)
 				swap(identifierSprite.mask(0.5F, 0.5F, 1, 0.5F))
-						.renderRect(width - fixedSize, fixedSize, fixedSize, height - fixedSize * 2, tint);
+						.render(width - fixedSize, fixedSize, fixedSize, height - fixedSize * 2, tint);
 			// Right upper
 			swap(identifierSprite.mask(0.5F, 0, 1, 0.5F))
-					.renderRect(width - fixedSize, 0, fixedSize, fixedSize, tint);
+					.render(width - fixedSize, 0, fixedSize, fixedSize, tint);
 
 			// Center
 			if (width != height)
 				swap(identifierSprite.mask(0.5F, 0.5F, 0.5F, 0.5F))
-						.renderRect(fixedSize, fixedSize, width - fixedSize * 2, height - fixedSize * 2, tint);
+						.render(fixedSize, fixedSize, width - fixedSize * 2, height - fixedSize * 2, tint);
 
 			return this;
 		}
 
-		public Renderer fixedOverlay() {
-			return fixedOverlay(PreciseColor.WHITE);
+		public Renderer renderFixedOverlay() {
+			return renderFixedOverlay(PreciseColor.WHITE);
 		}
 
-		public Renderer scaledOverlay(@NotNull BasicRGBA<?> tint, float aspectRatio) {
+		public Renderer renderScaledOverlay(@NotNull BasicRGBA<?> tint, float aspectRatio) {
         	float screenAspectRatio = (float) MinecraftClient.getInstance().getWindow().getScaledHeight() /
 											  (float) MinecraftClient.getInstance().getWindow().getScaledWidth();
 
 			return swap(identifierSprite.mask(
 						(1 - Math.min(aspectRatio / screenAspectRatio, 1)) / 2, (1 - Math.min(screenAspectRatio / aspectRatio, 1)) / 2,
                         	(1 + Math.min(aspectRatio / screenAspectRatio, 1)) / 2, (1 + Math.min(screenAspectRatio / aspectRatio, 1)) / 2
-					)).overlay(tint);
+					)).renderOverlay(tint);
 		}
 
-		public Renderer scaledOverlay(@NotNull BasicRGBA<?> tint) {
-			return scaledOverlay(tint, 1);
+		public Renderer renderScaledOverlay(float aspectRatio) {
+			return renderScaledOverlay(PreciseColor.WHITE, aspectRatio);
 		}
 
-		public Renderer scaledOverlay(float aspectRatio) {
-			return scaledOverlay(PreciseColor.WHITE, aspectRatio);
+		public Renderer renderScaledOverlay(@NotNull BasicRGBA<?> tint, double width, double height) {
+			return renderScaledOverlay(tint, (float) (height / width));
 		}
 
-		public Renderer scaledOverlay() {
-			return scaledOverlay(PreciseColor.WHITE);
+		public Renderer renderScaledOverlay(double width, double height) {
+			return renderScaledOverlay(PreciseColor.WHITE, width, height);
 		}
 
-		public Renderer scaledOverlay(@NotNull BasicRGBA<?> tint, double width, double height) {
-			return scaledOverlay(tint, (float) (height / width));
-		}
-
-		public Renderer scaledOverlay(double width, double height) {
-			return scaledOverlay(PreciseColor.WHITE, width, height);
-		}
-
-		public Renderer clampedOverlay(@NotNull BasicRGBA<?> tint, float aspectRatio) {
+		public Renderer renderClampedOverlay(@NotNull BasicRGBA<?> tint, float aspectRatio) {
 			float screenAspectRatio = (float) MinecraftClient.getInstance().getWindow().getScaledHeight() /
 											  (float) MinecraftClient.getInstance().getWindow().getScaledWidth();
 
-			return renderRect(Rect.scaledScreen(
+			return render(Rect.scaledScreen(
 					Math.min(1, (1 + Math.min(screenAspectRatio / aspectRatio, 1))),
 					Math.min(1, (1 + Math.min(aspectRatio / screenAspectRatio, 1)))
 			).tint(tint));
 		}
 
-		public Renderer clampedOverlay(@NotNull BasicRGBA<?> tint) {
-			return clampedOverlay(tint, 1);
+		public Renderer renderClampedOverlay(float aspectRatio) {
+			return renderClampedOverlay(PreciseColor.WHITE, aspectRatio);
 		}
 
-		public Renderer clampedOverlay(float aspectRatio) {
-			return clampedOverlay(PreciseColor.WHITE, aspectRatio);
+		public Renderer renderClampedOverlay(@NotNull BasicRGBA<?> tint, double width, double height) {
+			return renderClampedOverlay(tint, (float) (height / width));
 		}
 
-		public Renderer clampedOverlay() {
-			return clampedOverlay(PreciseColor.WHITE);
+		public Renderer renderClampedOverlay(double width, double height) {
+			return renderClampedOverlay(PreciseColor.WHITE, width, height);
 		}
 
-		public Renderer clampedOverlay(@NotNull BasicRGBA<?> tint, double width, double height) {
-			return clampedOverlay(tint, (float) (height / width));
-		}
-
-		public Renderer clampedOverlay(double width, double height) {
-			return clampedOverlay(PreciseColor.WHITE, width, height);
-		}
-
-		public Renderer tiledOverlay(@NotNull BasicRGBA<?> tint, float aspectRatio) {
+		public Renderer renderTiledOverlay(@NotNull BasicRGBA<?> tint, float aspectRatio) {
 			float screenAspectRatio = (float) MinecraftClient.getInstance().getWindow().getScaledHeight() /
 											  (float) MinecraftClient.getInstance().getWindow().getScaledWidth();
 
 			return swap(identifierSprite.mask(
 					(1 - Math.max(aspectRatio / screenAspectRatio, 1)) / 2, (1 - Math.max(screenAspectRatio / aspectRatio, 1)) / 2,
 					(1 + Math.max(aspectRatio / screenAspectRatio, 1)) / 2, (1 + Math.max(screenAspectRatio / aspectRatio, 1)) / 2
-			)).overlay(tint);
+			)).renderOverlay(tint);
 		}
 
-		public Renderer tiledOverlay(@NotNull BasicRGBA<?> tint) {
-			return tiledOverlay(tint, 1);
+		public Renderer renderTiledOverlay(float aspectRatio) {
+			return renderTiledOverlay(PreciseColor.WHITE, aspectRatio);
 		}
 
-		public Renderer tiledOverlay(float aspectRatio) {
-			return tiledOverlay(PreciseColor.WHITE, aspectRatio);
+		public Renderer renderTiledOverlay(@NotNull BasicRGBA<?> tint, double width, double height) {
+			return renderTiledOverlay(tint, (float) (height / width));
 		}
 
-		public Renderer tiledOverlay() {
-			return tiledOverlay(PreciseColor.WHITE);
+		public Renderer renderTiledOverlay(double width, double height) {
+			return renderTiledOverlay(PreciseColor.WHITE, width, height);
 		}
 
-		public Renderer tiledOverlay(@NotNull BasicRGBA<?> tint, double width, double height) {
-			return tiledOverlay(tint, (float) (height / width));
-		}
-
-		public Renderer tiledOverlay(double width, double height) {
-			return tiledOverlay(PreciseColor.WHITE, width, height);
-		}
-
-		public Renderer tiledBackground(@NotNull BasicRGBA<?> tint, float aspectRatio, float contraction, float uOffset, float vOffset) {
+		public Renderer renderTiledBackground(@NotNull BasicRGBA<?> tint, float aspectRatio, float contraction, float uOffset, float vOffset) {
 			int
 					width = MinecraftClient.getInstance().getWindow().getScaledWidth(),
 					height = MinecraftClient.getInstance().getWindow().getScaledHeight();
@@ -232,23 +215,23 @@ public class Equator {
 
 			return swap(identifierSprite.mask(
 					0.5F + u + uOffset, 0.5F + v + vOffset, 0.5F - u + uOffset, 0.5F - v + vOffset
-			)).overlay(tint);
+			)).renderOverlay(tint);
 		}
 
-		public Renderer tiledBackground(@NotNull BasicRGBA<?> tint, float aspectRatio, float contraction) {
-			return tiledBackground(tint, aspectRatio, contraction, 0, 0);
+		public Renderer renderTiledBackground(@NotNull BasicRGBA<?> tint, float aspectRatio) {
+			return renderTiledBackground(tint, aspectRatio, 7.5F, 0, 0);
 		}
 
-		public Renderer tiledBackground(@NotNull BasicRGBA<?> tint, float aspectRatio) {
-			return tiledBackground(tint, aspectRatio, 7);
+		public Renderer renderTiledBackground(float aspectRatio) {
+			return renderTiledBackground(PreciseColor.WHITE, aspectRatio);
 		}
 
-		public Renderer tiledBackground(@NotNull BasicRGBA<?> tint) {
-			return tiledBackground(tint, 1);
+		public Renderer renderTiledBackground(@NotNull BasicRGBA<?> tint, double width, double height) {
+			return renderTiledBackground(tint, (float) (height / width), (float) Math.max(width / MinecraftClient.getInstance().getWindow().getScaledWidth(), height / MinecraftClient.getInstance().getWindow().getScaledHeight()), 0, 0);
 		}
 
-		public Renderer tiledBackground() {
-			return tiledBackground(PreciseColor.WHITE);
+		public Renderer renderTiledBackground(double width, double height) {
+			return renderTiledBackground(PreciseColor.WHITE, width, height);
 		}
 
 		private Tessellator prepare() {
@@ -288,21 +271,11 @@ public class Equator {
 					).next();
 		}
 
-		private void renderRect(@NotNull BufferBuilder builder, @NotNull Rect.Tinted tinted) {
+		private void render(@NotNull BufferBuilder builder, @NotNull Rect.Tinted tinted) {
 			renderVertex(builder, tinted.getRightTopNode(), identifierSprite.uEnd(), identifierSprite.vBegin());
 			renderVertex(builder, tinted.getLeftTopNode(), identifierSprite.uBegin(), identifierSprite.vBegin());
 			renderVertex(builder, tinted.getLeftBottomNode(), identifierSprite.uBegin(), identifierSprite.vEnd());
 			renderVertex(builder, tinted.getRightBottomNode(), identifierSprite.uEnd(), identifierSprite.vEnd());
-		}
-
-		private void renderFixedRect(
-				@NotNull BufferBuilder builder, @NotNull Rect.Tinted tinted,
-				float uBegin, float vBegin, float uEnd, float vEnd
-		) {
-			renderVertex(builder, tinted.getRightTopNode(), uEnd, vBegin);
-			renderVertex(builder, tinted.getLeftTopNode(), uBegin, vBegin);
-			renderVertex(builder, tinted.getLeftBottomNode(), uBegin, vEnd);
-			renderVertex(builder, tinted.getRightBottomNode(), uEnd, vEnd);
 		}
 
 		@Override
@@ -316,149 +289,122 @@ public class Equator {
 	}
 
 	public record Painter(@NotNull MatrixStack matrixStack) implements ShortStringable, Cloneable {
-		public Painter swap(@NotNull MatrixStack matrixStack) {
+		@Contract("_ -> new")
+		public @NotNull Painter swap(@NotNull MatrixStack matrixStack) {
 			return new Painter(matrixStack);
 		}
 
 		@Contract("_ -> this")
-		public Painter paintRect(@NotNull Rect.Tinted tinted) {
+		public Painter paint(@NotNull Rect.Tinted tinted) {
 			Tessellator tessellator = prepare();
 			BufferBuilder builder = tessellator.getBuffer();
 			builder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
 
-			paintRect(builder, tinted.cut());
+			paint(builder, tinted.cut());
 
 			cleanup(tessellator);
 			return this;
 		}
 
-		public Painter overlay(@Nullable BasicRGBA<?> tint) {
-			return tint == null ? this : paintRect(Rect.fullScreen().tint(tint));
+		public Painter paintSimpleVerticalGradiant(Rect rect, BasicRGBA<?> top, BasicRGBA<?> bottom) {
+			return paint(rect.tint(top, bottom, bottom, top));
+		}
+
+		public Painter paintSimpleHorizontalGradiant(Rect rect, BasicRGBA<?> left, BasicRGBA<?> right) {
+			return paint(rect.tint(left, left, right, right));
+		}
+
+		public Painter paintOverlay(@Nullable BasicRGBA<?> tint) {
+			return tint == null ? this : paint(Rect.fullScreen().tint(tint));
 		}
 
 		public Painter paintPoint(@NotNull Node.Tinted tinted, double size) {
-			return paintRect(new Rect(tinted.getX() - size / 2, tinted.getY() - size / 2, size, size).tint(tinted));
+			return paint(new Rect(tinted.getX() - size / 2, tinted.getY() - size / 2, size, size).tint(tinted));
 		}
 
 		public Painter paintPoint(@NotNull Node.Tinted tinted) {
 			return paintPoint(tinted, 1);
 		}
 
-		public Painter paintLine(@NotNull Node.Tinted start, @NotNull Node.Tinted end, double width) {
+		public Painter paintLine(@NotNull Node.Tinted start, @NotNull Node.Tinted end, double boldness, boolean pigmentMix) {
 			double angle = start.angleTo(end);
-			return paintRect(Rect.Tinted.of(
-					start.operate(node -> node.rotate(node.shift(0, -width / 2), angle)),
-					start.operate(node -> node.rotate(node.shift(0, width / 2), angle)),
-					end.operate(node -> node.rotate(node.shift(0, width / 2), angle)),
-					end.operate(node -> node.rotate(node.shift(0, -width / 2), angle))
-			));
+			if (!pigmentMix) {
+				return paint(Rect.Tinted.of(
+						start.operate(node -> node.rotate(node.shift(0, -boldness / 2), angle)),
+						start.operate(node -> node.rotate(node.shift(0, boldness / 2), angle)),
+						end.operate(node -> node.rotate(node.shift(0, boldness / 2), angle)),
+						end.operate(node -> node.rotate(node.shift(0, -boldness / 2), angle))
+				));
+			} else {
+				return paintHorizontalGradiant(new Rect(start.getNode(), start.distanceTo(end), boldness).shift(0, -boldness / 2.0)
+													   .rotateBy(start.getNode(), angle), start, end, true);
+			}
 		}
 
-		public Painter paintLine(@NotNull Node.Tinted start, @NotNull Node.Tinted end) {
-			return paintLine(start, end, 1);
+		public Painter paintLine(@NotNull Node.Tinted start, @NotNull Node.Tinted end, boolean pigmentMix) {
+			return paintLine(start, end, 1, pigmentMix);
 		}
 
-		public Painter missingTexture(@NotNull Rect rect) {
-			return paintRect(rect.meshByGrid(2, 2, 1, 1).tint(PreciseColors.MINECRAFT_MISSING_TEXTURE_PURPLE))
-						   .paintRect(rect.meshByGrid(2, 2, 1, 2).tint(PreciseColors.MINECRAFT_MISSING_TEXTURE_BLACK))
-						   .paintRect(rect.meshByGrid(2, 2, 2, 1).tint(PreciseColors.MINECRAFT_MISSING_TEXTURE_BLACK))
-						   .paintRect(rect.meshByGrid(2, 2, 2, 2).tint(PreciseColors.MINECRAFT_MISSING_TEXTURE_PURPLE));
-		}
-
-		public Painter verticalGradiant(@NotNull Rect rect, @NotNull BasicRGBA<?> upper, @NotNull BasicRGBA<?> lower) {
-			return paintRect(rect.tint(upper, lower, lower, upper));
-		}
-
-		public Painter horizontalGradiant(@NotNull Rect rect, @NotNull BasicRGBA<?> left, @NotNull BasicRGBA<?> right) {
-			return paintRect(rect.tint(left, left, right, right));
-		}
-
-		public Painter verticalGradiant(@NotNull BasicRGBA<?> upper, @NotNull BasicRGBA<?> lower) {
-			return verticalGradiant(Rect.fullScreen(), upper, lower);
-		}
-
-		public Painter horizontalGradiant(@NotNull BasicRGBA<?> left, @NotNull BasicRGBA<?> right) {
-			return horizontalGradiant(Rect.fullScreen(), left, right);
+		public Painter paintMissingTexture(@NotNull Rect rect) {
+			return paint(rect.meshByGrid(2, 2, 1, 1).tint(PreciseColors.MINECRAFT_MISSING_TEXTURE_PURPLE))
+						   .paint(rect.meshByGrid(2, 2, 1, 2).tint(PreciseColors.MINECRAFT_MISSING_TEXTURE_BLACK))
+						   .paint(rect.meshByGrid(2, 2, 2, 1).tint(PreciseColors.MINECRAFT_MISSING_TEXTURE_BLACK))
+						   .paint(rect.meshByGrid(2, 2, 2, 2).tint(PreciseColors.MINECRAFT_MISSING_TEXTURE_PURPLE));
 		}
 
 		public static final double MIN_GRADIANT_AREA = 50;
 
-		@Contract("_, _ -> this")
-		public Painter verticalGradiant(@NotNull Rect.Tinted tinted, double upperToLowerAttenuation) {
+		public Painter paintVerticalGradiant(@NotNull Rect.Tinted tinted, double upperToLowerAttenuation, boolean pigmentMix) {
 			//upperToLowerAttenuation = nonLinearProjection(upperToLowerAttenuation);
-			if (tinted.getArea() <= MIN_GRADIANT_AREA) return paintRect(tinted);
+			if (tinted.getArea() <= MIN_GRADIANT_AREA) return paint(tinted);
 
-			return verticalGradiant(tinted.getRect().topHalf().tint(
-					tinted.getLeftTop(), tinted.getLeftBottom().blend(tinted.getLeftTop(), upperToLowerAttenuation),
-					tinted.getRightBottom().blend(tinted.getRightTop(), upperToLowerAttenuation), tinted.getRightTop()
-			), upperToLowerAttenuation)
-						   .verticalGradiant(tinted.getRect().bottomHalf().tint(
-					tinted.getLeftTop().blend(tinted.getLeftBottom(), 1 - upperToLowerAttenuation), tinted.getLeftBottom(),
-					tinted.getRightBottom(), tinted.getRightTop().blend(tinted.getRightBottom(), 1 - upperToLowerAttenuation)
-						   ), upperToLowerAttenuation);
+			return paintVerticalGradiant(tinted.getRect().topHalf().tint(
+					tinted.getLeftTop(), tinted.getLeftBottom().blendOrMix(tinted.getLeftTop(), upperToLowerAttenuation, pigmentMix),
+					tinted.getRightBottom().blendOrMix(tinted.getRightTop(), upperToLowerAttenuation, pigmentMix), tinted.getRightTop()
+			), upperToLowerAttenuation, pigmentMix)
+						   .paintVerticalGradiant(tinted.getRect().bottomHalf().tint(
+								   tinted.getLeftTop().blendOrMix(tinted.getLeftBottom(), 1 - upperToLowerAttenuation, pigmentMix), tinted.getLeftBottom(),
+								   tinted.getRightBottom(), tinted.getRightTop().blendOrMix(tinted.getRightBottom(), 1 - upperToLowerAttenuation, pigmentMix)
+						   ), upperToLowerAttenuation, pigmentMix);
 		}
 
-		@Contract("_, _ -> this")
-		public Painter horizontalGradiant(@NotNull Rect.Tinted tinted, double leftToRightAttenuation) {
+		public Painter paintHorizontalGradiant(@NotNull Rect.Tinted tinted, double leftToRightAttenuation, boolean pigmentMix) {
 			//leftToRightAttenuation = nonLinearProjection(leftToRightAttenuation);
-			if (tinted.getArea() <= MIN_GRADIANT_AREA) return paintRect(tinted);
+			if (tinted.getArea() <= MIN_GRADIANT_AREA) return paint(tinted);
 
-			return horizontalGradiant(tinted.getRect().leftHalf().tint(
+			return paintHorizontalGradiant(tinted.getRect().leftHalf().tint(
 					tinted.getLeftTop(), tinted.getLeftBottom(),
-					tinted.getRightBottom().blend(tinted.getLeftBottom(), leftToRightAttenuation),
-					tinted.getRightTop().blend(tinted.getLeftTop(), leftToRightAttenuation)
-			), leftToRightAttenuation)
-						   .horizontalGradiant(tinted.getRect().rightHalf().tint(
-					tinted.getLeftTop().blend(tinted.getRightTop(), 1 - leftToRightAttenuation),
-					tinted.getLeftBottom().blend(tinted.getRightBottom(), 1 - leftToRightAttenuation),
-					tinted.getRightBottom(), tinted.getRightTop()
-						   ), leftToRightAttenuation);
+					tinted.getRightBottom().blendOrMix(tinted.getLeftBottom(), leftToRightAttenuation, pigmentMix),
+					tinted.getRightTop().blendOrMix(tinted.getLeftTop(), leftToRightAttenuation, pigmentMix)
+			), leftToRightAttenuation, pigmentMix)
+						   .paintHorizontalGradiant(tinted.getRect().rightHalf().tint(
+								   tinted.getLeftTop().blendOrMix(tinted.getRightTop(), 1 - leftToRightAttenuation, pigmentMix),
+								   tinted.getLeftBottom().blendOrMix(tinted.getRightBottom(), 1 - leftToRightAttenuation, pigmentMix),
+								   tinted.getRightBottom(), tinted.getRightTop()
+						   ), leftToRightAttenuation, pigmentMix);
 		}
 
-		public Painter rectShadowWithScissor(@NotNull Rect.Tinted tinted, @NotNull Rect.Tinted scissor) {
+		public Painter paintVerticalGradiant(@NotNull Rect rect, @NotNull BasicRGBA<?> upper, @NotNull BasicRGBA<?> lower, boolean pigmentMix) {
+			return paintVerticalGradiant(rect.tint(upper, lower, lower, upper).cut(), 0.5, pigmentMix);
+		}
+
+		public Painter paintHorizontalGradiant(@NotNull Rect rect, @NotNull BasicRGBA<?> left, @NotNull BasicRGBA<?> right, boolean pigmentMix) {
+			return paintHorizontalGradiant(rect.tint(left, left, right, right).cut(), 0.5, pigmentMix);
+		}
+
+		public Painter paintRectShadowWithScissor(@NotNull Rect.Tinted tinted, @NotNull Rect.Tinted scissor, double attenuation, boolean pigmentMix) {
 			// Upper
-			return paintRect(Rect.Tinted.of(tinted.getLeftTopNode(), scissor.getLeftTopNode(), scissor.getRightTopNode(), tinted.getRightTopNode()))
+			return paintVerticalGradiant(Rect.Tinted.of(tinted.getLeftTopNode(), scissor.getLeftTopNode(), scissor.getRightTopNode(), tinted.getRightTopNode()).cut(), 1 - attenuation, pigmentMix)
 						   // Lower
-						   .paintRect(Rect.Tinted.of(scissor.getLeftBottomNode(), tinted.getLeftBottomNode(), tinted.getRightBottomNode(), scissor.getRightBottomNode()))
+						   .paintVerticalGradiant(Rect.Tinted.of(scissor.getLeftBottomNode(), tinted.getLeftBottomNode(), tinted.getRightBottomNode(), scissor.getRightBottomNode()).cut(), attenuation, pigmentMix)
 						   // Left
-						   .paintRect(Rect.Tinted.of(tinted.getLeftTopNode(), tinted.getLeftBottomNode(), scissor.getLeftBottomNode(), scissor.getLeftTopNode()))
+						   .paintHorizontalGradiant(Rect.Tinted.of(tinted.getLeftTopNode(), tinted.getLeftBottomNode(), scissor.getLeftBottomNode(), scissor.getLeftTopNode()).cut(), 1 - attenuation, pigmentMix)
 						   // Right
-						   .paintRect(Rect.Tinted.of(scissor.getRightTopNode(), scissor.getRightBottomNode(), tinted.getRightBottomNode(), tinted.getRightTopNode()));
+						   .paintHorizontalGradiant(Rect.Tinted.of(scissor.getRightTopNode(), scissor.getRightBottomNode(), tinted.getRightBottomNode(), tinted.getRightTopNode()).cut(), attenuation, pigmentMix);
 		}
 
-		public Painter rectShadowWithScissor(@NotNull Rect.Tinted tinted, @NotNull Rect.Tinted scissor, double attenuation) {
-			// Upper
-			return verticalGradiant(Rect.Tinted.of(tinted.getLeftTopNode(), scissor.getLeftTopNode(), scissor.getRightTopNode(), tinted.getRightTopNode()).cut(), 1 - attenuation)
-						   // Lower
-						   .verticalGradiant(Rect.Tinted.of(scissor.getLeftBottomNode(), tinted.getLeftBottomNode(), tinted.getRightBottomNode(), scissor.getRightBottomNode()).cut(), attenuation)
-						   // Left
-						   .horizontalGradiant(Rect.Tinted.of(tinted.getLeftTopNode(), tinted.getLeftBottomNode(), scissor.getLeftBottomNode(), scissor.getLeftTopNode()).cut(), 1 - attenuation)
-						   // Right
-						   .horizontalGradiant(Rect.Tinted.of(scissor.getRightTopNode(), scissor.getRightBottomNode(), tinted.getRightBottomNode(), tinted.getRightTopNode()).cut(), attenuation);
-		}
-
-		public Painter rectShadowWithScissor(@NotNull Rect.Tinted scissor, double attenuation) {
-			return rectShadowWithScissor(Rect.fullScreen().tint(PreciseColor.TRANSPARENT), scissor, attenuation);
-		}
-
-		public Painter rectShadowWithScissor(@NotNull Rect.Tinted scissor) {
-			return rectShadowWithScissor(Rect.fullScreen().tint(PreciseColor.TRANSPARENT), scissor);
-		}
-
-		public Painter rectShadow(@NotNull Rect.Tinted outer, @NotNull Rect.Tinted inner, double attenuation) {
-			return rectShadowWithScissor(outer, inner, attenuation).paintRect(inner);
-		}
-
-		public Painter rectShadow(@NotNull Rect.Tinted outer, @NotNull Rect.Tinted inner) {
-			return rectShadowWithScissor(outer, inner).paintRect(inner);
-		}
-
-		public Painter rectShadow(@NotNull Rect.Tinted inner, double attenuation) {
-			return rectShadow(Rect.fullScreen().tint(PreciseColor.TRANSPARENT), inner, attenuation);
-		}
-
-		public Painter rectShadow(@NotNull Rect.Tinted inner) {
-			return rectShadow(Rect.fullScreen().tint(PreciseColor.TRANSPARENT), inner);
+		public Painter paintRectShadow(@NotNull Rect.Tinted outer, @NotNull Rect.Tinted inner, double attenuation, boolean pigmentMix) {
+			return paintRectShadowWithScissor(outer, inner, attenuation, pigmentMix).paint(inner);
 		}
 
 		private Tessellator prepare() {
@@ -486,7 +432,7 @@ public class Equator {
 							vertex.getBlueFloat(), vertex.getAlphaFloat()).next();
 		}
 
-		private void paintRect(@NotNull BufferBuilder builder, @NotNull Rect.Tinted tinted) {
+		private void paint(@NotNull BufferBuilder builder, @NotNull Rect.Tinted tinted) {
 			if (!tinted.allHasColor()) throw new IllegalArgumentException("All vertices must have a color");
 			paintVertex(builder, tinted.getRightTopNode());
 			paintVertex(builder, tinted.getLeftTopNode());
@@ -504,6 +450,50 @@ public class Equator {
 		}
 	}
 
+	public record Writer(@NotNull MatrixStack matrixStack) implements ShortStringable, Cloneable {
+		public Writer write(@NotNull Text text, @NotNull BasicRGBA<?> tint, @NotNull Vec3d pos, float scale, boolean shadow) {
+			matrixStack.push();
+			matrixStack.translate(0, 0, pos.z);
+			matrixStack.scale(scale, scale, 1);
+			if (shadow)
+				MinecraftClient.getInstance().textRenderer
+						.drawWithShadow(matrixStack, text.asOrderedText(), (float) pos.x, (float) pos.y, tint.toColorInt());
+			else MinecraftClient.getInstance().textRenderer.draw(matrixStack, text.asOrderedText(), (float) pos.x, (float) pos.y, tint.toColorInt());
+			matrixStack.pop();
+			return this;
+		}
+
+		public Writer write(Text text, BasicRGBA<?> tint, Vec3d pos, float scale) {
+			return write(text, tint, pos, scale, true);
+		}
+
+		public Writer write(Text text, BasicRGBA<?> tint, Vec3d pos) {
+			return write(text, tint, pos, 1);
+		}
+
+		public Writer writeCentered(@NotNull Text text, @NotNull BasicRGBA<?> tint, @NotNull Vec3d pos, float scale, boolean shadow) {
+			return write(text, tint, pos.subtract(MinecraftClient.getInstance().textRenderer.getWidth(text) / 2F,
+					MinecraftClient.getInstance().textRenderer.fontHeight / 2F, 0), scale, shadow);
+		}
+
+		public Writer writeCentered(Text text, BasicRGBA<?> tint, Vec3d pos, float scale) {
+			return writeCentered(text, tint, pos, scale, true);
+		}
+
+		public Writer writeCentered(Text text, BasicRGBA<?> tint, Vec3d pos) {
+			return writeCentered(text, tint, pos, 1);
+		}
+
+		@Override
+		public Writer clone() {
+			try {
+				return (Writer) super.clone();
+			} catch (CloneNotSupportedException cloneNotSupportedException) {
+				throw new RuntimeException(cloneNotSupportedException);
+			}
+		}
+	}
+
 	@SuppressWarnings("deprecation")
 	private static void prepareModel() {
 		MinecraftClient.getInstance().getTextureManager().getTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE).setFilter(false, false);
@@ -514,7 +504,7 @@ public class Equator {
 		RenderSystem.setShaderColor(1, 1, 1, 1);
 	}
 
-	private static void applyModelView(MatrixStack matrixStack, Quaterniondc quaternion) {
+	private static void applyModelView(@NotNull MatrixStack matrixStack, @NotNull Quaterniondc quaternion) {
 		matrixStack.scale(1, -1, 1);
 		matrixStack.scale((float) (16 * quaternion.w()), (float) (16 * quaternion.w()), (float) (16 * quaternion.w()));
 		matrixStack.multiply(QuaternionAdapter.toFloat(quaternion));
@@ -522,8 +512,9 @@ public class Equator {
 		RenderSystem.applyModelViewMatrix();
 	}
 
-	public record ItemModel(ItemStack itemStack) implements ShortStringable, Cloneable {
-		public ItemModel render(Vec3d pos, boolean leftHanded, Quaterniondc quaternion) {
+	public record ItemModel(@NotNull ItemStack itemStack) implements ShortStringable, Cloneable {
+		@Contract("_, _, _ -> this")
+		public ItemModel render(@NotNull Vec3d pos, boolean leftHanded, @NotNull Quaterniondc quaternion) {
 			BakedModel bakedModel = MinecraftClient.getInstance().getItemRenderer().getModel(itemStack, null, null, 0);
 			prepareModel();
 			MatrixStack matrixStack = RenderSystem.getModelViewStack();
@@ -565,35 +556,23 @@ public class Equator {
 			return render(pos, false, new Quaterniond(0, 0, 0, 1));
 		}
 
-		public ItemModel render(double x, double y, Quaterniondc quaternion) {
-			return render(new Vec3d(x, y, 0), false, quaternion);
-		}
-
-		public ItemModel render(double x, double y, int size) {
-			return render(x, y, new Quaterniond(0, 0, 0, size / 16.0));
-		}
-
-		public ItemModel render(double x, double y) {
-			return render(x, y, 16);
-		}
-
-		public ItemModel render(Node leftTopVertex, boolean leftHanded, Quaterniondc quaternion) {
+		public ItemModel render(@NotNull Node leftTopVertex, boolean leftHanded, Quaterniondc quaternion) {
 			return render(leftTopVertex.toVec3d(), leftHanded, quaternion);
 		}
 
-		public ItemModel render(Node leftTopVertex, Quaterniondc quaternion) {
+		public ItemModel render(@NotNull Node leftTopVertex, Quaterniondc quaternion) {
 			return render(leftTopVertex.toVec3d(), quaternion);
 		}
 
-		public ItemModel render(Node leftTopVertex, int size) {
-			return render(leftTopVertex.getX(), leftTopVertex.getY(), size);
+		public ItemModel render(@NotNull Node leftTopVertex, int size) {
+			return render(leftTopVertex.toVec3d(), size);
 		}
 
-		public ItemModel render(Node leftTopVertex) {
-			return render(leftTopVertex.getX(), leftTopVertex.getY());
+		public ItemModel render(@NotNull Node leftTopVertex) {
+			return render(leftTopVertex.toVec3d());
 		}
 
-		public ItemModel renderCentered(Vec3d pos, boolean leftHanded, Quaterniondc quaternion) {
+		public ItemModel renderCentered(@NotNull Vec3d pos, boolean leftHanded, Quaterniondc quaternion) {
 			return render(pos.add(-8 * quaternion.w(), -8 * quaternion.w(), 0), leftHanded, quaternion);
 		}
 
@@ -609,32 +588,20 @@ public class Equator {
 			return renderCentered(pos, new Quaterniond(0, 0, 0, 1));
 		}
 
-		public ItemModel renderCentered(double x, double y, Quaterniondc quaternion) {
-			return renderCentered(new Vec3d(x, y, 0), quaternion);
-		}
-
-		public ItemModel renderCentered(double x, double y, int size) {
-			return renderCentered(x, y, new Quaterniond(0, 0, 0, size / 16.0));
-		}
-
-		public ItemModel renderCentered(double x, double y) {
-			return renderCentered(x, y, 16);
-		}
-
-		public ItemModel renderCentered(Node centerVertex, boolean leftHanded, Quaterniondc quaternion) {
+		public ItemModel renderCentered(@NotNull Node centerVertex, boolean leftHanded, Quaterniondc quaternion) {
 			return renderCentered(centerVertex.toVec3d(), leftHanded, quaternion);
 		}
 
-		public ItemModel renderCentered(Node centerVertex, Quaterniondc quaternion) {
+		public ItemModel renderCentered(@NotNull Node centerVertex, Quaterniondc quaternion) {
 			return renderCentered(centerVertex.toVec3d(), quaternion);
 		}
 
-		public ItemModel renderCentered(Node centerVertex, int size) {
-			return renderCentered(centerVertex.getX(), centerVertex.getY(), size);
+		public ItemModel renderCentered(@NotNull Node centerVertex, int size) {
+			return renderCentered(centerVertex.toVec3d(), size);
 		}
 
-		public ItemModel renderCentered(Node centerVertex) {
-			return renderCentered(centerVertex.getX(), centerVertex.getY());
+		public ItemModel renderCentered(@NotNull Node centerVertex) {
+			return renderCentered(centerVertex.toVec3d());
 		}
 
 		@Override
@@ -647,8 +614,9 @@ public class Equator {
 		}
 	}
 
-	public record BlockModel(BlockState blockState) implements ShortStringable, Cloneable {
-		public BlockModel render(Vec3d pos, Quaterniondc quaternion) {
+	public record BlockModel(@NotNull BlockState blockState) implements ShortStringable, Cloneable {
+		@Contract("_, _ -> this")
+		public BlockModel render(@NotNull Vec3d pos, @NotNull Quaterniondc quaternion) {
 			prepareModel();
 			MatrixStack matrixStack = RenderSystem.getModelViewStack();
 
@@ -680,31 +648,19 @@ public class Equator {
 			return render(pos, new Quaterniond(0, 0, 0, 1));
 		}
 
-		public BlockModel render(double x, double y, Quaterniondc quaternion) {
-			return render(new Vec3d(x, y, 0), quaternion);
-		}
-
-		public BlockModel render(double x, double y, int size) {
-			return render(x, y, new Quaterniond(0, 0, 0, size / 16.0));
-		}
-
-		public BlockModel render(double x, double y) {
-			return render(x, y, 16);
-		}
-
-		public BlockModel render(Node leftTopVertex, Quaterniondc quaternion) {
+		public BlockModel render(@NotNull Node leftTopVertex, Quaterniondc quaternion) {
 			return render(leftTopVertex.toVec3d(), quaternion);
 		}
 
-		public BlockModel render(Node leftTopVertex, int size) {
-			return render(leftTopVertex.getX(), leftTopVertex.getY(), size);
+		public BlockModel render(@NotNull Node leftTopVertex, int size) {
+			return render(leftTopVertex.toVec3d(), size);
 		}
 
-		public BlockModel render(Node leftTopVertex) {
-			return render(leftTopVertex.getX(), leftTopVertex.getY());
+		public BlockModel render(@NotNull Node leftTopVertex) {
+			return render(leftTopVertex.toVec3d());
 		}
 
-		public BlockModel renderCentered(Vec3d pos, Quaterniondc quaternion) {
+		public BlockModel renderCentered(@NotNull Vec3d pos, Quaterniondc quaternion) {
 			return render(pos.add(-8 * quaternion.w(), -8 * quaternion.w(), 0), quaternion);
 		}
 
@@ -716,28 +672,16 @@ public class Equator {
 			return renderCentered(pos, new Quaterniond(0, 0, 0, 1));
 		}
 
-		public BlockModel renderCentered(double x, double y, Quaterniondc quaternion) {
-			return renderCentered(new Vec3d(x, y, 0), quaternion);
-		}
-
-		public BlockModel renderCentered(double x, double y, int size) {
-			return renderCentered(x, y, new Quaterniond(0, 0, 0, size / 16.0));
-		}
-
-		public BlockModel renderCentered(double x, double y) {
-			return renderCentered(x, y, 16);
-		}
-
-		public BlockModel renderCentered(Node centerVertex, Quaterniondc quaternion) {
+		public BlockModel renderCentered(@NotNull Node centerVertex, Quaterniondc quaternion) {
 			return renderCentered(centerVertex.toVec3d(), quaternion);
 		}
 
-		public BlockModel renderCentered(Node centerVertex, int size) {
-			return renderCentered(centerVertex.getX(), centerVertex.getY(), size);
+		public BlockModel renderCentered(@NotNull Node centerVertex, int size) {
+			return renderCentered(centerVertex.toVec3d(), size);
 		}
 
-		public BlockModel renderCentered(Node centerVertex) {
-			return renderCentered(centerVertex.getX(), centerVertex.getY());
+		public BlockModel renderCentered(@NotNull Node centerVertex) {
+			return renderCentered(centerVertex.toVec3d());
 		}
 
 		@Override
