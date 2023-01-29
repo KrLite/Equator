@@ -9,6 +9,14 @@ group = project.maven_group
 
 repositories {
 	maven { url "https://jitpack.io" }
+	maven {
+		name "Ladysnake Mods"
+		url "https://ladysnake.jfrog.io/artifactory/mods"
+		content {
+			includeGroup "io.github.ladysnake"
+			includeGroupByRegex "io\\.github\\.onyxstudios.*"
+		}
+	}
 }
 
 dependencies {
@@ -22,6 +30,9 @@ dependencies {
 
 	/* Mixbox */
 	implementation include("com.scrtwpns:mixbox:2.0.0")
+
+	/* Satin */
+	modImplementation include("io.github.ladysnake:satin:${satin_version}")
 }
 
 processResources {

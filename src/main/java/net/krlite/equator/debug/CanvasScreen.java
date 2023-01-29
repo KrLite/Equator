@@ -66,12 +66,17 @@ public class CanvasScreen extends Screen {
 
 		 */
 
+		/*
 		float ratio = (float) EasingFunctions.sinNormal();
 		new Equator.Painter(matrixStack).paint(Rect.fullScreen().topHalf().tint(PreciseColor.BLUE.mix(PreciseColor.YELLOW, ratio)))
 				.paint(Rect.fullScreen().bottomHalf().tint(PreciseColor.BLUE.blend(PreciseColor.YELLOW, ratio)))
 				.paintLine(Node.leftTopScreen().tint(PreciseColor.BLUE), Node.rightBottomScreen().tint(PreciseColor.YELLOW), 8, true);
 		new Equator.Writer(matrixStack).writeCentered(Text.literal("Real Pigment Mixing"), PreciseColor.BLUE.mix(PreciseColor.YELLOW, ratio).lighter(), Node.topScreen().shift(0, 20).toVec3d())
 				.writeCentered(Text.literal("RGB Blending"), PreciseColor.BLUE.blend(PreciseColor.YELLOW, ratio).lighter(), Node.bottomScreen().shift(0, -20).toVec3d());
+
+		 */
+
+		new Equator.Painter(matrixStack).paint(Rect.fullScreen().tint(PreciseColor.BLUE, PreciseColor.YELLOW, PreciseColor.BLUE, PreciseColor.YELLOW));
 	}
 
 	@Override
