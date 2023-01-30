@@ -76,7 +76,7 @@ public class CanvasScreen extends Screen {
 
 		 */
 
-		new Equator.Painter(matrixStack).paint(Rect.fullScreen().tint(PreciseColor.BLUE, PreciseColor.YELLOW, PreciseColor.BLUE, PreciseColor.YELLOW));
+		//new Equator.Painter(matrixStack).paint(Rect.fullScreen().tint(PreciseColor.BLUE, PreciseColor.YELLOW, PreciseColor.BLUE, PreciseColor.YELLOW));
 	}
 
 	@Override
