@@ -2,6 +2,7 @@ package net.krlite.equator.render;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.krlite.equator.EquatorLib;
 import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.color.PreciseColors;
 import net.krlite.equator.color.core.BasicRGBA;
@@ -12,6 +13,7 @@ import net.krlite.equator.render.sprite.IdentifierSprite;
 import net.krlite.equator.util.QuaternionAdapter;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.ShaderProgram;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.render.model.json.ModelTransformation;

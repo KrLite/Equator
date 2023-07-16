@@ -142,14 +142,6 @@ public class Node extends HashCodeComparable implements ShortStringable, SimpleO
 	}
 
 	public class Tinted extends PreciseColor implements Operatable<Node, Tinted> {
-		public static Tinted of(double x, double y, double red, double green, double blue, double alpha) {
-			return new Node(x, y).new Tinted(red, green, blue, alpha);
-		}
-
-		public static Tinted of(double x, double y, double red, double green, double blue) {
-			return new Node(x, y).new Tinted(red, green, blue);
-		}
-
 		public static Tinted of(Node node, BasicRGBA<?> tint) {
 			return node.new Tinted(tint);
 		}
@@ -158,12 +150,12 @@ public class Node extends HashCodeComparable implements ShortStringable, SimpleO
 			return node.new Tinted(tint);
 		}
 
-		public double getX() {
-			return getNode().getX();
+		public static Tinted of(double x, double y, double red, double green, double blue, double alpha) {
+			return new Node(x, y).new Tinted(red, green, blue, alpha);
 		}
 
-		public double getY() {
-			return getNode().getY();
+		public static Tinted of(double x, double y, double red, double green, double blue) {
+			return new Node(x, y).new Tinted(red, green, blue);
 		}
 
 		public Node getNode() {
@@ -179,19 +171,23 @@ public class Node extends HashCodeComparable implements ShortStringable, SimpleO
 		}
 
 		public Tinted(double red, double green, double blue) {
-			this(red, green, blue, 1);
+			super(red, green, blue);
 		}
 
 		public Tinted(BasicRGBA<?> tint) {
-			this(tint.getRed(), tint.getGreen(), tint.getBlue(), tint.getAlpha());
-		}
-
-		public Tinted(PreciseColor tint) {
-			super(tint.getRed(), tint.getGreen(), tint.getBlue(), tint.getAlpha(), tint.isTransparent());
+			super(tint);
 		}
 
 		public Tinted(Color tint) {
-			this(PreciseColor.of(tint));
+			super(tint);
+		}
+
+		public Vec3d toVec3d(double z) {
+			return getNode().toVec3d(z);
+		}
+
+		public Vec3d toVec3d() {
+			return getNode().toVec3d();
 		}
 
 		public double distanceTo(Tinted another) {
@@ -202,35 +198,31 @@ public class Node extends HashCodeComparable implements ShortStringable, SimpleO
 			return getNode().angleTo(another.getNode());
 		}
 
-		public double crossWith(Node n1, Node n2) {
-			return getNode().crossWith(n1, n2);
+		public double crossWith(Tinted n1, Tinted n2) {
+			return getNode().crossWith(n1.getNode(), n2.getNode());
 		}
 
 		public boolean isIn(Rect rect) {
-			return getNode().isIn(rect);
+			return rect.contains(getNode());
 		}
 
 		public Tinted interpolate(Tinted another, double ratio) {
 			return getNode().interpolate(another.getNode(), ratio).tint(blend(another, ratio));
 		}
 
-		public Tinted swap(Node another) {
-			return another.tint(this);
-		}
-
-		@Override
-		public Tinted operate(Function<Node, Node> operation) {
-			return swap(operation.apply(getNode()));
-		}
-
 		@Override
 		public String toShortString() {
-			return super.toShortString() + "-" + getNode().toShortString();
+			return getNode().toShortString() + "-" + getTint().toShortString();
 		}
 
 		@Override
 		public String toString() {
-			return getClass().getSimpleName() + "{" + super.toString() + ", " + getNode().toString() + "}";
+			return getClass().getSimpleName() + "{" + getNode().toString() + ", " + getTint().toString() + "}";
+		}
+
+		@Override
+		public Tinted operate(Function<Node, Node> operation) {
+			return operation.apply(getNode()).tint(getTint());
 		}
 	}
 

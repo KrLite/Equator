@@ -1,5 +1,6 @@
 package net.krlite.equator.debug;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.krlite.equator.EquatorLib;
 import net.krlite.equator.color.PreciseColor;
 import net.krlite.equator.geometry.Node;
@@ -76,7 +77,7 @@ public class CanvasScreen extends Screen {
 
 		 */
 
-		//new Equator.Painter(matrixStack).paint(Rect.fullScreen().tint(PreciseColor.BLUE, PreciseColor.YELLOW, PreciseColor.BLUE, PreciseColor.YELLOW));
+		new Equator.Painter(matrixStack).paint(Rect.fullScreen().tint(PreciseColor.BLUE, PreciseColor.YELLOW, PreciseColor.BLUE, PreciseColor.YELLOW));
 	}
 
 	@Override

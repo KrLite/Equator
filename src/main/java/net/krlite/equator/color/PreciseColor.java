@@ -24,18 +24,9 @@ public class PreciseColor extends HashCodeComparable implements BasicRGBA<Precis
 
 	protected final boolean transparent;
 
-	public static PreciseColor of (BasicRGBA<?> color) {
-		return new PreciseColor(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-	}
-
-	public static PreciseColor of(@Nullable Color color) {
-		if (color == null) return TRANSPARENT;
-		return new PreciseColor(color.getRed() / 255.0, color.getGreen() / 255.0, color.getBlue() / 255.0, color.getAlpha() / 255.0);
-	}
-
 	public static PreciseColor of(@Nullable String hexString) {
 		if (hexString == null || hexString.isEmpty()) return TRANSPARENT;
-		return PreciseColor.of(Color.decode(hexString));
+		return new PreciseColor(Color.decode(hexString));
 	}
 
 	public static PreciseColor of(@Range(from = 0x0, to = 0xFFFFFFFFL) long colorCode) {
@@ -105,6 +96,14 @@ public class PreciseColor extends HashCodeComparable implements BasicRGBA<Precis
 
 	public PreciseColor(double grayscale) {
 		this(grayscale, grayscale, grayscale);
+	}
+
+	public PreciseColor(BasicRGBA<?> color) {
+		this(color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+	}
+
+	public PreciseColor(@Nullable Color color) {
+		this(color == null ? 0 : color.getRed() / 255.0, color == null ? 0 : color.getGreen() / 255.0, color == null ? 0 : color.getBlue() / 255.0, color == null ? 0 : color.getAlpha() / 255.0, color == null);
 	}
 
 	@Override

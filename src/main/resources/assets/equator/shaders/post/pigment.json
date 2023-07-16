@@ -1,0 +1,36 @@
+{
+    "targets": [
+        "swap",
+		"final"
+    ],
+    "passes": [
+        {
+            "name": "equator:pigment",
+            "intarget": "minecraft:main",
+            "outtarget": "swap",
+			"uniforms": [
+				{
+					"name": "LeftTop",
+					"values": [ 0.0, 1.0 ]
+				},
+				{
+					"name": "LeftBottom",
+					"values": [ 0.0, 0.0 ]
+				},
+				{
+					"name": "RightBottom",
+					"values": [ 1.0, 0.0 ]
+				},
+				{
+					"name": "RightTop",
+					"values": [ 1.0, 1.0 ]
+				}
+			]
+        },
+        {
+            "name": "blit",
+            "intarget": "swap",
+            "outtarget": "minecraft:main"
+        }
+    ]
+}
