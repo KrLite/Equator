@@ -2,6 +2,10 @@
 
 ![Banner](artwork/banner.png)
 
+> **Note**
+> This repository is stale since **Equator** has updated into version 2.  
+> [See **Equator v2** `→`](https://github.com/KrLite/Equator-v2)
+
 ### A Simple Rendering Library for Minecraft.
 
 **Equator** is a lightweight library designed to make rendering in Minecraft easier.
